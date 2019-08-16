@@ -1,6 +1,9 @@
 # Android-Multitasking-Mechanism
--$\realact(S) = A$, where $S$ is created by an action $start(A,\Ff)$
--$\tact(S) = A_1$,  $\bact(S) = A_m$. %~\mbox{where}~ S = A(\act^*)$
+- $realact(S) = A$, where $S$ is created by an action $start(A,F)$
+- $tact(S) = A_1$,  $bact(S) = A_m$. %where S = A(act^*)$
+
+
+
 \begin{itemize}
 	%	\item $\realact(S) = A$, where $S$ is created by an action $start(A,\Ff)$
 	\item $\tact(S) = A_1$,  $\bact(S) = A_m$. %~\mbox{where}~ S = A(\act^*)$
