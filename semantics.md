@@ -80,7 +80,9 @@ For simply speaking, we define some notations.
 - `Aft(S)` return the task affinity of the task S.
 
 <h3 id=21>2.1 Case without Intent Flags</h3>
+
 We first suppose `Lmd(A) != SIT`. I will talk about this in the [2.2](). 
+
 #### 2.1.1 `Lmd(B) = STD`
 B will be pushed into the top task directly.
 
