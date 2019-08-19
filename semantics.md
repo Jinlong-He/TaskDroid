@@ -107,40 +107,29 @@ If B is the different instance with A, B will be pushed into the top task.
 #### 2.2.1 `Lmd(B) = SIT`
 This case is special, because there is only one factor can change its behavious - the intent flag `FLAG_ACTIVITY_TASK_ON_HOME`.
 
-Recall the behavious we mentioned before, 
-if `FLAG_ACTIVITY_TASK_ON_HOME` is in `Fs`,
-
-It is not hard to figure out how task stack generates from above cases, there are two important steps for generating.
+We found that there are two important mechanisms for task stack generating as followed.
 - a. Search for task.
 - b. Operates on task.
 
-#### 2.1.1 How to Search for Task
+#### 2.2.2 How to Search for Task
 Now I will talk about the first step first, when one of the following conditions is satisfied, [step a]() will be executed.
 
-- 1) `Lmd(B) = SIT`
-- 2) `Lmd(A) = SIT`
-- 3) `Lmd(B) = STK`
-- 4) `NTK in Fs`
+- 1) `Lmd(A) = SIT`
+- 2) `Lmd(B) = STK`
+- 3) `NTK in Fs`
 
 We define a function `getTask(B, TS)` to repersent the process of [step a](), where `TS` means the current task stack.
 
     Task getTask(B, TS) {
-        if (Lmd(B) = SIT) {
-            for (Task S from TS.top() to TS.bot())
-                if (Rat(S) = B) return S;
-            return null;
-        } else {
-            for (Task S from TS.top() to TS.bot())
-                if (Rat(S) = B) return S;
-            for (Task S from TS.top() to TS.bot())
-                if (Aft(S) = Aft(B)) return S;
-            return null;
-        }
+        for (Task S from TS.top() to TS.bot())
+            if (Rat(S) = B) return S;
+        for (Task S from TS.top() to TS.bot())
+            if (Aft(S) = Aft(B)) return S;
+        return null;
     } 
 
-Simply speaking, if [`Lmd(B) = SIT`](), there exists a task S in the task stack and `Rat(S) = B`, return S.
-
-- else if there exists a task S in the task stack and `Rat(S) = B`, return the first S.
+Simply speaking, 
+- if there exists a task S in the task stack and `Rat(S) = B`, return the first S.
 - else if there exists a task S which `Aft(S) = Aft(B)`, return the first S.
 - else, return null.
 
