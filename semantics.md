@@ -68,7 +68,7 @@ We can set the intent flag in the function `startActivity(Intent intent)`.
         }
 ```
 
-<h2 id=2>2 Semantics of `A.StartActivity(B, Fs)`</h2>
+## 2 Semantics of `A.StartActivity(B, Fs)`
 In the following, I will talk about how the contents of the task stack change, 
 when calling function `A.StartActivity(B, Fs)`,
 which means A startActivity B with the intent flags Fs.
@@ -83,7 +83,8 @@ For simply speaking, we define some notations.
 We first suppose `Lmd(A) != SIT`. I will talk about this in the [2.2](). 
 #### 2.1.1 `Lmd(B) = STD`
 B will be pushed into the top task directly.
-![avatar](/picture/standard1.jpg)
+
+![standard](https://github.com/LoringHe/Android-Multitasking-Mechanism/blob/master/pictures/standar.png)
 
 #### 2.1.2 `Lmd(B) = STP`
 If B is the different instance with A, B will be pushed into the top task.
