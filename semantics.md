@@ -81,48 +81,41 @@ For simply speaking, we define some notations.
 
 <h3 id=21>2.1 Case without Intent Flags</h3>
 
-We first suppose `Lmd(A) != SIT`. I will talk about this in the [2.2](). 
+We first suppose `Lmd(A) != singleInstance`. I will talk about this in the [2.2](). 
 
-#### 2.1.1 `Lmd(B) = STD`
+#### 2.1.1 `Lmd(B) = standard`
 B will be pushed into the top task directly.
 
 ![standard](https://github.com/LoringHe/Android-Multitasking-Mechanism/blob/master/pictures/standard.png)
 
-#### 2.1.2 `Lmd(B) = STP`
+#### 2.1.2 `Lmd(B) = singleTop`
 If B is the different instance with A, B will be pushed into the top task.
 
 ![singleTop](https://github.com/LoringHe/Android-Multitasking-Mechanism/blob/master/pictures/singleTop.png)
 
-#### 2.1.3 `Lmd(B) = STK`
+#### 2.1.3 `Lmd(B) = singleTask`
 - if there exists a task which task affinity is equal to `Aft(B)` and its realActivity's lauch mode is not `SIT`, then that task will be moved to the top of task stack first, and
     - if B is not in the top task, B will be pushed into the top task directly.
     - otherwise, the top task will pop until B is on the top.
 - otherwise, it will create a new task which realActivity is B, and this task will be pushed into task stack.
 
-#### 2.1.4 `Lmd(B) = SIT`
+#### 2.1.4 `Lmd(B) = singleInstance`
 - if there is no one task which realActivity is B, it will create a new task which realActivity is B, and this task will be pushed into task stack.
 - otherwise, the task which realAcitivity is B will be moved to the top of task stack.
 
-### 2.2 General Case
-#### 2.2.1 Special case
-The case that `Lmd(B) = SIT` is special, because there is only one factor can change its behavious - the intent flag `FLAG_ACTIVITY_TASK_ON_HOME`.
+### 2.2 Searching for Task Mechanism
+Recall the behavious of launch mode is `singleTask` or `singleInstance`, they both need to find the target task. In the following, I will give a detailed description about this mechanism.
+There are two kinds of searching for task mechanism.
 
-//todo
+- 1) `Lmd(B) = singleInstance`
+- 2) `Lmd(A) = SIT` | `Lmd(B) = STK` | `NTK in Fs`
 
-We found that there are two important mechanisms for task stack generating as followed.
-- a. Search for task.
-- b. Operate on task.
+The first one is simple to understand, to find the task which `realActivity` is instance of B.
 
-#### 2.2.2 How to Search for Task
-Now I will talk about the first step first, when one of the following conditions is satisfied, [mechanism a.]() will be executed.
+Now I will tell you how dose the second one work. 
+We define a function `searchTask(B, TS)` to simulate the process of the second one, where `TS` means the current task stack.
 
-- 1) `Lmd(A) = SIT`
-- 2) `Lmd(B) = STK`
-- 3) `NTK in Fs`
-
-We define a function `getTask(B, TS)` to simulate the process of [mechanism a.](), where `TS` means the current task stack.
-
-    Task getTask(B, TS) {
+    Task searchTask(B, TS) {
         for (Task S from TS.top() to TS.bot())
             if (Rat(S) = B) return S;
         for (Task S from TS.top() to TS.bot())
@@ -135,7 +128,15 @@ Simply speaking,
 - else if there exists a task S which `Aft(S) = Aft(B)`, return the first S.
 - else, return null.
 
-#### 2.2.3 How to Operate on Task
+### 2.3 Operating on Task and Task Stack
+#### 2.3.1 Operating on Task Stack
+After understanding the mechanism of searching for task, I will introduce the process of moving task.
+There are two sorts of operations depends on the result of `searchTask(B, TS)`, 
+
+- if return a task `S`, it will move the target task `S` to the top of task stack.
+- if return `null` it will create a new task which `realActivity` is B;
+
+#### 2.3.2 Operating on Task 
 There are six operations on task as followed:
 
 - Pop(): Remove the top activity in the task.
@@ -147,4 +148,3 @@ There are six operations on task as followed:
 
 Android multitasking mechanism will choose one of operations to operate on task according to the factors.
 
-#### 2.2.4 How to Operate on Task
