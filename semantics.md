@@ -83,6 +83,7 @@ For simply speaking, we define some notations.
 We first suppose `Lmd(A) != SIT`. I will talk about this in the [2.2](). 
 #### 2.1.1 `Lmd(B) = STD`
 B will be pushed into the top task directly.
+![avatar](/picture/standard1.jpg)
 
 #### 2.1.2 `Lmd(B) = STP`
 If B is the different instance with A, B will be pushed into the top task.
