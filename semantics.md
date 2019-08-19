@@ -104,21 +104,23 @@ If B is the different instance with A, B will be pushed into the top task.
 - otherwise, the task which realAcitivity is B will be moved to the top of task stack.
 
 ### 2.2 General Case
-#### 2.2.1 `Lmd(B) = SIT`
-This case is special, because there is only one factor can change its behavious - the intent flag `FLAG_ACTIVITY_TASK_ON_HOME`.
+#### 2.2.1 Special case
+The case that `Lmd(B) = SIT` is special, because there is only one factor can change its behavious - the intent flag `FLAG_ACTIVITY_TASK_ON_HOME`.
+
+//todo
 
 We found that there are two important mechanisms for task stack generating as followed.
 - a. Search for task.
-- b. Operates on task.
+- b. Operate on task.
 
 #### 2.2.2 How to Search for Task
-Now I will talk about the first step first, when one of the following conditions is satisfied, [step a]() will be executed.
+Now I will talk about the first step first, when one of the following conditions is satisfied, [mechanism a.]() will be executed.
 
 - 1) `Lmd(A) = SIT`
 - 2) `Lmd(B) = STK`
 - 3) `NTK in Fs`
 
-We define a function `getTask(B, TS)` to repersent the process of [step a](), where `TS` means the current task stack.
+We define a function `getTask(B, TS)` to simulate the process of [mechanism a.](), where `TS` means the current task stack.
 
     Task getTask(B, TS) {
         for (Task S from TS.top() to TS.bot())
@@ -133,3 +135,16 @@ Simply speaking,
 - else if there exists a task S which `Aft(S) = Aft(B)`, return the first S.
 - else, return null.
 
+#### 2.2.3 How to Operate on Task
+There are six operations on task as followed:
+
+- Pop(): Remove the top activity in the task.
+- Push(A): Add the instance of A into task.
+- ClearTop(A): Pop() until the top of the task is the instance of A.
+- ClearTask(A): Pop() until the task is empty, and Push(A).
+- Move2Top(A): Move the first instance of A to the top of task.
+- Undo(): 
+
+Android multitasking mechanism will choose one of operations to operate on task according to the factors.
+
+#### 2.2.4 How to Operate on Task
