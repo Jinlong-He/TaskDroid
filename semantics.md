@@ -103,19 +103,22 @@ If B is the different instance with A, B will be pushed into the top task.
 - if there is no one task which realActivity is B, it will create a new task which realActivity is B, and this task will be pushed into task stack.
 - otherwise, the task which realAcitivity is B will be moved to the top of task stack.
 
-### 2.2 Searching for Task Mechanism
-Recall the behavious of launch mode is `singleTask` or `singleInstance`, they both need to find the target task. In the following, I will give a detailed description about this mechanism.
-There are two kinds of searching for task mechanism.
+### 2.2 Task Allocation Mechanism
+The task allocation mechanism, namely, to specify, when an activity is launched, to which task will it be allocated.
+Recall the semantics of launching an activity with `singleTask` or `singleInstance` launch mode, they both need to allocate to a task first. 
+In the following, I will give a detailed description about the task allocation mechanism.
+There are two kinds of task allocation mechanism.
 
-- 1) `Lmd(B) = singleInstance`
-- 2) `Lmd(A) = SIT` | `Lmd(B) = STK` | `NTK in Fs`
+- 1) SingleInstance Task Allocation Mechanism: 
+    - Condition: `Lmd(B) = singleInstance`
+    - To find the task which `realActivity` is instance of B
+- 2) Non-SingleInstance Task Allocation Mechanism: 
+    - Condition: `Lmd(A) = SIT` | `Lmd(B) = STK` | `NTK in Fs`
+    - The process as followed.
 
-The first one is simple to understand, to find the task which `realActivity` is instance of B.
+We define a function `AllocateTask(B, TS)` to simulate Non-SingleInstance Task Allocation Mechanism, where `TS` means the current task stack.
 
-Now I will tell you how dose the second one work. 
-We define a function `searchTask(B, TS)` to simulate the process of the second one, where `TS` means the current task stack.
-
-    Task searchTask(B, TS) {
+    Task AllocateTask(B, TS) {
         for (Task S from TS.top() to TS.bot())
             if (Rat(S) = B) return S;
         for (Task S from TS.top() to TS.bot())
@@ -124,9 +127,8 @@ We define a function `searchTask(B, TS)` to simulate the process of the second o
     } 
 
 Simply speaking, 
-- if there exists a task S in the task stack and `Rat(S) = B`, return the first S.
-- else if there exists a task S which `Aft(S) = Aft(B)`, return the first S.
-- else, return null.
+- to find the first task S which `Rat(S) = B`, 
+- if not founded, to find the first task S which `Aft(S) = Aft(B)`.
 
 ### 2.3 Operating on Task and Task Stack
 #### 2.3.1 Operating on Task Stack
