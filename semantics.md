@@ -86,10 +86,12 @@ We first suppose `Lmd(A) != SIT`. I will talk about this in the [2.2]().
 #### 2.1.1 `Lmd(B) = STD`
 B will be pushed into the top task directly.
 
-![standard](https://github.com/LoringHe/Android-Multitasking-Mechanism/blob/master/pictures/standar.png)
+![standard](https://github.com/LoringHe/Android-Multitasking-Mechanism/blob/master/pictures/standard.png)
 
 #### 2.1.2 `Lmd(B) = STP`
 If B is the different instance with A, B will be pushed into the top task.
+
+![singleTop](https://github.com/LoringHe/Android-Multitasking-Mechanism/blob/master/pictures/singleTop.png)
 
 #### 2.1.3 `Lmd(B) = STK`
 - if there exists a task which task affinity is equal to `Aft(B)` and its realActivity's lauch mode is not `SIT`, then that task will be moved to the top of task stack first, and
