@@ -30,14 +30,37 @@ Launch mode is an attribute of Activity in Android system, there are four launch
 - `standard`: 
     - It is the default value. 
     - Multiple instances can be instantiated and pushed into the same task or different tasks.
+    - The instance of Activity will be pushed into the top task directly.
+
+![standard](https://github.com/LoringHe/TaskDroid/blob/master/pictures/standard.png)
+
 - `singleTop`: 
     - The difference from `standard` is if there exists an instance of activity at the top of current task, it will be reused instead of instantiating a new one.
+
 - `singleTask` 
     - There is only one instance of activity which set this launch mode in one task.
     - The Task affinity of the instance of activity is the task affinity of the task stored it.
+    - If there exists a task which task affinity is equal to `Aft(B)` and its realActivity's lauch mode is not `SIT`, then that task will be moved to the top of task stack first, and
+        - if B is not in the top task, B will be pushed into the top task directly;
+        - otherwise, the top task will pop until B is on the top;
+    - otherwise, it will create a new task which realActivity is B, and this task will be pushed into task stack.
+
+![singleTask3](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask3.png)
+
+![singleTask2](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask2.png)
+
+![singleTask1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
+
+
 - `singleInstance`
     - There is only one instance of activity which set this launch mode in the whole task stack.
     - No activities instance can be pushed into the same task of this instance's.
+    - If there is no one task which realActivity is B, it will create a new task which realActivity is B, and this task will be pushed into task stack;
+    - otherwise, the task which realAcitivity is B will be moved to the top of task stack.
+
+![singleInstance1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
+
+![singleInstance2](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleInstance.png)
 
 <h3 id=15>1.5 Task Affinity</h3>
 
@@ -71,56 +94,12 @@ We can set the intent flag in the function `startActivity(Intent intent)`.
             }
         }
 ```
-
-## 2 Semantics of `A.StartActivity(B, Fs)`
-
-In the following, I will talk about how the contents of the task stack change, 
-when calling function `A.StartActivity(B, Fs)`,
-which means A startActivity B with the intent flags Fs.
-
+### 2 Task Allocation Mechanism
 For simply speaking, we define some notations.
 - `Lmd(A)` return the launch mode of the activity A.
 - `Aft(A)` return the task affinity of the activity A.
 - `Rat(S)` return the realActivity of the task S.
 - `Aft(S)` return the task affinity of the task S.
-
-<h3 id=21>2.1 Case without Intent Flags</h3>
-
-We first suppose `Lmd(A) != singleInstance`. I will talk about this in the [2.2](). 
-
-#### 2.1.1 `Lmd(B) = standard`
-B will be pushed into the top task directly.
-
-![standard](https://github.com/LoringHe/TaskDroid/blob/master/pictures/standard.png)
-
-#### 2.1.2 `Lmd(B) = singleTop`
-If B is the different instance with A, B will be pushed into the top task.
-
-![singleTop](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTop.png)
-
-#### 2.1.3 `Lmd(B) = singleTask`
-- if there exists a task which task affinity is equal to `Aft(B)` and its realActivity's lauch mode is not `SIT`, then that task will be moved to the top of task stack first, and
-    - if B is not in the top task, B will be pushed into the top task directly.
-    - otherwise, the top task will pop until B is on the top.
-
-![singleTask2](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask2.png)
-
-![singleTask3](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask3.png)
-
-- otherwise, it will create a new task which realActivity is B, and this task will be pushed into task stack.
-
-![singleTask1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
-
-#### 2.1.4 `Lmd(B) = singleInstance`
-- if there is no one task which realActivity is B, it will create a new task which realActivity is B, and this task will be pushed into task stack.
-
-![singleInstance1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
-
-- otherwise, the task which realAcitivity is B will be moved to the top of task stack.
-
-![singleInstance2](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleInstance.png)
-
-### 2.2 Task Allocation Mechanism
 The task allocation mechanism, namely, to specify, when an activity is launched, to which task will it be allocated.
 Recall the semantics of launching an activity with `singleTask` or `singleInstance` launch mode, they both need to allocate to a task first. 
 In the following, I will give a detailed description about the task allocation mechanism.
@@ -147,34 +126,31 @@ Simply speaking,
 - to find the first task S which `Rat(S) = B`, 
 - if not founded, to find the first task S which `Aft(S) = Aft(B)`.
 
-### 2.3 Operating on Task and Task Stack
+### 3 Operating on Task and Task Stack
 In this section I will introduce some operations on task (reps. task stack). 
 All the behavious of `startActivity()` are based on the combinations of these operations.
-#### 2.3.1 Operating on Task Stack
+#### 3.1 Operating on Task Stack
 After understanding the Task Allocation Mechanism, I will introduce two sorts of operations depends on the result of `allocateTask(B, TS)`, 
 
 - MoveTask2Top(S): Move the task S to the top of task stack.
-    - Task Allocation Mechanism finds a task S.
-- CreateTask(B): Create a new task which `realActivity` is B and push into task stack. 
+    - Task Allocation Mechanism finds a task S, and S in not the top of task stack.
+- LaunchTask(B): Create a new task which `realActivity` is B and push into task stack. 
     - Task Allocation Mechanism doesn't find a task.
 
-#### 2.3.2 Operating on Task 
+#### 3.2 Operating on Task 
 There are four operations on task as followed:
 
-- Push(B): Add the instance of B into task.
+- LaunchAct(B): Push the instance of B into the top task.
     - etc. Launch an standard activity B.
-- ClearTop(B): Remove activity until the top of the task is the instance of B.
+- ClearTop(B): Pop activity until the top of the top task is the instance of B.
     - etc. Launch an singleTask activity B.
-- ClearTask(B): Remove activity until the task is empty, and Push(B).
+- ClearTask(B): Pop activity until the top task is empty, and Push(B).
     - etc. Launch an activity B with intent flag `FLAG_ACTIVITY_CLEAR_TASK`.
-- MoveAct2Top(B): Move the first instance of B to the top of task.
+- MoveAct2Top(B): Move the first instance of B to the top of the top task.
     - etc. Launch an activity B with intent flag `FLAG_ACTIVITY_REORDER_TO_FRONT`.
 
-## 3 Deep Understanding Semantics
-In this section, I will give the conditions for each operation in the Android system.
-### 3.1 Without operations on task stack
-
-#### 3.1.1 Push(B)
-- `Lmd(B) = standard`, 
-
-### 3.1 With operations on task stack
+## 4 Deep Understanding Semantics
+In this section I will tell you how to decide the behavious of `A.startActivity(B, Fs)`.
+In the following, I will talk about how the contents of the task stack change, 
+when calling function `A.StartActivity(B, Fs)`,
+which means A startActivity B with the intent flags Fs.
