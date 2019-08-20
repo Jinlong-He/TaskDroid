@@ -22,7 +22,9 @@ Activities in Current Activity Manager State:
 
 ### 1.3 Task Stack
 A task stack is used to store the back stacks for different tasks.
+
 <h3 id=14>1.4 Launch Mode</h3>
+
 Launch mode is an attribute of Activity in Android system, there are four launch modes could be set as followed. Here we give some high level understanding of these launch modes, more details will be represented in the [semantics part](#21). 
 
 - `standard`: 
@@ -38,6 +40,7 @@ Launch mode is an attribute of Activity in Android system, there are four launch
     - No activities instance can be pushed into the same task of this instance's.
 
 <h3 id=15>1.5 Task Affinity</h3>
+
 The task affinity of an activity indicates to which task the activity prefers to belong.
 
 ``` xml 
@@ -46,6 +49,7 @@ The task affinity of an activity indicates to which task the activity prefers to
     </activity>
 ```
 We can both set [lauch mode](#14) and [task affinity](#15) of an Activity in the [Manifest.xml](https://developer.android.com/guide/topics/manifest/manifest-intro).
+
 ### 1.6 Intent Flag
 - FLAG_ACTIVITY_NEW_TASK 
 - FLAG_ACTIVITY_CLEAR_TOP 
@@ -69,6 +73,7 @@ We can set the intent flag in the function `startActivity(Intent intent)`.
 ```
 
 ## 2 Semantics of `A.StartActivity(B, Fs)`
+
 In the following, I will talk about how the contents of the task stack change, 
 when calling function `A.StartActivity(B, Fs)`,
 which means A startActivity B with the intent flags Fs.
@@ -86,14 +91,17 @@ We first suppose `Lmd(A) != singleInstance`. I will talk about this in the [2.2]
 #### 2.1.1 `Lmd(B) = standard`
 B will be pushed into the top task directly.
 
-![standard](https://github.com/LoringHe/Android-Multitasking-Mechanism/blob/master/pictures/standard.png)
+![standard](https://github.com/LoringHe/TaskDroid/blob/master/pictures/standard.png)
 
 #### 2.1.2 `Lmd(B) = singleTop`
 If B is the different instance with A, B will be pushed into the top task.
 
-![singleTop](https://github.com/LoringHe/Android-Multitasking-Mechanism/blob/master/pictures/singleTop.png)
+![singleTop](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTop.png)
 
 #### 2.1.3 `Lmd(B) = singleTask`
+![singleTask1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
+![singleTask1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask2.png)
+![singleTask1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask3.png)
 - if there exists a task which task affinity is equal to `Aft(B)` and its realActivity's lauch mode is not `SIT`, then that task will be moved to the top of task stack first, and
     - if B is not in the top task, B will be pushed into the top task directly.
     - otherwise, the top task will pop until B is on the top.
@@ -113,12 +121,12 @@ There are two kinds of task allocation mechanism.
     - Condition: `Lmd(B) = singleInstance`
     - To find the task which `realActivity` is instance of B
 - 2) Non-SingleInstance Task Allocation Mechanism: 
-    - Condition: `Lmd(A) = SIT` | `Lmd(B) = STK` | `NTK in Fs`
+    - Condition: `Lmd(A) = singleInstance` | `Lmd(B) = singleTask` | `FLAG_ACTIVITY_CLEAR_TASK in Fs`
     - The process as followed.
 
-We define a function `AllocateTask(B, TS)` to simulate Non-SingleInstance Task Allocation Mechanism, where `TS` means the current task stack.
+We define a function `allocateTask(B, TS)` to simulate Non-SingleInstance Task Allocation Mechanism, where `TS` means the current task stack.
 
-    Task AllocateTask(B, TS) {
+    Task allocateTask(B, TS) {
         for (Task S from TS.top() to TS.bot())
             if (Rat(S) = B) return S;
         for (Task S from TS.top() to TS.bot())
@@ -131,22 +139,33 @@ Simply speaking,
 - if not founded, to find the first task S which `Aft(S) = Aft(B)`.
 
 ### 2.3 Operating on Task and Task Stack
+In this section I will introduce some operations on task (reps. task stack). 
+All the behavious of `startActivity()` are based on the combinations of these operations.
 #### 2.3.1 Operating on Task Stack
-After understanding the mechanism of searching for task, I will introduce the process of moving task.
-There are two sorts of operations depends on the result of `searchTask(B, TS)`, 
+After understanding the Task Allocation Mechanism, I will introduce two sorts of operations depends on the result of `allocateTask(B, TS)`, 
 
-- if return a task `S`, it will move the target task `S` to the top of task stack.
-- if return `null` it will create a new task which `realActivity` is B;
+- MoveTask2Top(S): Move the task S to the top of task stack.
+    - Task Allocation Mechanism finds a task S.
+- CreateTask(B): Create a new task which `realActivity` is B and push into task stack. 
+    - Task Allocation Mechanism doesn't find a task.
 
 #### 2.3.2 Operating on Task 
-There are six operations on task as followed:
+There are four operations on task as followed:
 
-- Pop(): Remove the top activity in the task.
-- Push(A): Add the instance of A into task.
-- ClearTop(A): Pop() until the top of the task is the instance of A.
-- ClearTask(A): Pop() until the task is empty, and Push(A).
-- Move2Top(A): Move the first instance of A to the top of task.
-- Undo(): 
+- Push(B): Add the instance of B into task.
+    - etc. Launch an standard activity B.
+- ClearTop(B): Remove activity until the top of the task is the instance of B.
+    - etc. Launch an singleTask activity B.
+- ClearTask(B): Remove activity until the task is empty, and Push(B).
+    - etc. Launch an activity B with intent flag `FLAG_ACTIVITY_CLEAR_TASK`.
+- MoveAct2Top(B): Move the first instance of B to the top of task.
+    - etc. Launch an activity B with intent flag `FLAG_ACTIVITY_REORDER_TO_FRONT`.
 
-Android multitasking mechanism will choose one of operations to operate on task according to the factors.
+## 3 Deep Understanding Semantics
+In this section, I will give the conditions for each operation in the Android system.
+### 3.1 Without operations on task stack
 
+#### 3.1.1 Push(B)
+- `Lmd(B) = standard`, 
+
+### 3.1 With operations on task stack
