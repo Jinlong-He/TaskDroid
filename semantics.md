@@ -37,6 +37,8 @@ Launch mode is an attribute of Activity in Android system, there are four launch
 - `singleTop`: 
     - The difference from `standard` is if there exists an instance of activity at the top of current task, it will be reused instead of instantiating a new one.
 
+![singleTop](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTop.png)
+
 - `singleTask` 
     - There is only one instance of activity which set this launch mode in one task.
     - The Task affinity of the instance of activity is the task affinity of the task stored it.
@@ -100,6 +102,7 @@ For simply speaking, we define some notations.
 - `Aft(A)` return the task affinity of the activity A.
 - `Rat(S)` return the realActivity of the task S.
 - `Aft(S)` return the task affinity of the task S.
+
 The task allocation mechanism, namely, to specify, when an activity is launched, to which task will it be allocated.
 Recall the semantics of launching an activity with `singleTask` or `singleInstance` launch mode, they both need to allocate to a task first. 
 In the following, I will give a detailed description about the task allocation mechanism.
@@ -133,9 +136,11 @@ All the behavious of `startActivity()` are based on the combinations of these op
 After understanding the Task Allocation Mechanism, I will introduce two sorts of operations depends on the result of `allocateTask(B, TS)`, 
 
 - MoveTask2Top(S): Move the task S to the top of task stack.
-    - Task Allocation Mechanism finds a task S, and S in not the top of task stack.
-- LaunchTask(B): Create a new task which `realActivity` is B and push into task stack. 
+    - Task Allocation Mechanism finds a task S, and S in not the top task of task stack.
+- LaunchTask(B): Create a new task which `realActivity` is B and push it into task stack. 
     - Task Allocation Mechanism doesn't find a task.
+- TaskOnHome(S): Move all the tasks expect task S.
+    - Task stack change.
 
 #### 3.2 Operating on Task 
 There are four operations on task as followed:
@@ -150,7 +155,17 @@ There are four operations on task as followed:
     - etc. Launch an activity B with intent flag `FLAG_ACTIVITY_REORDER_TO_FRONT`.
 
 ## 4 Deep Understanding Semantics
-In this section I will tell you how to decide the behavious of `A.startActivity(B, Fs)`.
-In the following, I will talk about how the contents of the task stack change, 
-when calling function `A.StartActivity(B, Fs)`,
+In this section I will tell you how to decide the behavious of `A.startActivity(B, Fs)`, 
 which means A startActivity B with the intent flags Fs.
+
+### Principal 1: SingleInstance First
+When the launch mode of B is `singleInstance`, there is nothing but intent flag `FLAG_ACTIVITY_TASK_ON_HOME` can influence.
+We don't consider that flag first, I will talk later.
+
+Recall the semantics of launch mode `singleInstance`, it just depends on whether there is a task which `realActivity` is B.
+
+### Q1 How does Intent Flag `FLAG_ACTIVITY_TASK_ON_HOME` Work?
+We designed lots of expriments to figure out this question. 
+We obtain the conclusion that when the number or order of tasks in the task stack change, 
+This flag will be enable.
+In another word, if some 
