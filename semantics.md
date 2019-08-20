@@ -99,17 +99,19 @@ If B is the different instance with A, B will be pushed into the top task.
 ![singleTop](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTop.png)
 
 #### 2.1.3 `Lmd(B) = singleTask`
-![singleTask1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
-![singleTask1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask2.png)
-![singleTask1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask3.png)
 - if there exists a task which task affinity is equal to `Aft(B)` and its realActivity's lauch mode is not `SIT`, then that task will be moved to the top of task stack first, and
     - if B is not in the top task, B will be pushed into the top task directly.
+![singleTask2](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask2.png)
     - otherwise, the top task will pop until B is on the top.
+![singleTask3](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask3.png)
 - otherwise, it will create a new task which realActivity is B, and this task will be pushed into task stack.
+![singleTask1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
 
 #### 2.1.4 `Lmd(B) = singleInstance`
 - if there is no one task which realActivity is B, it will create a new task which realActivity is B, and this task will be pushed into task stack.
+![singleInstance1](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
 - otherwise, the task which realAcitivity is B will be moved to the top of task stack.
+![singleInstance2](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleInstance.png)
 
 ### 2.2 Task Allocation Mechanism
 The task allocation mechanism, namely, to specify, when an activity is launched, to which task will it be allocated.
