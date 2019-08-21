@@ -256,6 +256,39 @@ We let S' as the top task of task stack.
 
 ![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
 
+- **MoveTask2Top(S)** + **ClearTask(B)**
+
+|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
+|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
+|      |  1     |singleTask |  2    | {FLAG_ACTIVITY_CLEAR_TASK} | {~~FLAG_ACTIVITY_TASK_ON_HOME~~} |S is not the top task|
+
+![MoveTask2Top(S) + ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.6.png)
+
+- **MoveTask2Top(S)** + **ClearTop(B)**
+
+|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
+|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
+|      |  1     |singleTask |  2    | {} | {~~FLAG_ACTIVITY_CLEAR_TASK~~ <br> ~~FLAG_ACTIVITY_TASK_ON_HOME~~} |S is not the top task <br> B is in S|
+
+![MoveTask2Top(S) + ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.9.png)
+
+- **MoveTask2Top(S)** + **LaunchAct(B)**
+
+|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
+|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
+|      |  1     |singleTask |  2    | {} | {~~FLAG_ACTIVITY_CLEAR_TASK~~ <br> ~~FLAG_ACTIVITY_TASK_ON_HOME~~} |S is not the top task <br> B is not in S|
+
+![MoveTask2Top(S) + LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.10.png)
+
+- **LaunchTask(B)** 
+
+|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
+|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
+|      |  1     |singleTask |  2    | {} | {~~FLAG_ACTIVITY_TASK_ON_HOME~~} |S is not founded|
+
+![LaunchTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
+
+
 - **TaskOnHome(S)** + **ClearTask(B)**
 
 |Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
@@ -287,40 +320,6 @@ We let S' as the top task of task stack.
 |      |  1     |singleTask |  2    | {FLAG_ACTIVITY_TASK_ON_HOME} | {} |S is not founded|
 
 ![TaskOnHome(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.5.png)
-
-- **MoveTask2Top(S)** + **ClearTask(B)**
-
-|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
-|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
-|      |  1     |singleTask |  2    | {FLAG_ACTIVITY_CLEAR_TASK} | {~~FLAG_ACTIVITY_TASK_ON_HOME~~} |S is not the top task|
-
-![MoveTask2Top(S) + ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.6.png)
-
-- **MoveTask2Top(S)** + **ClearTop(B)**
-
-|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
-|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
-|      |  1     |singleTask |  2    | {} | {~~FLAG_ACTIVITY_CLEAR_TASK~~ <br> ~~FLAG_ACTIVITY_TASK_ON_HOME~~} |S is not the top task <br> B is in S|
-
-![MoveTask2Top(S) + ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.9.png)
-
-- **MoveTask2Top(S)** + **LaunchAct(B)**
-
-|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
-|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
-|      |  1     |singleTask |  2    | {} | {~~FLAG_ACTIVITY_CLEAR_TASK~~ <br> ~~FLAG_ACTIVITY_TASK_ON_HOME~~} |S is not the top task <br> B is not in S|
-
-![MoveTask2Top(S) + LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.10.png)
-
-
-
-- **LaunchTask(B)** 
-
-|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
-|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
-|      |  1     |singleTask |  2    | {} | {~~FLAG_ACTIVITY_TASK_ON_HOME~~} |S is not founded|
-
-![LaunchTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
 
 
 #### 4.2.2 Expriments
