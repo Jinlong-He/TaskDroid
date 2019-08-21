@@ -174,7 +174,7 @@ which means A startActivity B with the intent flags Fs.
 - {Lmd(B) = singleInstance; A = B}
     - **NoAction()**
 
-![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.1.png)
+![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.1.png)
 
 - {Lmd(B) = singleInstance; A != B; ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~;} 
     - **MoveTask2Top(S)**
@@ -188,13 +188,9 @@ which means A startActivity B with the intent flags Fs.
     - **TaskOnHome(S)**
     - **TaskOnHome(B)**
 
-![TaskOnHome(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.2.png)
+![TaskOnHome(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.2.png)
 
-![TaskOnHome(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.4.png)
-
-
-
-
+![TaskOnHome(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.4.png)
 
 ### 4.2 `Lmd(B) = singleTask`
 #### 4.2.1 Methodology
@@ -215,6 +211,19 @@ which means A startActivity B with the intent flags Fs.
     - otherwise, **LaunchAct(B)**.
 
 #### 4.2.2 Expriments
+We let S' as the top task of task stack.
+- {Lmd(B) = singleTask; `FLAG_ACTIVITY_CLEAR_TASK`; Aft(B) = Aft(S');}
+    - **NoAction()** + **ClearTask(B)**
+
+![NoAction() + ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.1.png)
+
+- {Lmd(B) = singleTask; ~~`FLAG_ACTIVITY_CLEAR_TASK`~~; Aft(B) = Aft(S');}
+    - **NoAction()** + **ClearTop(B)**
+    - **NoAction()** + **LaunchAct(B)**
+
+![NoAction() + ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.2.png)
+
+![NoAction() + LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
 
 ### Q1 How does Intent Flag `FLAG_ACTIVITY_TASK_ON_HOME` Work?
 We designed lots of expriments to figure out this question. 
