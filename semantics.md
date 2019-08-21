@@ -244,7 +244,6 @@ We let S' as the top task of task stack.
 - {Lmd(B) = singleTask; `FLAG_ACTIVITY_TASK_ON_HOME` + ~~`FLAG_ACTIVITY_CLEAR_TASK`~~; Aft(B) != Aft(S');}
     - **TaskOnHome(S)** + **ClearTop(B)**
     - **TaskOnHome(S)** + **LaunchAct(B)**
-    - **TaskOnHome(B)** 
 
 ![TaskOnHome(S) + ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.7.png)
 
@@ -253,7 +252,10 @@ We let S' as the top task of task stack.
 - {Lmd(B) = singleTask; ~~`FLAG_ACTIVITY_CLEAR_TASK`~~ + ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~; Aft(B) != Aft(S');}
     - **MoveTask2Top(S)** + **ClearTop(B)**
     - **MoveTask2Top(S)** + **LaunchAct(B)**
-    - **LaunchTask(B)** 
+
+![MoveTask2Top(S) + ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.9.png)
+
+![MoveTask2Top(S) + LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.10.png)
 
 ### Q1 How does Intent Flag `FLAG_ACTIVITY_TASK_ON_HOME` Work?
 We designed lots of expriments to figure out this question. 
