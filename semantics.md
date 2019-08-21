@@ -172,24 +172,43 @@ which means A startActivity B with the intent flags Fs.
 
 #### 4.1.2 Expriments
 
-- {Lmd(B) = singleInstance; A = B}
-    - **NoAction()**
+- **NoAction()**
+
+|Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
+|----  |  ----          | ----   |  ----  | ----    |
+|      | singleInstance |        |        |  A = B  |
 
 ![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.1.png)
 
-- {Lmd(B) = singleInstance; A != B; ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~;} 
-    - **MoveTask2Top(S)**
-    - **LaunchTask(B)**
+- **MoveTask2Top(S)**
+
+|Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
+|----  |  ----          | ----   |  ----  | ----    |
+|      | singleInstance |        | ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~ |  A != B; S is founded|
 
 ![MoveTask2Top(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleInstance.png)
 
+- **LaunchTask(B)**
+
+|Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
+|----  |  ----          | ----   |  ----  | ----    |
+|      | singleInstance |        | ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~ |  A != B; S is not founded|
+
 ![LaunchTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
 
-- {Lmd(B) = singleInstance; A != B; `FLAG_ACTIVITY_TASK_ON_HOME`;} 
-    - **TaskOnHome(S)**
-    - **TaskOnHome(B)**
+- **TaskOnHome(S)**
+
+|Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
+|----  |  ----          | ----   |  ----  | ----    |
+|      | singleInstance |  `FLAG_ACTIVITY_TASK_ON_HOME` |  |  A != B; S is founded|
 
 ![TaskOnHome(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.2.png)
+
+- **TaskOnHome(B)**
+
+|Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
+|----  |  ----          | ----   |  ----  | ----    |
+|      | singleInstance |  `FLAG_ACTIVITY_TASK_ON_HOME` |  |  A != B; S is not founded|
 
 ![TaskOnHome(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.4.png)
 
