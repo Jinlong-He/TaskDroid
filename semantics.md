@@ -96,7 +96,7 @@ We can set the intent flag in the function `startActivity(Intent intent)`.
             }
         }
 ```
-### 2 Task Allocation Mechanism
+## 2 Task Allocation Mechanism
 For simply speaking, we define some notations.
 - `Lmd(A)` return the launch mode of the activity A.
 - `Aft(A)` return the task affinity of the activity A.
@@ -109,14 +109,14 @@ In the following, I will give a detailed description about the task allocation m
 There are two kinds of task allocation mechanism.
 
 - 1) SingleInstance Task Allocation Mechanism: 
-    - Condition: `Lmd(B) = singleInstance`
-    - To find the task which `realActivity` is instance of B
+    - To find the task which `realActivity` is instance of B.
 - 2) Non-SingleInstance Task Allocation Mechanism: 
-    - Condition: `Lmd(A) = singleInstance` | `Lmd(B) = singleTask` | `FLAG_ACTIVITY_CLEAR_TASK in Fs`
-    - The process as followed.
+    - To find the first task S which `realActivity` is instance of B.
+    - if not founded, to find the first task S which `task affinity` is equal to the `task affinity` of B. 
 
 We define a function `allocateTask(B, TS)` to simulate Non-SingleInstance Task Allocation Mechanism, where `TS` means the current task stack.
 
+```
     Task allocateTask(B, TS) {
         for (Task S from TS.top() to TS.bot())
             if (Rat(S) = B) return S;
@@ -124,15 +124,12 @@ We define a function `allocateTask(B, TS)` to simulate Non-SingleInstance Task A
             if (Aft(S) = Aft(B)) return S;
         return null;
     } 
+```
 
-Simply speaking, 
-- to find the first task S which `Rat(S) = B`, 
-- if not founded, to find the first task S which `Aft(S) = Aft(B)`.
-
-### 3 Operating on Task and Task Stack
+## 3 Operating on Task and Task Stack
 In this section I will introduce some operations on task (reps. task stack). 
 All the behavious of `startActivity()` are based on the combinations of these operations.
-#### 3.1 Operating on Task Stack
+### 3.1 Operating on Task Stack
 After understanding the Task Allocation Mechanism, I will introduce two sorts of operations depends on the result of `allocateTask(B, TS)`, 
 
 - MoveTask2Top(S): Move the task S to the top of task stack.
@@ -141,8 +138,11 @@ After understanding the Task Allocation Mechanism, I will introduce two sorts of
     - Task Allocation Mechanism doesn't find a task.
 - TaskOnHome(S): Move all the tasks expect task S.
     - Task stack change.
+- TaskOnHome(B): Move all the tasks and LaunchTask(B).
+    - Task stack change.
+- NoAction().
 
-#### 3.2 Operating on Task 
+### 3.2 Operating on Task 
 There are four operations on task as followed:
 
 - LaunchAct(B): Push the instance of B into the top task.
@@ -158,14 +158,42 @@ There are four operations on task as followed:
 In this section I will tell you how to decide the behavious of `A.startActivity(B, Fs)`, 
 which means A startActivity B with the intent flags Fs.
 
-### Principal 1: SingleInstance First
-When the launch mode of B is `singleInstance`, there is nothing but intent flag `FLAG_ACTIVITY_TASK_ON_HOME` can influence.
-We don't consider that flag first, I will talk later.
+### 4.1 `Lmd(B) = singleInstance`
+#### 4.1.1 Methodology
+##### Find a task S via SingleInstance Task Allocation Mechanism.
+- if S is the top task in the task stack, then **NoAction()**;
+- if S is not the top task in the task stack.
+    - if `FLAG_ACTIVITY_TASK_ON_HOME` is in Fs, then **TaskOnHome(S)**;
+    - otherwise, **MoveTask2Top(S)**.
+- if S is not existed.
+    - if `FLAG_ACTIVITY_TASK_ON_HOME` is in Fs, then **TaskOnHome(B)**;
+    - otherwise, **LaunchTask(B)**.
 
-Recall the semantics of launch mode `singleInstance`, it just depends on whether there is a task which `realActivity` is B.
+#### 4.1.2 Expriments
+
+### 4.2 `Lmd(B) = singleTask`
+#### 4.2.1 Methodology
+##### a. Find a task S via Non-SingleInstance Task Allocation Mechanism.
+##### b. Operate on task stack
+- if S is the top task in the task stack, then **NoAction()**;
+- if S is not the top task in the task stack,
+    - if `FLAG_ACTIVITY_TASK_ON_HOME` is in Fs, then **TaskOnHome(S)**;
+    - otherwise, **MoveTask2Top(S)**;
+- if S is not existed,
+    - if `FLAG_ACTIVITY_TASK_ON_HOME` is in Fs, then **TaskOnHome(B)**;
+    - otherwise, **LaunchTask(B)**.
+
+##### c. Operate on task 
+- if `FLAG_ACTIVITY_CLEAR_TASK` is in Fs, then **ClearTask(B)**;
+- otherwise, 
+    - if there exists an instance which class is B in the top task, then **ClearTop(B)**;
+    - otherwise, **LaunchAct(B)**.
+
+#### 4.2.2 Expriments
 
 ### Q1 How does Intent Flag `FLAG_ACTIVITY_TASK_ON_HOME` Work?
 We designed lots of expriments to figure out this question. 
 We obtain the conclusion that when the number or order of tasks in the task stack change, 
 This flag will be enable.
 In another word, if some 
+    - Condition: `Lmd(A) = singleInstance` | `Lmd(B) = singleTask` | `FLAG_ACTIVITY_CLEAR_TASK in Fs`
