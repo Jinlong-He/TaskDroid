@@ -236,7 +236,7 @@ We let S' as the top task of task stack.
 
 |Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
 |----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
-|      |  1     |singleTask |  1    | {FLAG_ACTIVITY_CLEAR_TASK} | {} |S is the top task|
+|   ~~singleInstance~~   |  1     |singleTask |  1    | {FLAG_ACTIVITY_CLEAR_TASK} | {} |S is the top task|
 
 ![ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.1.png)
 
@@ -244,7 +244,7 @@ We let S' as the top task of task stack.
 
 |Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
 |----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
-|      |  1     |singleTask |  1  | {} | {~~FLAG_ACTIVITY_CLEAR_TASK~~} |S is the top task; <br> B is in S|
+|   ~~singleInstance~~   |  1     |singleTask |  1  | {} | {~~FLAG_ACTIVITY_CLEAR_TASK~~} |S is the top task; <br> B is in S|
 
 ![ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.2.png)
 
@@ -252,7 +252,7 @@ We let S' as the top task of task stack.
 
 |Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
 |----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
-|      |  1     |singleTask |1 | {} | {~~FLAG_ACTIVITY_CLEAR_TASK~~} |S is the top task; <br> B is not in S|
+|   ~~singleInstance~~   |  1     |singleTask |1 | {} | {~~FLAG_ACTIVITY_CLEAR_TASK~~} |S is the top task; <br> B is not in S|
 
 ![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
 
@@ -415,6 +415,29 @@ We let S' as the top task of task stack.
 - otherwise, **LaunchAct(B)**.
 
 #### 4.3.2 Expriments
+- **ClearTop(B)**
+
+|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
+|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
+|  ~~singleInstance~~ |  1     |standard | 2  | {FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_NEW_TASK~~} | B is in S|
+|  ~~singleInstance~~ |  1     |standard | 1  | {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_CLEAR_TASK~~} | S is the top task; <br> B is in S|
+
+![ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.2.png)
+
+- **LaunchAct(B)**
+
+|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
+|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
+|  ~~singleInstance~~ |  1     |standard | 2  | {FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_NEW_TASK~~} | B is not in S|
+|  ~~singleInstance~~ |  1     |standard | 2  | {FLAG_ACTIVITY_SINGLE_TOP} | {~~FLAG_ACTIVITY_CLEAR_TOP~~ <br>~~FLAG_ACTIVITY_NEW_TASK~~} | B is not the top of S|
+|  ~~singleInstance~~ |  1     |standard | 2  | {} | {~~FLAG_ACTIVITY_SINGLE_TOP~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~ <br>~~FLAG_ACTIVITY_NEW_TASK~~} | B is not the top of S|
+|  ~~singleInstance~~ |  1     |standard | 1  | {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_MULTIPLE_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TASK~~} | S is the top task; <br> B is not in S|
+|  ~~singleInstance~~ |  1     |standard | 1  | {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_REORDER_TO_FRONT} | {~~FLAG_ACTIVITY_MULTIPLE_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~<br>~~FLAG_ACTIVITY_CLEAR_TASK~~} | S is the top task; <br> B is not in S|
+|  ~~singleInstance~~ |  1     |standard | 1  | {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_SINGLE_TOP} | {~~FLAG_ACTIVITY_MULTIPLE_TASK~~<br>~~FLAG_ACTIVITY_REORDER_TO_FRONT~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~<br>~~FLAG_ACTIVITY_CLEAR_TASK~~} | S is the top task; <br> B is not the top of S|
+|  ~~singleInstance~~ |  1     |standard | 1  | {FLAG_ACTIVITY_NEW_TASK} | {~~FLAG_ACTIVITY_MULTIPLE_TASK~~<br>~~FLAG_ACTIVITY_SINGLE_TOP~~<br>~~FLAG_ACTIVITY_REORDER_TO_FRONT~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~<br>~~FLAG_ACTIVITY_CLEAR_TASK~~} | S is the top task; |
+
+#### 4.3.2 Expriments
+
 - {Lmd(B) = standard; Lmd(A) != singleInstance; `FLAG_ACTIVITY_CLEAR_TOP`; ~~`FLAG_ACTIVITY_NEW_TASK`~~;}
     - **ClearTop(B)**
     - **LaunchAct(B)**
