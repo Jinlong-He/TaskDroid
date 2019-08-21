@@ -214,17 +214,17 @@ which means A startActivity B with the intent flags Fs.
 #### 4.2.2 Expriments
 We let S' as the top task of task stack.
 - {Lmd(B) = singleTask; `FLAG_ACTIVITY_CLEAR_TASK`; Aft(B) = Aft(S');}
-    - **NoAction()** + **ClearTask(B)**
+    - **ClearTask(B)**
 
-![NoAction() + ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.1.png)
+![ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.1.png)
 
 - {Lmd(B) = singleTask; ~~`FLAG_ACTIVITY_CLEAR_TASK`~~; Aft(B) = Aft(S');}
-    - **NoAction()** + **ClearTop(B)**
-    - **NoAction()** + **LaunchAct(B)**
+    - **ClearTop(B)**
+    - **LaunchAct(B)**
 
-![NoAction() + ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.2.png)
+![ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.2.png)
 
-![NoAction() + LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
+![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
 
 - {Lmd(B) = singleTask; `FLAG_ACTIVITY_CLEAR_TASK` + `FLAG_ACTIVITY_TASK_ON_HOME`; Aft(B) != Aft(S');}
     - **TaskOnHome(S)** + **ClearTask(B)**
@@ -261,7 +261,11 @@ We let S' as the top task of task stack.
 ### 4.3 `Lmd(B) = standard`
 #### 4.3.1 Methodology
 ##### Decide whether to allocate task.
-- if `Lmd(A) = singleInstance` or `FLAG_ACTIVITY_NEW_TASK`, then goto a.
+- if `Lmd(A) = singleInstance` or `FLAG_ACTIVITY_NEW_TASK`, 
+    - if `FLAG_ACTIVITY_MULTIPLE_TASK`, 
+        - if `FLAG_ACTIVITY_MULTIPLE_TASK`, **TaskOnHome(B)**.
+        - otherwise, **LaunchTask(B)**.
+    - otherwise, goto a.
 - otherwise, goto d.
 
 ##### a. Find a task S via Non-SingleInstance Task Allocation Mechanism.
@@ -299,7 +303,7 @@ We let S' as the top task of task stack.
 - otherwise, **LaunchAct(B)**.
 
 #### 4.3.2 Expriments
-- {Lmd(B) = standard; Lmd(A) != singleInstance; ; `FLAG_ACTIVITY_CLEAR_TOP`; ~~`FLAG_ACTIVITY_NEW_TASK`~~;}
+- {Lmd(B) = standard; Lmd(A) != singleInstance; `FLAG_ACTIVITY_CLEAR_TOP`; ~~`FLAG_ACTIVITY_NEW_TASK`~~;}
     - **ClearTop(B)**
     - **LaunchAct(B)**
 
@@ -325,6 +329,38 @@ We let S' as the top task of task stack.
 
 - {Lmd(B) = standard; Lmd(A) != singleInstance; ~~`FLAG_ACTIVITY_SINGLE_TOP`~~ +  ~~`FLAG_ACTIVITY_REORDER_TO_FRONT`~~ + ~~`FLAG_ACTIVITY_CLEAR_TOP`~~ +  ~~`FLAG_ACTIVITY_NEW_TASK`~~;}
     - **LaunchAct(B)**
+
+![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.3.2.2.png)
+
+- {Lmd(B) = standard; [Lmd(A) = singleInstance | `FLAG_ACTIVITY_NEW_TASK`]; `FLAG_ACTIVITY_CLEAR_TASK`; Aft(B) = Aft(S')}
+    - **ClearTask(B)**
+
+![ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.1.png)
+
+- {Lmd(B) = standard; [Lmd(A) = singleInstance | `FLAG_ACTIVITY_NEW_TASK`]; `FLAG_ACTIVITY_CLEAR_TOP`; ~~`FLAG_ACTIVITY_CLEAR_TASK`~~; Aft(B) = Aft(S')}
+    - **ClearTop(B)**
+    - **NoAction()**
+    - **LaunchAct(B)**
+
+![ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.2.png)
+
+![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.3.2.1.png)
+
+![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
+
+- {Lmd(B) = standard; [Lmd(A) = singleInstance | `FLAG_ACTIVITY_NEW_TASK`]; `FLAG_ACTIVITY_CLEAR_TOP`; ~~`FLAG_ACTIVITY_CLEAR_TOP`~~ + ~~`FLAG_ACTIVITY_CLEAR_TASK`~~; Aft(B) = Aft(S')}
+    - **NoAction()**
+    - **LaunchAct(B)**
+
+![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.1.png)
+
+![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
+
+- {Lmd(B) = standard; [Lmd(A) = singleInstance | `FLAG_ACTIVITY_NEW_TASK`]; ~~`FLAG_ACTIVITY_CLEAR_TOP`~~ + ~~`FLAG_ACTIVITY_CLEAR_TOP`~~ + ~~`FLAG_ACTIVITY_CLEAR_TASK`~~; Aft(B) = Aft(S')}
+    - **NoAction()**
+    - **LaunchAct(B)**
+
+![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.3.2.1.png)
 
 ![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
 
