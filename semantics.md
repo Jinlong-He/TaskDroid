@@ -245,6 +245,11 @@ We let S' as the top task of task stack.
     - **TaskOnHome(S)** + **ClearTop(B)**
     - **TaskOnHome(S)** + **LaunchAct(B)**
     - **TaskOnHome(B)** 
+
+![TaskOnHome(S) + ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.7.png)
+
+![TaskOnHome(S) + LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.8.png)
+
 - {Lmd(B) = singleTask; ~~`FLAG_ACTIVITY_CLEAR_TASK`~~ + ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~; Aft(B) != Aft(S');}
     - **MoveTask2Top(S)** + **ClearTop(B)**
     - **MoveTask2Top(S)** + **LaunchAct(B)**
