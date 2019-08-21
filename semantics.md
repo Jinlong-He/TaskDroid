@@ -169,27 +169,36 @@ which means A startActivity B with the intent flags Fs.
     - if `FLAG_ACTIVITY_TASK_ON_HOME` is in Fs, then **TaskOnHome(B)**;
     - otherwise, **LaunchTask(B)**.
 
+#### 4.1.2 Expriments
+
+- **NoAction()**
+    - {Lmd(B) = singleInstance; A = B}
+
 ![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.1.png)
 
-<center>NoAction() {Lmd(B) = singleInstance;}</center>
+- **TaskOnHome(S)**
+    - {Lmd(B) = singleInstance; A != B; `FLAG_ACTIVITY_TASK_ON_HOME`;} 
 
 ![TaskOnHome(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.2.png)
 
-<center>TaskOnHome(S) {Lmd(B) = singleInstance; Aft(B) != Aft(A); <font color=green>`FLAG_ACTIVITY_TASK_ON_HOME`</font>;}</center>
+
+- **MoveTask2Top(S)**
+    - {Lmd(B) = singleInstance; A != B; ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~;} 
 
 ![MoveTask2Top(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleInstance.png)
 
-<center>MoveTask2Top(S) {Lmd(B) = singleInstance; Aft(B) != Aft(A); <font color=red>`FLAG_ACTIVITY_TASK_ON_HOME`</font>;}</center>
+
+- **TaskOnHome(B)**
+    - {Lmd(B) = singleInstance; A != B; `FLAG_ACTIVITY_TASK_ON_HOME`;} 
 
 ![TaskOnHome(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.4.png)
 
-<center>TaskOnHome(B) {Lmd(B) = singleInstance; Aft(B) != Aft(A); <font color=green>`FLAG_ACTIVITY_TASK_ON_HOME`</font>;}</center>
+- **LaunchTask(S)**
+    - {Lmd(B) = singleInstance; A != B; ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~;} 
 
 ![LaunchTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
 
-<center>LaunchTask(B) {Lmd(B) = singleInstance; Aft(B) != Aft(A); <font color=red>`FLAG_ACTIVITY_TASK_ON_HOME`</font>;}</center>
 
-#### 4.1.2 Expriments
 
 ### 4.2 `Lmd(B) = singleTask`
 #### 4.2.1 Methodology
