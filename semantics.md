@@ -169,6 +169,16 @@ which means A startActivity B with the intent flags Fs.
     - if `FLAG_ACTIVITY_TASK_ON_HOME` is in Fs, then **TaskOnHome(B)**;
     - otherwise, **LaunchTask(B)**.
 
+![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.1.png "111")
+
+![TaskOnHome(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.2.png)
+
+![MoveTask2Top(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleInstance.png)
+
+![TaskOnHome(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.4.png)
+
+![LaunchTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask.png)
+
 #### 4.1.2 Expriments
 
 ### 4.2 `Lmd(B) = singleTask`
@@ -182,16 +192,6 @@ which means A startActivity B with the intent flags Fs.
 - if S is not existed,
     - if `FLAG_ACTIVITY_TASK_ON_HOME` is in Fs, then **TaskOnHome(B)**;
     - otherwise, **LaunchTask(B)**.
-
-![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.1.png)
-
-![TaskOnHome(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.2.png)
-
-![MoveTask2Top(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleInstance2.png)
-
-![TaskOnHome(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.1.4.png)
-
-![LaunchTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleInstance1.png)
 
 ##### c. Operate on task 
 - if `FLAG_ACTIVITY_CLEAR_TASK` is in Fs, then **ClearTask(B)**;
