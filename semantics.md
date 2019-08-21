@@ -175,7 +175,7 @@ which means A startActivity B with the intent flags Fs.
 - **NoAction()**
 
 |Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
-|----  |  ----          | ----   |  ----  | ----    |
+|----  |  ----          | ----   |  ----  | :----:    |
 |      | singleInstance |        |        |  A = B  |
 
 ![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.1.png)
@@ -183,7 +183,7 @@ which means A startActivity B with the intent flags Fs.
 - **MoveTask2Top(S)**
 
 |Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
-|----  |  ----          | ----   |  ----  | ----    |
+|----  |  ----          | ----   |  ----  | :----:    |
 |      | singleInstance |        | ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~ |  A != B; S is founded|
 
 ![MoveTask2Top(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleInstance.png)
@@ -191,7 +191,7 @@ which means A startActivity B with the intent flags Fs.
 - **LaunchTask(B)**
 
 |Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
-|----  |  ----          | ----   |  ----  | ----    |
+|----  |  ----          | ----   |  ----  | :----:    |
 |      | singleInstance |        | ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~ |  A != B; S is not founded|
 
 ![LaunchTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
@@ -199,7 +199,7 @@ which means A startActivity B with the intent flags Fs.
 - **TaskOnHome(S)**
 
 |Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
-|----  |  ----          | ----   |  ----  | ----    |
+|----  |  ----          | ----   |  ----  | :----:    |
 |      | singleInstance |  `FLAG_ACTIVITY_TASK_ON_HOME` |  |  A != B; S is founded|
 
 ![TaskOnHome(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.2.png)
@@ -207,7 +207,7 @@ which means A startActivity B with the intent flags Fs.
 - **TaskOnHome(B)**
 
 |Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
-|----  |  ----          | ----   |  ----  | ----    |
+|----  |  ----          | ----   |  ----  | :----:    |
 |      | singleInstance |  `FLAG_ACTIVITY_TASK_ON_HOME` |  |  A != B; S is not founded|
 
 ![TaskOnHome(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.4.png)
@@ -229,6 +229,65 @@ which means A startActivity B with the intent flags Fs.
 - otherwise, 
     - if there exists an instance which class is B in the top task, then **ClearTop(B)**;
     - otherwise, **LaunchAct(B)**.
+
+#### 4.2.2 Expriments
+We let S' as the top task of task stack.
+- **ClearTask(B)**
+
+|Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
+|----  |  ----          | ----   |  ----  | :----:    |
+|      | singleTask |  `FLAG_ACTIVITY_CLEAR_TASK` |  | Aft(B) = Aft(S')|
+
+![ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.1.png)
+
+- **ClearTop(B)**
+
+|Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
+|----  |  ----          | ----   |  ----  | :----:    |
+|      | singleTask |  | ~~`FLAG_ACTIVITY_CLEAR_TASK`~~ | Aft(B) = Aft(S'), B is in S|
+
+![ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.2.png)
+
+- **LaunchAct(B)**
+
+|Lmd(A)|  Lmd(B)        | Flags+ | Flags- | Remarks |
+|----  |  ----          | ----   |  ----  | :----:    |
+|      | singleTask |  | ~~`FLAG_ACTIVITY_CLEAR_TASK`~~ | Aft(B) = Aft(S'), B is not in S|
+
+![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
+
+- {Lmd(B) = singleTask; `FLAG_ACTIVITY_CLEAR_TASK` + `FLAG_ACTIVITY_TASK_ON_HOME`; Aft(B) != Aft(S');}
+    - **TaskOnHome(S)** + **ClearTask(B)**
+    - **TaskOnHome(B)** 
+
+![TaskOnHome(S) + ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.4.png)
+
+![TaskOnHome(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.5.png)
+
+- {Lmd(B) = singleTask; `FLAG_ACTIVITY_CLEAR_TASK`; ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~; Aft(B) != Aft(S');}
+    - **MoveTask2Top(S)** + **ClearTask(B)**
+    - **LaunchTask(B)** 
+
+![MoveTask2Top(S) + ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.6.png)
+
+![LaunchTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
+
+- {Lmd(B) = singleTask; `FLAG_ACTIVITY_TASK_ON_HOME`;  ~~`FLAG_ACTIVITY_CLEAR_TASK`~~; Aft(B) != Aft(S');}
+    - **TaskOnHome(S)** + **ClearTop(B)**
+    - **TaskOnHome(S)** + **LaunchAct(B)**
+
+![TaskOnHome(S) + ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.7.png)
+
+![TaskOnHome(S) + LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.8.png)
+
+- {Lmd(B) = singleTask; ~~`FLAG_ACTIVITY_CLEAR_TASK`~~ + ~~`FLAG_ACTIVITY_TASK_ON_HOME`~~; Aft(B) != Aft(S');}
+    - **MoveTask2Top(S)** + **ClearTop(B)**
+    - **MoveTask2Top(S)** + **LaunchAct(B)**
+
+![MoveTask2Top(S) + ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.9.png)
+
+![MoveTask2Top(S) + LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.10.png)
+
 
 #### 4.2.2 Expriments
 We let S' as the top task of task stack.
