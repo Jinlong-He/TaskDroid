@@ -208,7 +208,7 @@ We don't consider the intent flag `FLAG_ACTIVITY_REORDER_TO_FRONT` first, I will
 
 ![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
 
-- S is the top task
+- S is not the top task
 
 | Flags+ | Flags- | Task| Action |
 | :----:   |  :----:  | :----:| :----:|
@@ -222,7 +222,7 @@ We don't consider the intent flag `FLAG_ACTIVITY_REORDER_TO_FRONT` first, I will
 
 ![MoveTask2Top(S) + LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.10.png)
 
-- S is the top task
+- S is not existed
 
 | Flags+ | Flags- | Task| Action |
 | :----:   |  :----:  | :----:| :----:|
@@ -274,7 +274,7 @@ We don't consider the intent flag `FLAG_ACTIVITY_REORDER_TO_FRONT` first, I will
     - otherwise, **LaunchAct(B)**.
 
 #### 4.3.2 Expriments
-- Method 1
+##### Method 1
 
 | Flags+ | Flags- | Task| Action |
 | :----:   |  :----:  | :----:| :----:|
@@ -302,4 +302,44 @@ We don't consider the intent flag `FLAG_ACTIVITY_REORDER_TO_FRONT` first, I will
 ![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.1.png)
 
 ![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
+
+##### Method 2
+
+- S is the top task
+
+| Flags+ | Flags- | Task| Action |
+| :----:   |  :----:  | :----:| :----:|
+| {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_CLEAR_TASK} | {} ||**ClearTask(B)**|
+
+![ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.1.png)
+
+| Flags+ | Flags- | Task| Action |
+| :----:   |  :----:  | :----:| :----:|
+| {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_CLEAR_TASK~~} |B is in S|**ClearTop(B)**|
+| {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_CLEAR_TASK~~} |B is not in S|**LaunchAct(B)**|
+
+![ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.2.png)
+
+![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
+
+| Flags+ | Flags- | Task| Action |
+| :----:   |  :----:  | :----:| :----:|
+| {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_SINGLE_TOP} | {~~FLAG_ACTIVITY_CLEAR_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~} |B is top|**NoAction()**|
+| {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_SINGLE_TOP} | {~~FLAG_ACTIVITY_CLEAR_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~} |B is not top;<br>B is not mainActivity;<br>B is realActivity of S|**NoAction()**|
+| {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_SINGLE_TOP} | {~~FLAG_ACTIVITY_CLEAR_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~} |B is not top;<br>B is mainActivity;|**LaunchAct(B)**|
+| {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_SINGLE_TOP} | {~~FLAG_ACTIVITY_CLEAR_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~} |B is not top;<br>B is not realActivity of S;|**LaunchAct(B)**|
+
+![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.1.png)
+
+![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.3.2.1.png)
+
+![LaunchAct()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.3.2.2.png)
+
+![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
+
+| Flags+ | Flags- | Task| Action |
+| :----:   |  :----:  | :----:| :----:|
+| {FLAG_ACTIVITY_NEW_TASK} | {~~FLAG_ACTIVITY_CLEAR_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~<br>~~FLAG_ACTIVITY_SINGLE_TOP~~} |B is not mainActivity;<br>B is realActivity of S|**NoAction()**|
+| {FLAG_ACTIVITY_NEW_TASK} | {~~FLAG_ACTIVITY_CLEAR_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~<br>~~FLAG_ACTIVITY_SINGLE_TOP~~} |B is mainActivity;|**LaunchAct(B)**|
+| {FLAG_ACTIVITY_NEW_TASK} | {~~FLAG_ACTIVITY_CLEAR_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~<br>~~FLAG_ACTIVITY_SINGLE_TOP~~} |B is not realActivity of S;|**LaunchAct(B)**|
 
