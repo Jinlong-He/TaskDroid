@@ -171,6 +171,37 @@ which means A startActivity B with the intent flags Fs.
     - otherwise, **LaunchTask(B)**.
 
 #### 4.1.2 Expriments
+- S is the top task (A = B)
+
+| Flags+   | Flags-   |  Semantics     |
+| :----:   |  :----:  |  :----:        |
+|   {}     |   {}     |  **NoAction()**|
+
+![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.1.png)
+
+- S is not the top task (A != B)
+
+| Flags+   | Flags-   |  Semantics     |
+| :----:   |  :----:  |  :----:        |
+|    {}  | {~~FLAG_ACTIVITY_TASK_ON_HOME~~} | **MoveTask2Top(S)**|
+|    {FLAG_ACTIVITY_TASK_ON_HOME}  | {}     | **TaskOnHome(S)**|
+
+![MoveTask2Top(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleInstance.png)
+
+![TaskOnHome(S)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.2.png)
+
+- S is not founded (A != B)
+
+| Flags+   | Flags-   |  Semantics     |
+| :----:   |  :----:  |  :----:        |
+|    {}  | {~~FLAG_ACTIVITY_TASK_ON_HOME~~} | **LaunchTask(B)**|
+|    {FLAG_ACTIVITY_TASK_ON_HOME}  | {}     | **TaskOnHome(B)**|
+
+![LaunchTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/singleTask1.png)
+
+![TaskOnHome(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.4.png)
+
+#### 4.1.2 Expriments
 
 - **NoAction()**
 
