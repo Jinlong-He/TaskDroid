@@ -157,7 +157,7 @@ There are four operations on task as followed:
 In this section I will tell you how to decide the behavious of `A.startActivity(B, Fs)`, 
 which means A startActivity B with the intent flags Fs.
 
-We don't consider the intent flag `FLAG_ACTIVITY_REORDER_TO_FRONT` first, I will talk about this later.
+We don't consider the intent flag `FLAG_ACTIVITY_REORDER_TO_FRONT` first, I will talk about this later. And suppose the launch mode of caller activity A is not `singleInstance`.
 
 ### 4.1 `Lmd(B) = singleInstance`
 #### 4.1.1 Methodology
@@ -233,143 +233,73 @@ We don't consider the intent flag `FLAG_ACTIVITY_REORDER_TO_FRONT` first, I will
 ### 4.3 `Lmd(B) = standard`
 #### 4.3.1 Methodology
 ##### Decide whether to allocate task.
-- if `Lmd(A) = singleInstance` or `FLAG_ACTIVITY_NEW_TASK`, 
-    - if `FLAG_ACTIVITY_MULTIPLE_TASK`, 
-        - if `FLAG_ACTIVITY_MULTIPLE_TASK`, **TaskOnHome(B)**.
-        - otherwise, **LaunchTask(B)**.
-    - otherwise, goto a.
-- otherwise, goto d.
+- if ~~FLAG_ACTIVITY_NEW_TASK~~,  goto [Method 1](#4312).
+- if FLAG_ACTIVITY_NEW_TASK and ~~FLAG_ACTIVITY_MULTIPLE_TASK~~, then goto [Method 2](#4311).
+- if FLAG_ACTIVITY_NEW_TASK and FLAG_ACTIVITY_MULTIPLE_TASK, then **LaunchTask(B)**
 
-##### a. Find a task S via Non-SingleInstance Task Allocation Mechanism.
-##### b. Operate on task stack
+<h5 id=4312>Method 1</h5>
+
+- if FLAG_ACTIVITY_CLEAR_TOP,
+    - if B is in the top task, then **ClearTop(B)**;
+    - otherwise, **LaunchAct(B)**.
+- if FLAG_ACTIVITY_REORDER_TO_FRONT, ~~FLAG_ACTIVITY_CLEAR_TOP~~,
+    - if B is in the top task, then **MoveAct2Top(B)**;
+    - otherwise, **LaunchAct(B)**.
+- if FLAG_ACTIVITY_SINGLE_TOP, ~~FLAG_ACTIVITY_REORDER_TO_FRONT~~, ~~FLAG_ACTIVITY_CLEAR_TOP~~,
+    - if B is the top of the top task, then **NoAction()**;
+    - otherwise, **LaunchAct(B)**.
+- if ~~FLAG_ACTIVITY_SINGLE_TOP~~, ~~FLAG_ACTIVITY_REORDER_TO_FRONT~~, ~~FLAG_ACTIVITY_CLEAR_TOP~~,
+<br> then **LaunchAct(B)**.
+
+
+<h5 id=4311>Method 2</h5>
+
+###### a. Find a task S via Non-SingleInstance Task Allocation Mechanism.
+###### b. Operate on task stack
 - if S is the top task in the task stack, then **NoAction()**;
-- if S is not the top task in the task stack,
-    - if `FLAG_ACTIVITY_TASK_ON_HOME` is in Fs, then **TaskOnHome(S)**;
-    - otherwise, **MoveTask2Top(S)**;
-- if S is not existed,
-    - if `FLAG_ACTIVITY_TASK_ON_HOME` is in Fs, then **TaskOnHome(B)**;
-    - otherwise, **LaunchTask(B)**.
+- if S is not the top task in the task stack, then **MoveTask2Top(S)**;
+- if S is not existed, then **LaunchTask(B)**.
 
-##### c. Operate on task 
-- if `FLAG_ACTIVITY_CLEAR_TASK` is in Fs, then **ClearTask(B)**;
-- else if `FLAG_ACTIVITY_CLEAR_TOP` is in Fs,
-    - if there exists an instance which class is B in the top task, then **ClearTop(B)**;
+###### c. Operate on task 
+- if FLAG_ACTIVITY_CLEAR_TASK, then **ClearTask(B)**;
+- if FLAG_ACTIVITY_CLEAR_TOP, ~~FLAG_ACTIVITY_CLEAR_TASK~~,
+    - if B is in the top task, then **ClearTop(B)**;
     - otherwise, **LaunchAct(B)**.
-- else if `FLAG_ACTIVITY_SINGLE_TOP` is in Fs 
-    - if the class of the top instance in the top task is B, then **NoAction()**;
-    - else if B is the class of the `realActivity` of S and B is not `mainActivity`, then **NoAction()**;
+- if FLAG_ACTIVITY_SINGLE_TOP, ~~FLAG_ACTIVITY_CLEAR_TOP~~, ~~FLAG_ACTIVITY_CLEAR_TASK~~,
+    - if B is the top of the top task, then **NoAction()**;
+    - if B is the `realActivity` of S and B is not `mainActivity`, then **NoAction()**;
     - otherwise, **LaunchAct(B)**.
-- else if B is the class of the `realActivity` of S and B is not `mainActivity`, then **NoAction()**;
-- otherwise, **LaunchAct(B)**.
-
-##### d. Operate on task 
-- if `FLAG_ACTIVITY_CLEAR_TOP` is in Fs,
-    - if there exists an instance which class is B in the top task, then **ClearTop(B)**;
+- if ~~FLAG_ACTIVITY_SINGLE_TOP~~, ~~FLAG_ACTIVITY_CLEAR_TOP~~, ~~FLAG_ACTIVITY_CLEAR_TASK~~,
+    - if B is the `realActivity` of S and B is not `mainActivity`, then **NoAction()**;
     - otherwise, **LaunchAct(B)**.
-- else if `FLAG_ACTIVITY_REORDER_TO_FRONT` is in Fs,
-    - if there exists an instance which class is B in the top task, then **MoveAct2Top(B)**;
-    - otherwise, **LaunchAct(B)**.
-- else if `FLAG_ACTIVITY_SINGLE_TOP` is in Fs 
-    - if the class of the top instance in the top task is B, then **NoAction()**;
-    - otherwise, **LaunchAct(B)**.
-- otherwise, **LaunchAct(B)**.
 
 #### 4.3.2 Expriments
-- **ClearTop(B)**
+- Method 1
 
-|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
-|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
-|  ~~singleInstance~~ |  1     |standard | 2  | {FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_NEW_TASK~~} | B is in S|
-|  ~~singleInstance~~ |  1     |standard | 1  | {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_CLEAR_TASK~~} | S is the top task; <br> B is in S|
-
-![ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.2.png)
-
-- **LaunchAct(B)**
-
-|Lmd(A)|Aft(A) |  Lmd(B)       |Aft(B)| Flags+ | Flags- | Remarks |
-|----  | :----:|  ----         |:----:| :----:   |  :----:  | :----:  |
-|  ~~singleInstance~~ |  1     |standard | 2  | {FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_NEW_TASK~~} | B is not in S|
-|  ~~singleInstance~~ |  1     |standard | 2  | {FLAG_ACTIVITY_SINGLE_TOP} | {~~FLAG_ACTIVITY_CLEAR_TOP~~ <br>~~FLAG_ACTIVITY_NEW_TASK~~} | B is not the top of S|
-|  ~~singleInstance~~ |  1     |standard | 2  | {} | {~~FLAG_ACTIVITY_SINGLE_TOP~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~ <br>~~FLAG_ACTIVITY_NEW_TASK~~} | B is not the top of S|
-|  ~~singleInstance~~ |  1     |standard | 1  | {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_MULTIPLE_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TASK~~} | S is the top task; <br> B is not in S|
-|  ~~singleInstance~~ |  1     |standard | 1  | {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_REORDER_TO_FRONT} | {~~FLAG_ACTIVITY_MULTIPLE_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~<br>~~FLAG_ACTIVITY_CLEAR_TASK~~} | S is the top task; <br> B is not in S|
-|  ~~singleInstance~~ |  1     |standard | 1  | {FLAG_ACTIVITY_NEW_TASK<br>FLAG_ACTIVITY_SINGLE_TOP} | {~~FLAG_ACTIVITY_MULTIPLE_TASK~~<br>~~FLAG_ACTIVITY_REORDER_TO_FRONT~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~<br>~~FLAG_ACTIVITY_CLEAR_TASK~~} | S is the top task; <br> B is not the top of S|
-|  ~~singleInstance~~ |  1     |standard | 1  | {FLAG_ACTIVITY_NEW_TASK} | {~~FLAG_ACTIVITY_MULTIPLE_TASK~~<br>~~FLAG_ACTIVITY_SINGLE_TOP~~<br>~~FLAG_ACTIVITY_REORDER_TO_FRONT~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~<br>~~FLAG_ACTIVITY_CLEAR_TASK~~} | S is the top task; |
-
-#### 4.3.2 Expriments
-
-- {Lmd(B) = standard; Lmd(A) != singleInstance; `FLAG_ACTIVITY_CLEAR_TOP`; ~~`FLAG_ACTIVITY_NEW_TASK`~~;}
-    - **ClearTop(B)**
-    - **LaunchAct(B)**
+| Flags+ | Flags- | Task| Action |
+| :----:   |  :----:  | :----:| :----:|
+| {FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_NEW_TASK~~} |B is in the top task|**ClearTop(B)**|
+| {FLAG_ACTIVITY_CLEAR_TOP} | {~~FLAG_ACTIVITY_NEW_TASK~~} |B is not in the top task|**LaunchAct(B)**|
 
 ![ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.2.png)
 
 ![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
 
-- {Lmd(B) = standard; Lmd(A) != singleInstance; `FLAG_ACTIVITY_REORDER_TO_FRONT`; ~~`FLAG_ACTIVITY_CLEAR_TOP`~~ +  ~~`FLAG_ACTIVITY_NEW_TASK`~~;}
-    - **MoveAct2Top(B)**
-    - **LaunchAct(B)**
+| Flags+ | Flags- | Task| Action |
+| :----:   |  :----:  | :----:| :----:|
+| {FLAG_ACTIVITY_REORDER_TO_FRONT} | {~~FLAG_ACTIVITY_NEW_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~} |B is in the top task|**MoveAct2Top(B)**|
+| {FLAG_ACTIVITY_REORDER_TO_FRONT} | {~~FLAG_ACTIVITY_NEW_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~} |B is in the top task|**LaunchAct(B)**|
 
 ![MoveAct2Top(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.3.1.png)
 
 ![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
 
-- {Lmd(B) = standard; Lmd(A) != singleInstance; `FLAG_ACTIVITY_SINGLE_TOP`; ~~`FLAG_ACTIVITY_REORDER_TO_FRONT`~~ + ~~`FLAG_ACTIVITY_CLEAR_TOP`~~ +  ~~`FLAG_ACTIVITY_NEW_TASK`~~;}
-    - **NoAction()**
-    - **LaunchAct(B)**
+| Flags+ | Flags- | Task| Action |
+| :----:   |  :----:  | :----:| :----:|
+| {FLAG_ACTIVITY_Single_TOP} | {~~FLAG_ACTIVITY_NEW_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~<br>~~FLAG_ACTIVITY_REORDER_TO_FRONT~~} |B is top |**NoAction()**|
+| {FLAG_ACTIVITY_Single_TOP} | {~~FLAG_ACTIVITY_NEW_TASK~~<br>~~FLAG_ACTIVITY_CLEAR_TOP~~<br>~~FLAG_ACTIVITY_REORDER_TO_FRONT~~} |B is not top|**LaunchAct(B)**|
 
 ![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.1.png)
 
 ![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
 
-- {Lmd(B) = standard; Lmd(A) != singleInstance; ~~`FLAG_ACTIVITY_SINGLE_TOP`~~ +  ~~`FLAG_ACTIVITY_REORDER_TO_FRONT`~~ + ~~`FLAG_ACTIVITY_CLEAR_TOP`~~ +  ~~`FLAG_ACTIVITY_NEW_TASK`~~;}
-    - **LaunchAct(B)**
-
-![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.3.2.2.png)
-
-- {Lmd(B) = standard; [Lmd(A) = singleInstance | `FLAG_ACTIVITY_NEW_TASK`]; `FLAG_ACTIVITY_CLEAR_TASK`; Aft(B) = Aft(S')}
-    - **ClearTask(B)**
-
-![ClearTask(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.1.png)
-
-- {Lmd(B) = standard; [Lmd(A) = singleInstance | `FLAG_ACTIVITY_NEW_TASK`]; `FLAG_ACTIVITY_CLEAR_TOP`; ~~`FLAG_ACTIVITY_CLEAR_TASK`~~; Aft(B) = Aft(S')}
-    - **ClearTop(B)**
-    - **NoAction()**
-    - **LaunchAct(B)**
-
-![ClearTop(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.2.png)
-
-![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.3.2.1.png)
-
-![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
-
-- {Lmd(B) = standard; [Lmd(A) = singleInstance | `FLAG_ACTIVITY_NEW_TASK`]; `FLAG_ACTIVITY_CLEAR_TOP`; ~~`FLAG_ACTIVITY_CLEAR_TOP`~~ + ~~`FLAG_ACTIVITY_CLEAR_TASK`~~; Aft(B) = Aft(S')}
-    - **NoAction()**
-    - **LaunchAct(B)**
-
-![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.1.2.1.png)
-
-![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
-
-- {Lmd(B) = standard; [Lmd(A) = singleInstance | `FLAG_ACTIVITY_NEW_TASK`]; ~~`FLAG_ACTIVITY_CLEAR_TOP`~~ + ~~`FLAG_ACTIVITY_CLEAR_TOP`~~ + ~~`FLAG_ACTIVITY_CLEAR_TASK`~~; Aft(B) = Aft(S')}
-    - **NoAction()**
-    - **LaunchAct(B)**
-
-![NoAction()](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.3.2.1.png)
-
-![LaunchAct(B)](https://github.com/LoringHe/TaskDroid/blob/master/pictures/4.2.2.3.png)
-
-### 4.4 Principal
-#### 4.4.1 Equivalence Rule
-##### 1) (Lmd(A) = singleInstance) == `FLAG_ACTIVITY_NEW_TASK`
-##### 2) (Lmd(B) = singleTop) == (Lmd(B) = standard) + `FLAG_ACTIVITY_SINGLE_TOP`
-##### 3) (Lmd(B) = singleTask) == (Lmd(B) = standard) + `FLAG_ACTIVITY_NEW_TASK` + `FLAG_ACTIVITY_CLEAR_TOP`
-#### 4.4.2 Enable Rule
-##### 1) `FLAG_ACTIVITY_NEW_TASK` -> `FLAG_ACTIVITY_CLEAR_TASK`
-##### 2) `FLAG_ACTIVITY_NEW_TASK` -> `FLAG_ACTIVITY_MULTIPLE_TASK`
-##### 3) `FLAG_ACTIVITY_NEW_TASK` -> `FLAG_ACTIVITY_TASK_ON_HOME`
-#### 4.4.3 Disable Rule
-##### 1) `FLAG_ACTIVITY_NEW_TASK` => `FLAG_ACTIVITY_REORDER_TO_FRONT`
-##### 2) `FLAG_ACTIVITY_CLEAR_TOP` => `FLAG_ACTIVITY_REORDER_TO_FRONT`
-##### 3) `FLAG_ACTIVITY_CLEAR_TASK` => `FLAG_ACTIVITY_CLEAR_TOP`
-##### 4) `FLAG_ACTIVITY_CLEAR_TASK` => `FLAG_ACTIVITY_SINGLE_TOP`
