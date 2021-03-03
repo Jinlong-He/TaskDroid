@@ -1,0 +1,19 @@
+
+# CMake 最低版本号要求
+CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
+# 项目工程名
+PROJECT (TaskDroid)
+MESSAGE(STATUS "root This is SOURCE dir " ${PROJECT_SOURCE_DIR})
+INCLUDE_DIRECTORIES(
+  ${PROJECT_SOURCE_DIR}/include
+  /usr/local/include
+  /usr/include
+)
+
+SET (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/build/bin)
+SET (CMAKE_CXX_STANDARD 17)
+SET (CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -std=c++17")
+SET (CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall -std=c++17")
+
+# 添加子目录
+ADD_SUBDIRECTORY(src)
