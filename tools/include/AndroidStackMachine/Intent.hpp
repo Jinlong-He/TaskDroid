@@ -15,12 +15,13 @@
 using std::vector;
 namespace TaskDroid {
     enum FLAG {F_NTK, F_CTP, F_STP, F_CTK, F_MTK, F_TOM, F_RTF};
-    typedef vector<FLAG> FLAGs;
+    typedef unordered_set<FLAG> FLAGs;
     class Intent {
     public:
         Intent()
             : activity(nullptr),
-              flags() {}
+              flags(),
+              finish(false) {}
         Intent(Activity* activity_, const FLAGs& flags_ = FLAGs())
             : activity(activity_),
               flags(flags_) {}
@@ -28,11 +29,15 @@ namespace TaskDroid {
         Activity* getActivity() const;
         void setActivity(Activity* activity);
         const FLAGs& getFlags() const;
+        void setFinish(bool f);
+        bool isFinish() const;
         void setFlags(const FLAGs& flags);
         void addFlag(const FLAG& flag);
+        void addFlag(const string& flag);
     private:
         Activity* activity;
         FLAGs flags;
+        bool finish;
     };
 }
 

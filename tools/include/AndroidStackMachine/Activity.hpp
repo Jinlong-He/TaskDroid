@@ -11,10 +11,10 @@
 #define Activity_hpp 
 
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
+#include <boost/unordered_set.hpp>
+#include <boost/unordered_map.hpp>
 #include "FragmentTransaction.hpp"
-using std::string, std::unordered_set, std::unordered_map;
+using std::string, boost::unordered_set, boost::unordered_map;
 namespace TaskDroid {
     enum LaunchMode {STD, STK, STP, SIT};
     typedef unordered_set<FragmentTransaction*> FragmentTransactions;

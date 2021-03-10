@@ -1,9 +1,13 @@
 #include <iostream>
 #include "AndroidStackMachine/AndroidStackMachine.hpp"
+#include "Parser/ASMParser.hpp"
+#include "Analyzer/MutiTaskAnalyzer.hpp"
 using namespace TaskDroid;
 using std::cout, std::endl;
-int main () {
+int main (int argc, char* argv[]) {
     AndroidStackMachine a;
-    cout << a.mkActivity("A", "1", STD) -> getName() << endl;
+    ASMParser::parseManifest(argv[1], &a);
+    ASMParser::parseATG(argv[2], &a);
+    MutiTaskAnalyzer::analyzeReachability(&a, 5);
     return 0;
 }
