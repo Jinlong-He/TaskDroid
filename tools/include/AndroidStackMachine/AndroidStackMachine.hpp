@@ -10,27 +10,34 @@
 #ifndef AndroidStackMachine_hpp 
 #define AndroidStackMachine_hpp 
 
-#include "Activity.hpp"
+#include "Configuration.hpp"
 #include "Intent.hpp"
-using boost::unordered_map, boost::unordered_set;
+using boost::unordered_map, boost::unordered_set, std::pair;
 namespace TaskDroid {
+    typedef unordered_map<string, Fragment*> FragmentMap;
+    typedef vector<FragmentTransaction*> FragmentTransactionVec;
+    typedef unordered_map<Fragment*, FragmentTransactionVec> FragmentTransactionMap;
+    typedef unordered_map<Activity*, FragmentTransactionVec> ActivityTransactionMap;
     typedef unordered_set<Activity*> Activities;
     typedef unordered_set<Intent*> Intents;
     typedef vector<Fragment*> FragmentVec;
     typedef vector<Activity*> ActivityVec;
     typedef vector<Intent*> IntentVec;
-    typedef unordered_map<Activity*, Intents> ActionMap;
+    typedef pair<Intent*, bool> Action;
+    typedef vector<Action> Actions;
+    typedef unordered_map<Activity*, Actions> ActionMap;
     typedef unordered_map<string, Activity*> ActivityMap;
+    typedef unordered_map<string, ID> AffinityMap;
+    typedef unordered_map<string, ID> ViewMap;
     enum ActionMode {PUSH, STOP, CTOP, CTSK, RTOF,
-                     PUSH_A, STOP_A, CTOP_A, CTSK_A, RTOF_A};
+                     PUSH_N, STOP_N, CTOP_N, CTSK_N, RTOF_N};
     class AndroidStackMachine {
     public:
         AndroidStackMachine()
             : mainActivity(nullptr),
               activityMap(),
               actionMap(),
-              intents(),
-              fragments() {}
+              intents() {}
         AndroidStackMachine(Activity* mainActivity_, 
                             const ActivityMap& activityMap_,
                             const ActionMap& actionMap_,
@@ -39,8 +46,7 @@ namespace TaskDroid {
             : mainActivity(mainActivity_),
               activityMap(activityMap_),
               actionMap(actionMap_),
-              intents(intents_),
-              fragments(fragments_) {}
+              intents(intents_) {}
         ~AndroidStackMachine() {
             for (auto& pair : activityMap) {
                 delete pair.second;
@@ -50,31 +56,48 @@ namespace TaskDroid {
                 delete intent;
                 intent = nullptr;
             }
-            for (auto fragment : fragments) {
-                delete fragment;
-                fragment = nullptr;
+            for (auto& pair : fragmentMap) {
+                delete pair.second;
+                pair.second = nullptr;
             }
         }
         Activity* mkActivity(const string& name, const string& affinity, const LaunchMode& launchMode);
         Intent* mkIntent(Activity* activity);
         Fragment* mkFragment(const string& name);
         Activity* getActivity(const string& name) const;
+        Fragment* getFragment(const string& name) const;
         void setMainActivity(Activity* activity);
         Activity* getMainActivity() const;
-        const unordered_set<string>& getAffinities() const;
+        const AffinityMap& getAffnityMap() const;
         const ActivityMap& getActivityMap() const;
         const ActionMap& getActionMap() const;
-        void addAction(Activity* activity, Intent* intent);
+        const ViewMap& getViewMap() const;
+        ID getTaskID(const string& affinity) const;
+        ID getViewID(const string& view) const;
+        void addAction(Activity* activity, Intent* intent, bool finish = false);
         void minimize();
         void print() const;
         static ActionMode getMode(Intent* intent);
+        static bool isNewMode(Intent* intent);
+
+        const FragmentMap& getFragmentMap() const;
+        const FragmentTransactionMap& getFragmentTransactionMap() const;
+        const ActivityTransactionMap& getActivityTransactionMap() const;
+        void setFragmentTransactionMap(const FragmentTransactionMap& fragmentTransactionMap);
+        void addFragmentTransaction(Fragment* fragment, FragmentTransaction* fragmentTransaction);
+        void addFragmentTransaction(Activity* activity, FragmentTransaction* fragmentTransaction);
+        FragmentTransaction* mkFragmentTransaction();
     private:
         Activity* mainActivity;
         ActivityMap activityMap;
         ActionMap actionMap;
+        AffinityMap affinityMap;
+        ViewMap viewMap;
+        FragmentMap fragmentMap;
         IntentVec intents;
-        FragmentVec fragments;
-        unordered_set<string> affinities;
+        ActivityTransactionMap activityTransactionMap;
+        FragmentTransactionMap fragmentTransactionMap;
+        FragmentTransactionVec fragmentTransactions;
     };
 }
 #endif /* AndroidStackMachine_hpp */

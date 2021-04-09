@@ -8,14 +8,6 @@ namespace TaskDroid {
         this -> activity = activity;
     }
 
-    void Intent::setFinish(bool f) {
-        finish = f;
-    }
-
-    bool Intent::isFinish() const {
-        return finish;
-    }
-
     const FLAGs& Intent::getFlags() const {
         return flags;
     }

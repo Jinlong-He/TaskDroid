@@ -1,6 +1,7 @@
 #include "Parser/ASMParser.hpp"
-#include "fml/util/util.hpp"
+#include "util/util.hpp"
 #include <iostream>
+#include <regex>
 using std::cout, std::endl;
 namespace TaskDroid {
     void ASMParser::parse(const char* fileName, AndroidStackMachine* a) {
@@ -94,11 +95,128 @@ namespace TaskDroid {
                                 intent -> addFlag(flag);
                             }
                         }
-                        a -> addAction(sourceActivity, intent);
+                        if (des -> FindAttribute("finish")) {
+                            string finish = des -> Attribute("finish");
+                            if (finish == "true") {
+                                a -> addAction(sourceActivity, intent, true);
+                            } else {
+                                a -> addAction(sourceActivity, intent, false);
+                            }
+                        } else {
+                            a -> addAction(sourceActivity, intent, false);
+                        }
                         des = des -> NextSiblingElement();
                     }
                 }
                 element = element -> NextSiblingElement();
+            }
+        }
+    }
+
+    void ASMParser::parseFragment(const char* fileName, AndroidStackMachine* a) {
+        XMLDocument doc;
+        doc.LoadFile(fileName);
+        XMLElement* root = doc.RootElement();
+        if (root -> FirstChildElement()) {
+            auto singleMethod = root -> FirstChildElement();
+            while (singleMethod) {
+                if (!singleMethod -> FirstChildElement()) {
+                    singleMethod = singleMethod -> NextSiblingElement();
+                    continue;
+                }
+                auto singleFragment = singleMethod -> FirstChildElement();
+                while (singleFragment) {
+                    if (!singleFragment -> FirstChildElement()) {
+                        singleFragment = singleFragment -> NextSiblingElement();
+                        continue;
+                    }
+                    auto element = singleFragment -> FirstChildElement();
+                    while (element) {
+                        string list = element -> Name();
+                        if (list == "setDestinationList") {
+                            string names = element -> Attribute("value");
+                            for (auto& name : util::split(names, ", ")) {
+                                a -> mkFragment(name);
+                            }
+                        }
+                        element = element -> NextSiblingElement();
+                    }
+                    singleFragment = singleFragment -> NextSiblingElement();
+                }
+                singleMethod = singleMethod -> NextSiblingElement();
+            }
+        }
+
+        root = doc.RootElement();
+        std::regex addPatten("(add|replace)\\(.*\\)>\\([0-9]+");
+        std::regex a2bPatten("(addToBackStack)\\(.*\\)");
+        if (root -> FirstChildElement()) {
+            auto singleMethod = root -> FirstChildElement();
+            while (singleMethod) {
+                if (!singleMethod -> FirstChildElement()) {
+                    singleMethod = singleMethod -> NextSiblingElement();
+                    continue;
+                }
+                string source = singleMethod -> Attribute("source");
+                string name = source.substr(1,source.find(":") - 1);
+                auto activity = a -> getActivity(name);
+                auto fragment = a -> getFragment(name);
+                auto singleFragment = singleMethod -> FirstChildElement();
+                while (singleFragment) {
+                    if (!singleFragment -> FirstChildElement()) {
+                        singleFragment = singleFragment -> NextSiblingElement();
+                        continue;
+                    }
+                    auto element = singleFragment -> FirstChildElement();
+                    vector<string> nameVec;
+                    while (element) {
+                        string list = element -> Name();
+                        auto transaction = a -> mkFragmentTransaction();
+                        if (list == "setDestinationList") {
+                            string names = element -> Attribute("value");
+                            nameVec = util::split(names, ", ");
+                        } else if (list == "flow") {
+                            if (!element -> FirstChildElement()) {
+                                element = element -> NextSiblingElement();
+                                continue;
+                            }
+                            auto data = element -> FirstChildElement();
+                            ID index = 0;
+                            while (data) {
+                                if (((string) data -> Name()) == "dataHandleList" ) {
+                                    string value = data -> Attribute("value");
+                                    std::smatch m;
+                                    if (std::regex_search(value, m, addPatten)) {
+                                        string result = m[0];
+                                        string viewId = result.substr(result.find(">(")+2);
+                                        auto mode = 
+                                            result.find("add") != string::npos ?
+                                            ADD : REP;
+                                        auto newFragment = a -> getFragment(
+                                                nameVec[index++]);
+                                        transaction -> addFragmentAction(
+                                                mode, newFragment, viewId);
+                                    } else if (std::regex_search(value, m, a2bPatten)) {
+                                        transaction -> setAddTobackStack(1);
+                                    }
+                                        
+                                }
+                                data = data -> NextSiblingElement();
+                            }
+                            if (fragment && 
+                                transaction -> getFragmentActions().size() > 0) {
+                                a -> addFragmentTransaction(fragment, transaction);
+                            }
+                            if (activity && 
+                                transaction -> getFragmentActions().size() > 0) {
+                                a -> addFragmentTransaction(activity, transaction);
+                            }
+                        }
+                        element = element -> NextSiblingElement();
+                    }
+                    singleFragment = singleFragment -> NextSiblingElement();
+                }
+                singleMethod = singleMethod -> NextSiblingElement();
             }
         }
     }

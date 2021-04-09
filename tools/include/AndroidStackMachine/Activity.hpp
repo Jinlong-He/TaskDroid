@@ -17,25 +17,17 @@
 using std::string, boost::unordered_set, boost::unordered_map;
 namespace TaskDroid {
     enum LaunchMode {STD, STK, STP, SIT};
-    typedef unordered_set<FragmentTransaction*> FragmentTransactions;
-    typedef vector<FragmentTransaction*> FragmentTransactionVec;
-    typedef unordered_map<Fragment*, FragmentTransactions> FragmentTransactionMap;
     class Activity {
     public:
         Activity()
             : name(""),
               affinity(""),
-              launchMode(STD),
-              fragmentTransactionMap() {}
+              launchMode(STD) {}
         Activity(const string& name_, const string& affinity_, const LaunchMode& launchMode_)
             : name(name_),
               affinity(affinity_),
               launchMode(launchMode_) {}
         ~Activity() {
-            for (auto fragmentTransaction : fragmentTransactions) {
-                delete fragmentTransaction;
-                fragmentTransaction = nullptr;
-            }
         }
         const string& getName() const;
         void setName(const string& name);
@@ -43,16 +35,10 @@ namespace TaskDroid {
         void setAffinity(const string& affinity);
         const LaunchMode& getLaunchMode() const;
         void setLaunchMode(const LaunchMode& launchMode);
-        const FragmentTransactionMap& getFragmentTransactionMap() const;
-        void setFragmentTransactionMap(const FragmentTransactionMap& fragmentTransactionMap);
-        void addFragmentTransaction(Fragment* fragment, FragmentTransaction* fragmentTransaction);
-        FragmentTransaction* mkFragmentTransaction();
     private:
         string name;
         string affinity;
         LaunchMode launchMode;
-        FragmentTransactionMap fragmentTransactionMap;
-        FragmentTransactionVec fragmentTransactions;
     };
 }
 

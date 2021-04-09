@@ -50,7 +50,7 @@
             android:launchMode="standard"
             android:theme="@style/DarkTheme"
             android:uiOptions="splitActionBarWhenNarrow" 
-            android:taskAffinity="A" >
+            android:taskAffinity="B" >
         </activity>
         <activity
             android:name="C"

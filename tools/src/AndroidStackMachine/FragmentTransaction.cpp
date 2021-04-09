@@ -16,7 +16,7 @@ namespace TaskDroid {
         this -> fragmentActions = fragmentActions;
     }
 
-    void FragmentTransaction::addFragmentAction(Action action, Fragment* fragment, ID viewID) {
-        fragmentActions.emplace_back(FragmentTransaction::FragmentAction(action, fragment, viewID));
+    void FragmentTransaction::addFragmentAction(FragmentMode mode, Fragment* fragment, const string viewID) {
+        fragmentActions.emplace_back(FragmentTransaction::FragmentAction(mode, fragment, viewID));
     }
 }

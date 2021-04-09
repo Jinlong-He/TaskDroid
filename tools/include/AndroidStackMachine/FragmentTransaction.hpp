@@ -14,23 +14,35 @@
 #include "Fragment.hpp"
 using std::vector;
 namespace TaskDroid {
-    enum Action {ADD, REM, REP, HID, SHO};
+    enum FragmentMode {ADD, REM, REP};
     typedef size_t ID;
     class FragmentTransaction {
     public:
         struct FragmentAction {
             FragmentAction()
-                : action(ADD),
+                : mode(ADD),
                   fragment(nullptr),
-                  viewID(-1) {}
-            FragmentAction(Action action_, Fragment* fragment_, ID viewID_ = -1)
-                : action (action_),
+                  viewID("") {}
+            FragmentAction(FragmentMode mode_, Fragment* fragment_, 
+                           const string viewID_ = "")
+                : mode (mode_),
                   fragment(fragment_),
                   viewID(viewID_) {}
+            FragmentMode getFragmentMode() const {
+                return mode;
+            }
+
+            Fragment* getFragment() const {
+                return fragment;
+            }
+
+            const string getViewID() const {
+                return viewID;
+            }
         private:
-            Action action;
+            FragmentMode mode;
             Fragment* fragment;
-            ID viewID;
+            string viewID;
         };
         typedef vector<FragmentAction> FragmentActions;
 
@@ -46,11 +58,12 @@ namespace TaskDroid {
         void setAddTobackStack(bool addToBackStack);
         const FragmentActions& getFragmentActions() const;
         void setFragmentActions(const FragmentActions& fragmentActions);
-        void addFragmentAction(Action action, Fragment* fragment, ID viewID = -1);
+        void addFragmentAction(FragmentMode mode, Fragment* fragment, const string viewID = "");
     private:
         bool addToBackStack;
         FragmentActions fragmentActions;
     };
+    typedef FragmentTransaction::FragmentAction FragmentAction;
     typedef FragmentTransaction::FragmentActions FragmentActions;
 }
 #endif /* FragmentTransaction_hpp */

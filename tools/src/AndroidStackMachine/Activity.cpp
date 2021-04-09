@@ -23,22 +23,4 @@ namespace TaskDroid {
     void Activity::setLaunchMode(const LaunchMode& launchMode) {
         this -> launchMode = launchMode;
     }
-
-    const FragmentTransactionMap& Activity::getFragmentTransactionMap() const {
-        return fragmentTransactionMap;
-    }
-
-    void Activity::setFragmentTransactionMap(const FragmentTransactionMap& fragmentTransactionMap) {
-        this -> fragmentTransactionMap = fragmentTransactionMap;
-    }
-
-    void Activity::addFragmentTransaction(Fragment* fragment, FragmentTransaction* fragmentTransaction) {
-        fragmentTransactionMap[fragment].insert(fragmentTransaction);
-    }
-
-    FragmentTransaction* Activity::mkFragmentTransaction() {
-        FragmentTransaction* fragmentTransaction = new FragmentTransaction();
-        fragmentTransactions.emplace_back(fragmentTransaction);
-        return fragmentTransaction;
-    }
 }

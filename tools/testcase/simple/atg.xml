@@ -2,12 +2,9 @@
 
 <root>
   <source name="A">
-    <destination name="B" type="Class2Comp" action="com.csipsimple.phone.action.INCALL" extras="Parcelable@-&quot;call_info&quot;:new com.csipsimple.api.SipCallSession, Parcelable@-&quot;call_info&quot;:new com.csipsimple.api.SipCallSession" flags="FLAG_ACTIVITY_CLEAR_TOP "/>
+    <destination name="B" type="Class2Comp" action="com.csipsimple.phone.action.INCALL" extras="Parcelable@-&quot;call_info&quot;:new com.csipsimple.api.SipCallSession, Parcelable@-&quot;call_info&quot;:new com.csipsimple.api.SipCallSession" flags="FLAG_ACTIVITY_NEW_TASK FLAG_ACTIVITY_CLEAR_TOP"/>
   </source>
   <source name="B">
-    <destination name="C" type="Class2Comp" action="com.csipsimple.phone.action.INCALL" extras="Parcelable@-&quot;call_info&quot;:new com.csipsimple.api.SipCallSession, Parcelable@-&quot;call_info&quot;:new com.csipsimple.api.SipCallSession" />
-  </source>
-  <source name="C">
-    <destination name="B" type="Class2Comp" action="com.csipsimple.phone.action.INCALL" extras="Parcelable@-&quot;call_info&quot;:new com.csipsimple.api.SipCallSession, Parcelable@-&quot;call_info&quot;:new com.csipsimple.api.SipCallSession" flags="FLAG_ACTIVITY_CLEAR_TASK "/>
+    <destination name="C" type="Class2Comp" action="com.csipsimple.phone.action.INCALL" extras="Parcelable@-&quot;call_info&quot;:new com.csipsimple.api.SipCallSession, Parcelable@-&quot;call_info&quot;:new com.csipsimple.api.SipCallSession" flags="FLAG_ACTIVITY_CLEAR_TOP "/>
   </source>
 </root>
