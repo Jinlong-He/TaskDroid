@@ -124,6 +124,9 @@ namespace TaskDroid {
                     singleMethod = singleMethod -> NextSiblingElement();
                     continue;
                 }
+                string source = singleMethod -> Attribute("source");
+                string name = source.substr(1,source.find(":") - 1);
+                if (name.find("Fragment") != string::npos) a -> mkFragment(name);
                 auto singleFragment = singleMethod -> FirstChildElement();
                 while (singleFragment) {
                     if (!singleFragment -> FirstChildElement()) {

@@ -26,6 +26,10 @@ namespace TaskDroid {
         return fragmentMap;
     }
 
+    const ViewMap& AndroidStackMachine::getViewMap() const {
+        return viewMap;
+    }
+
     ID AndroidStackMachine::getTaskID(const string& affinity) const {
         if (affinityMap.count(affinity) == 0) return -1;
         return affinityMap.at(affinity);

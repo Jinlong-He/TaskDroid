@@ -20,12 +20,24 @@ namespace TaskDroid {
         FragmentAnalyzer()
             : k(0),
               h(0),
-              a(nullptr) {}
+              a(nullptr),
+              nullValue("null"),
+              sharpValue("sharp"),
+              popValue("pop"),
+              orderValues({nullValue}),
+              transactionValues({nullValue, popValue}),
+              fragmentValues({nullValue}) {}
 
         FragmentAnalyzer(ID k_, ID h_)
             : k(k_),
               h(h_),
-              a(nullptr) {}
+              a(nullptr),
+              nullValue("null"),
+              sharpValue("sharp"),
+              popValue("pop"),
+              orderValues({nullValue}),
+              transactionValues({nullValue, popValue}),
+              fragmentValues({nullValue}) {}
 
         void analyzeBoundedness();
         void analyzeReachability();
@@ -43,8 +55,17 @@ namespace TaskDroid {
                    const atomic_proposition& ap);
         void mkREP_B(FragmentAction* action, FragmentTransaction* transaction,
                      const atomic_proposition& ap);
+        void mkADDPOP(FragmentAction* action, FragmentTransaction* transaction,
+                     const atomic_proposition& ap);
+        void mkREPPOP(FragmentAction* action, FragmentTransaction* transaction,
+                     const atomic_proposition& ap);
+
         void translate2FOA();
         void getTopOrderAP(ID viewID, ID stackID, atomic_proposition& ap);
+        void getREPOrderAP(ID viewID, ID stackID, atomic_proposition& ap);
+        void mkREPOrder(ID viewID, const atomic_proposition& ap);
+        void mkREP_BOrder(ID viewID, FragmentTransaction* transaction, const atomic_proposition& ap);
+        void mkPOPOrder(ID viewID, FragmentTransaction* transaction, const atomic_proposition& ap);
 
         ID k;
         ID h;
@@ -55,6 +76,7 @@ namespace TaskDroid {
 
         FragmentTransactionMap backTransactionMap;
         enum_value nullValue;
+        enum_value sharpValue;
         enum_value popValue;
         enum_variable transactionVar;
         vector<item*> items;
