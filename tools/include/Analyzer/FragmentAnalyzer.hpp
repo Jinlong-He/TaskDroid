@@ -24,9 +24,9 @@ namespace TaskDroid {
               nullValue("null"),
               sharpValue("sharp"),
               popValue("pop"),
-              orderValues({nullValue}),
               transactionValues({nullValue, popValue}),
-              fragmentValues({nullValue}) {}
+              fragmentValues({nullValue}),
+              orderValues({nullValue}) {}
 
         FragmentAnalyzer(ID k_, ID h_)
             : k(k_),
@@ -35,9 +35,9 @@ namespace TaskDroid {
               nullValue("null"),
               sharpValue("sharp"),
               popValue("pop"),
-              orderValues({nullValue}),
               transactionValues({nullValue, popValue}),
-              fragmentValues({nullValue}) {}
+              fragmentValues({nullValue}),
+              orderValues({nullValue}) {}
 
         void analyzeBoundedness();
         void analyzeReachability();
@@ -63,9 +63,13 @@ namespace TaskDroid {
         void translate2FOA();
         void getTopOrderAP(ID viewID, ID stackID, atomic_proposition& ap);
         void getREPOrderAP(ID viewID, ID stackID, atomic_proposition& ap);
-        void mkREPOrder(ID viewID, const atomic_proposition& ap);
-        void mkREP_BOrder(ID viewID, FragmentTransaction* transaction, const atomic_proposition& ap);
-        void mkPOPOrder(ID viewID, FragmentTransaction* transaction, const atomic_proposition& ap);
+        void mkREPOrder(FragmentAction* action, const atomic_proposition& ap);
+        void mkREP_BOrder(FragmentAction* action, 
+                          FragmentTransaction* transaction, 
+                          const atomic_proposition& ap);
+        void mkPOPOrder(FragmentAction* action, 
+                        FragmentTransaction* transaction, 
+                        const atomic_proposition& ap);
 
         ID k;
         ID h;

@@ -56,7 +56,7 @@ namespace test {
     };
 }
 
-namespace boost {
+namespace std {
     template<>
     struct hash<test::Symbol> {
         std::size_t operator() (const test::Symbol& c) const{

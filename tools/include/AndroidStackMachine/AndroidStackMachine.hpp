@@ -12,7 +12,7 @@
 
 #include "Configuration.hpp"
 #include "Intent.hpp"
-using boost::unordered_map, boost::unordered_set, std::pair;
+using std::unordered_map, std::unordered_set, std::pair;
 namespace TaskDroid {
     typedef unordered_map<string, Fragment*> FragmentMap;
     typedef vector<FragmentTransaction*> FragmentTransactionVec;

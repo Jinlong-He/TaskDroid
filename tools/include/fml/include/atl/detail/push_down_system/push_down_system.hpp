@@ -10,15 +10,14 @@
 #ifndef atl_detail_push_down_system_hpp 
 #define atl_detail_push_down_system_hpp
 
+#include <unordered_set>
+#include <unordered_map>
 #include <vector>
-#include <boost/unordered_set.hpp>
-#include <boost/unordered_map.hpp>
 #include <util/util.hpp>
 #include <atl/detail/automaton.hpp>
 #include <atl/detail/no_type.hpp>
 
-using boost::unordered_map;
-using boost::unordered_set;
+using std::unordered_map, std::unordered_set;
 
 namespace atl {
     namespace detail {
@@ -89,12 +88,10 @@ namespace atl {
 
             typedef typename std::conditional<std::is_same<SymbolProperty, no_type>::value,
                                   unordered_map<State, 
-                                            unordered_set<std::vector<Symbol>,
-                                                      boost::hash<std::vector<Symbol> > > >, 
+                                        unordered_set<std::vector<Symbol> > > , 
                                   unordered_map<State, 
                                             unordered_map<std::vector<Symbol>, 
-                                                      unordered_set<SymbolProperty>,
-                                                      boost::hash<std::vector<Symbol> > > > >::type
+                                                      unordered_set<SymbolProperty> > > >::type
                 State2StackMap;
 
             typedef unordered_map<State, unordered_map<Symbol, State2StackMap> > TransitionMap;

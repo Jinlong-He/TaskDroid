@@ -104,6 +104,14 @@ namespace TaskDroid {
         return isDel(check, c + 1);
     }
 
+    bool isDel(unordered_map<enum_value*, unordered_set<ID> >& checks) {
+        bool res = false;
+        for (auto& [v, check] : checks) {
+            res |= isDel(check, 0);
+        }
+        return res;
+    }
+
     void FragmentAnalyzer::mkOrderValues() {
         vector<pair<enum_value*, ID> > fts;
         for (auto& [f, transactions] : a -> getFragmentTransactionMap()) {
@@ -114,6 +122,10 @@ namespace TaskDroid {
                 }
             }
         }
+        vector<vector<ID> > oldOrders;
+        getOrders(k, (ID)-1, oldOrders);
+
+
         for (ID hide = 0; hide <= k; hide++) {
             ID show = k - hide;
             vector<vector<ID> > hideOrders, showOrders;
@@ -137,11 +149,12 @@ namespace TaskDroid {
                         util::shuffle(hideOrder, showOrder, shuffleOrders);
                         for (auto& order : shuffleOrders) {
                             string name = "o";
-                            unordered_set<ID> check;
+                            unordered_map<enum_value*, unordered_set<ID> > checks;
                             for (auto& [i, pair] : order) {
-                                if (pair.second != -1) check.insert(pair.second);
+                                if (pair.second != -1) 
+                                    checks[pair.first].insert(pair.second);
                             }
-                            if (isDel(check, 0)) continue;
+                            if (isDel(checks)) continue;
                             for (auto& [i, pair] : order) {
                                 if (pair.second == -1) name += "_S";
                                 else name += "_H" + to_string(pair.second) + pair.first -> identifier() + "o";
@@ -149,6 +162,7 @@ namespace TaskDroid {
                                 else name += "null";
                             }
                             if (names.insert(name).second && name.find("onull") == string::npos) {
+                                cout << name << endl;
                                 orders.emplace_back(order);
                                 enum_value* v = new enum_value(name);
                                 orderValueMap[order] = v;
@@ -187,7 +201,6 @@ namespace TaskDroid {
     }
 
     void FragmentAnalyzer::mkFragmentVars() {
-        ID id = 0;
         for (ID i = 0; i < viewNum; i++) {
             auto& map = fragmentVarMap[i];
             for (ID l = 0; l < h; l++) {
@@ -238,8 +251,10 @@ namespace TaskDroid {
         if (ap.to_string() == "FALSE") ap = atomic_proposition("TRUE");
     }
 
-    void FragmentAnalyzer::mkPOPOrder(ID viewID, FragmentTransaction* transaction,
+    void FragmentAnalyzer::mkPOPOrder(FragmentAction* action,
+                                      FragmentTransaction* transaction,
                                       const atomic_proposition& ap) {
+        auto viewID = a -> getViewID(action -> getViewID());
         auto& var = *orderVarMap.at(viewID);
         auto transactionValue = transactionValueMap.at(transaction);
         for (auto& order : orders) {
@@ -251,23 +266,24 @@ namespace TaskDroid {
                     newOrder[i] = pair(order[i].first, pair(nullptr, -1));
                     count++;
                 }
-                if (order[i].second.first == transactionValue && 
-                    order[i].second.second > 0) {
-                    newOrder[i] = pair(order[i].first, 
-                                       pair(transactionValue, order[i].second.second - 1));
-                }
             }
             for (ID i = 0; i < order.size(); i++) {
-                if (order[i].second.first == nullptr) {
-                    auto height = order[i].second.second;
-                    if (height == h - 1) {
-                        newOrder[i] = pair(-1, pair(nullptr, -1));
-                    } else {
-                        newOrder[i] = pair(order[i].first, pair(transactionValue, height + 1));
-                    }
-                }
-                if (order[i].second.second != -1) {
+                //Show
+                if (order[i].second.first == nullptr &&
+                    order[i].first != -1) {
                     newOrder[i] = pair(newOrder[i].first + count, newOrder[i].second);
+                }
+                //Hide and height > 0
+                if (order[i].second.first == transactionValue && 
+                    order[i].second.second > 0) {
+                    newOrder[i] = pair(order[i].first - count, 
+                                       pair(transactionValue, order[i].second.second - 1));
+                }
+                //Hide and height > 0
+                if (order[i].second.first != transactionValue && 
+                    order[i].second.first != nullptr && 
+                    order[i].first > 0) {
+                    newOrder[i] = pair(order[i].first - count, order[i].second);
                 }
             }
             if (count) {
@@ -278,8 +294,10 @@ namespace TaskDroid {
         }
     }
 
-    void FragmentAnalyzer::mkREP_BOrder(ID viewID, FragmentTransaction* transaction,
+    void FragmentAnalyzer::mkREP_BOrder(FragmentAction* action,
+                                        FragmentTransaction* transaction,
                                         const atomic_proposition& ap) {
+        auto viewID = a -> getViewID(action -> getViewID());
         auto& var = *orderVarMap.at(viewID);
         auto transactionValue = transactionValueMap.at(transaction);
         for (auto& order : orders) {
@@ -313,7 +331,9 @@ namespace TaskDroid {
         }
     }
 
-    void FragmentAnalyzer::mkREPOrder(ID viewID, const atomic_proposition& ap) {
+    void FragmentAnalyzer::mkREPOrder(FragmentAction* action,
+                                      const atomic_proposition& ap) {
+        auto viewID = a -> getViewID(action -> getViewID());
         auto& var = *orderVarMap.at(viewID);
         for (auto& order : orders) {
             auto newOrder = order;
@@ -336,8 +356,8 @@ namespace TaskDroid {
                                  FragmentTransaction* transaction,
                                  const atomic_proposition& ap) {
         auto viewID = a -> getViewID(action -> getViewID());
-        if (transaction -> isAddTobackStack()) mkREP_BOrder(viewID, transaction, ap);
-        else mkREPOrder(viewID, ap);
+        if (transaction -> isAddTobackStack()) mkREP_BOrder(action, transaction, ap);
+        else mkREPOrder(action, ap);
         auto fragment = action -> getFragment();
         auto& newValue = transaction -> isAddTobackStack() ?
                          *backFragmentValueMap.at(pair(fragment, transaction)) :
@@ -403,7 +423,7 @@ namespace TaskDroid {
                                     FragmentTransaction* transaction,
                                     const atomic_proposition& ap) {
         mkADDPOP(action, transaction, ap);
-        mkPOPOrder()
+        mkPOPOrder(action, transaction, ap);
     }
 
     void FragmentAnalyzer::analyzeBoundedness() {
@@ -422,12 +442,15 @@ namespace TaskDroid {
                 for (auto action : transaction -> getFragmentActions()) {
                     auto mode = action.getFragmentMode();
                     auto ap = transactionVar == value;
+                    auto popAP = transactionVar == popValue;
                     switch (mode) {
                         case ADD :
                             mkADD(&action, transaction, ap);
+                            mkADDPOP(&action, transaction, popAP);
                             break;
                         case REP :
                             mkREP(&action, transaction, ap);
+                            mkREPPOP(&action, transaction, popAP);
                             break;
                         case REM :
                             break;
