@@ -22,47 +22,65 @@ namespace TaskDroid {
               h(0),
               a(nullptr),
               nullValue("null"),
-              sharpValue("sharp"),
               popValue("pop"),
+              sharpValue("sharp"),
               transactionValues({nullValue, popValue}),
-              fragmentValues({nullValue}),
-              orderValues({nullValue}) {}
+              backTransactionValues({nullValue}),
+              fragmentValues({nullValue, sharpValue}) {}
 
         FragmentAnalyzer(ID k_, ID h_)
             : k(k_),
               h(h_),
               a(nullptr),
               nullValue("null"),
-              sharpValue("sharp"),
               popValue("pop"),
+              sharpValue("sharp"),
               transactionValues({nullValue, popValue}),
-              fragmentValues({nullValue}),
-              orderValues({nullValue}) {}
+              backTransactionValues({nullValue}),
+              fragmentValues({nullValue, sharpValue}) {}
 
         void analyzeBoundedness();
-        void analyzeReachability();
+        void analyzeReachability(Activity* activity, const string& viewID,
+                                 const vector<Fragment*>& task);
+        void analyzeReachability(Activity* activity);
         void loadASM(AndroidStackMachine* a);
+        void setInitFragments(const unordered_map<string, Fragment*>& initFragments);
     private:
         void mkFragmentValues();
         void mkOrderValues();
+        void mkOrderValues1();
         void mkTransactionValues();
         void mkFragmentVars();
         void mkOrderVars();
         void mkTransactionVars();
-        void mkADD(FragmentAction* action, FragmentTransaction* transaction,
+        void mkADD(Fragment* sourceFragment, FragmentAction* action, 
+                   FragmentTransaction* transaction,
                    const atomic_proposition& ap);
-        void mkREP(FragmentAction* action, FragmentTransaction* transaction,
+        void mkREP(Fragment* sourceFragment, FragmentAction* action, 
+                   FragmentTransaction* transaction,
                    const atomic_proposition& ap);
-        void mkREP_B(FragmentAction* action, FragmentTransaction* transaction,
-                     const atomic_proposition& ap);
+        void mkREP_B(Fragment* sourceFragment, FragmentAction* action, 
+                   FragmentTransaction* transaction,
+                   const atomic_proposition& ap);
         void mkADDPOP(FragmentAction* action, FragmentTransaction* transaction,
                      const atomic_proposition& ap);
         void mkREPPOP(FragmentAction* action, FragmentTransaction* transaction,
                      const atomic_proposition& ap);
 
+        void mkA2B(FragmentAction* action, FragmentTransaction* transaction,
+                   const atomic_proposition& ap);
+
+        void endVars();
+
         void translate2FOA();
         void getTopOrderAP(ID viewID, ID stackID, atomic_proposition& ap);
         void getREPOrderAP(ID viewID, ID stackID, atomic_proposition& ap);
+        void getREP_BOrderAP(ID viewID, ID stackID, ID topID,
+                             atomic_proposition& ap);
+        void getPopTopAP(FragmentTransaction* transaction, 
+                         atomic_proposition& ap);
+        void getFragmentTopAP(ID viewID, ID taskID, Fragment* fragment,
+                              atomic_proposition& ap);
         void mkREPOrder(FragmentAction* action, const atomic_proposition& ap);
         void mkREP_BOrder(FragmentAction* action, 
                           FragmentTransaction* transaction, 
@@ -71,17 +89,27 @@ namespace TaskDroid {
                         FragmentTransaction* transaction, 
                         const atomic_proposition& ap);
 
+        void getStackAP(ID viewID, ID stackID, const vector<Fragment*>& task,
+                       atomic_proposition& ap);
+        void getStackAP(const string& viewID, const vector<Fragment*>& task,
+                       atomic_proposition& ap);
+
         ID k;
         ID h;
         AndroidStackMachine* a;
         fomula_automaton<> foa;
 
+        FragmentMap fragmentMap;
+        FragmentTransactionMap fragmentTransactionMap;
+        InitFragmentsMap initFragmentsMap;
+        ViewMap viewMap;
+
         ID viewNum;
 
         FragmentTransactionMap backTransactionMap;
         enum_value nullValue;
-        enum_value sharpValue;
         enum_value popValue;
+        enum_value sharpValue;
         enum_variable transactionVar;
         vector<item*> items;
         vector<vector<pair<ID, pair<enum_value*, ID> > > > orders;
@@ -92,12 +120,15 @@ namespace TaskDroid {
         unordered_map<string, ID> viewIDMap;
         unordered_map<vector<pair<ID, pair<enum_value*, ID> > >, enum_value*> orderValueMap;
         unordered_map<Fragment*, enum_value*> fragmentValueMap;
+        unordered_map<Fragment*, vector<enum_value*> > fragmentValuesMap;
+        unordered_map<FragmentTransaction*, enum_value*> transactionValueMap;
+        unordered_map<pair<Fragment*, FragmentTransaction*>, enum_value*> backFragmentValueMap;
         unordered_map<ID, 
             unordered_map<pair<ID, ID>, enum_variable*> > fragmentVarMap;
         unordered_map<ID, enum_variable*> backTransactionVarMap;
         unordered_map<ID, enum_variable*> orderVarMap;
-        unordered_map<FragmentTransaction*, enum_value*> transactionValueMap;
-        unordered_map<pair<Fragment*, FragmentTransaction*>, enum_value*> backFragmentValueMap;
+
+
     };
 }
 #endif /* FragmentAnalyzer_hpp */

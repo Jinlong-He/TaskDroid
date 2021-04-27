@@ -46,7 +46,7 @@ namespace TaskDroid {
         void analyze(AndroidStackMachine* a);
         bool analyzeBoundedness();
         void analyzeReachability(AndroidStackMachine* a, int k, 
-                                 const Configuration& configuration);
+                                 const Configuration<Activity>& configuration);
         void analyzeReachability(const string& affinity, 
                                  const vector<Activity*>& task);
         void translate2FOA();

@@ -15,12 +15,13 @@
 #include "Activity.hpp"
 using std::string, std::vector, std::pair;
 namespace TaskDroid {
+    template <class Symbol>
     class Configuration {
     public:
         Configuration() {}
-        void addTask(const string& affinity, const vector<Activity*> task);
+        void addTask(const string& address, const vector<Symbol*> task);
     private:
-        vector<pair<string, vector<Activity*> > > content;
+        vector<pair<string, vector<Symbol*> > > content;
     };
 }
 #endif /* Configuration_hpp */

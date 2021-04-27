@@ -26,6 +26,10 @@ namespace TaskDroid {
         return fragmentMap;
     }
 
+    const FragmentMap& AndroidStackMachine::getFragmentMap(Activity* activity) const {
+        return activity2FragmentsMap.at(activity);
+    }
+
     const ViewMap& AndroidStackMachine::getViewMap() const {
         return viewMap;
     }
@@ -56,8 +60,20 @@ namespace TaskDroid {
         return fragmentTransactionMap;
     }
 
+    const FragmentTransactionMap& AndroidStackMachine::getFragmentTransactionMap(Activity* activity) const {
+        return activity2FragmentTransactionMap.at(activity);
+    }
+
     const ActivityTransactionMap& AndroidStackMachine::getActivityTransactionMap() const {
         return activityTransactionMap;
+    }
+
+    const InitFragmentsMap& AndroidStackMachine::getInitFragmentsMap(Activity* activity) const {
+        return activity2InitFragmentsMap.at(activity);
+    }
+
+    const ViewMap& AndroidStackMachine::getViewMap(Activity* activity) const {
+        return activity2ViewMap.at(activity);
     }
 
     Intent* AndroidStackMachine::mkIntent(Activity* activity) {
@@ -153,6 +169,11 @@ namespace TaskDroid {
         }
     }
 
+    void AndroidStackMachine::fomalize() {
+        minimize();
+        formActivity();
+    }
+
     ActionMode AndroidStackMachine::getMode(Intent* intent) {
         const auto& flags = intent -> getFlags();
         auto activity = intent -> getActivity();
@@ -206,5 +227,74 @@ namespace TaskDroid {
 
     bool AndroidStackMachine::isNewMode(Intent* intent) {
         return (getMode(intent) > 4);
+    }
+
+    void AndroidStackMachine::formFragmentTransaction(FragmentTransaction* transaction) {
+        unordered_map<string, FragmentActions> fragmentActionsMap;
+        for (auto& action : transaction -> getFragmentActions()) {
+            fragmentActionsMap[action.getViewID()].emplace_back(action);
+        }
+        for (auto& [view, actions] : fragmentActionsMap) {
+            ID pos = -1;
+            for (ID i = 0; i < actions.size(); i++) {
+                if (actions[i].getFragmentMode() == REP) pos = i;
+            }
+            if (pos != -1) {
+                FragmentActions newActions(actions.begin() + pos, actions.end());
+                transaction -> setFragmentActions(newActions);
+            }
+        }
+    }
+
+    void AndroidStackMachine::formActivity(Fragment* fragment, 
+                                           FragmentTransactionMap& map,
+                                           FragmentMap& fragmentMap) {
+        if (fragmentMap.insert(pair(fragment -> getName(), fragment)).second) {
+            if (fragmentTransactionMap.count(fragment) == 0) return;
+            auto& transactions = fragmentTransactionMap.at(fragment);
+            map[fragment] = transactions;
+            for (auto& transaction : transactions) {
+                for (auto action : transaction -> getFragmentActions()) {
+                    formActivity(action.getFragment(), map, fragmentMap);
+                }
+            }
+        }
+    }
+
+    void AndroidStackMachine::formActivity() {
+        for (auto& [activity, transactions] : activityTransactionMap) {
+            for (auto& transaction : transactions) {
+                formFragmentTransaction(transaction);
+            }
+        }
+        for (auto& [fragment, transactions] : fragmentTransactionMap) {
+            for (auto& transaction : transactions) {
+                formFragmentTransaction(transaction);
+            }
+        }
+        for (auto& [activity, transactions] : activityTransactionMap) {
+            auto& initFragments = activity2InitFragmentsMap[activity];
+            auto& fragmentMap = activity2FragmentsMap[activity];
+            auto& fragmentTransactionMap = 
+                activity2FragmentTransactionMap[activity];
+            auto& viewMap = activity2ViewMap[activity];
+            for (auto& transaction : transactions) {
+                for (auto action : transaction -> getFragmentActions()) {
+                    auto fragment = action.getFragment();
+                    auto viewID = getViewID(action.getViewID());
+                    initFragments[viewID].emplace_back(fragment);
+                    formActivity(fragment, fragmentTransactionMap, fragmentMap);
+                }
+            }
+            for (auto& [fragment, transactions] : fragmentTransactionMap) {
+                for (auto& transaction : transactions) {
+                    for (auto& action : transaction -> getFragmentActions()) {
+                        if (viewMap.count(action.getViewID()) == 0) {
+                            viewMap[action.getViewID()] = viewMap.size();
+                        }
+                    }
+                }
+            }
+        }
     }
 }

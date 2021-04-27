@@ -138,6 +138,8 @@ namespace test {
 
     void test_basic_regular_expression();
     void test_transducer();
+
+    bool test_combination();
 }
 
 #endif /* test_hpp */

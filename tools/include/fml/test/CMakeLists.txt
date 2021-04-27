@@ -13,6 +13,7 @@ ADD_LIBRARY (test_fomula_automaton test_fomula_automaton.cpp)
 ADD_LIBRARY (test_propositional_logic test_propositional_logic.cpp)
 ADD_LIBRARY (test_ltl test_ltl.cpp)
 ADD_LIBRARY (test_ctl test_ctl.cpp)
+ADD_LIBRARY (test_util test_util.cpp)
 
 ADD_EXECUTABLE (main main.cpp)
 TARGET_LINK_LIBRARIES (main
@@ -32,6 +33,7 @@ TARGET_LINK_LIBRARIES (main
       test_propositional_logic
       test_ltl
       test_ctl
+      test_util
       Boost::unit_test_framework
   )
 

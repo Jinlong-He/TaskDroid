@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <root>
-  <singleMethod source="&lt;AFragment: void onBuildHeaders(java.util.List)&gt;">
+  <singleMethod source="&lt;A: void onBuildHeaders(java.util.List)&gt;">
     <SingleFragment>
       <setDestinationList value="BFragment"/>
       <flow>
@@ -17,6 +17,50 @@
       <setDestinationList value="CFragment"/>
       <flow>
         <createList value="$r4 = virtualinvoke r0.&lt;com.csipsimple.ui.calllog.CallLogDetailsActivity: android.support.v4.app.FragmentManager getSupportFragmentManager()&gt;()"/>
+        <dataHandleList value="$r5 = virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: android.support.v4.app.FragmentTransaction add(int,android.support.v4.app.Fragment)&gt;(16908290, r2), $r5 = virtualinvoke $r4.&lt;android.support.v4.app.FragmentManager: android.support.v4.app.FragmentTransaction beginTransaction()&gt;()"/>
+        <sendFragment2Start value="virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: int commit()&gt;()"/>
+        <sendFragment2Start value="virtualinvoke r0.&lt;com.csipsimple.ui.prefs.hc.MainPrefs: void loadHeadersFromResource(int,java.util.List)&gt;(2131034115, r1)"/>
+      </flow>
+    </SingleFragment>
+  </singleMethod>
+  <singleMethod source="&lt;CFragment: void onBuildHeaders(java.util.List)&gt;">
+    <SingleFragment>
+      <setDestinationList value="AFragment"/>
+      <flow>
+        <createList value="$r4 = virtualinvoke r0.&lt;com.csipsimple.ui.calllog.CallLogDetailsActivity: android.support.v4.app.FragmentManager getSupportFragmentManager()&gt;()"/>
+        <dataHandleList value="$r5 = virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: android.support.v4.app.FragmentTransaction add(int,android.support.v4.app.Fragment)&gt;(16908290, r2), $r5 = virtualinvoke $r4.&lt;android.support.v4.app.FragmentManager: android.support.v4.app.FragmentTransaction beginTransaction()&gt;()"/>
+        <sendFragment2Start value="virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: int commit()&gt;()"/>
+        <sendFragment2Start value="virtualinvoke r0.&lt;com.csipsimple.ui.prefs.hc.MainPrefs: void loadHeadersFromResource(int,java.util.List)&gt;(2131034115, r1)"/>
+      </flow>
+    </SingleFragment>
+  </singleMethod>
+  <singleMethod source="&lt;AFragment: void onBuildHeaders(java.util.List)&gt;">
+    <SingleFragment>
+      <setDestinationList value="BFragment"/>
+      <flow>
+        <createList value="$r4 = virtualinvoke r0.&lt;com.csipsimple.ui.calllog.CallLogDetailsActivity: android.support.v4.app.FragmentManager getSupportFragmentManager()&gt;()"/>
+        <dataHandleList value="$r5 = virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: android.support.v4.app.FragmentTransaction add(int,android.support.v4.app.Fragment)&gt;(16908290, r2), $r5 = virtualinvoke $r4.&lt;android.support.v4.app.FragmentManager: android.support.v4.app.FragmentTransaction beginTransaction()&gt;()"/>
+        <sendFragment2Start value="virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: int commit()&gt;()"/>
+        <sendFragment2Start value="virtualinvoke r0.&lt;com.csipsimple.ui.prefs.hc.MainPrefs: void loadHeadersFromResource(int,java.util.List)&gt;(2131034115, r1)"/>
+      </flow>
+    </SingleFragment>
+  </singleMethod>
+  <singleMethod source="&lt;CFragment: void onBuildHeaders(java.util.List)&gt;">
+    <SingleFragment>
+      <setDestinationList value="DFragment"/>
+      <flow>
+        <createList value="$r4 = virtualinvoke r0.&lt;com.csipsimple.ui.calllog.CallLogDetailsActivity: android.support.v4.app.FragmentManager getSupportFragmentManager()&gt;()"/>
+        <dataHandleList value="$r5 = virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: android.support.v4.app.FragmentTransaction add(int,android.support.v4.app.Fragment)&gt;(16908290, r2), $r5 = virtualinvoke $r4.&lt;android.support.v4.app.FragmentManager: android.support.v4.app.FragmentTransaction beginTransaction()&gt;()"/>
+        <sendFragment2Start value="virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: int commit()&gt;()"/>
+        <sendFragment2Start value="virtualinvoke r0.&lt;com.csipsimple.ui.prefs.hc.MainPrefs: void loadHeadersFromResource(int,java.util.List)&gt;(2131034115, r1)"/>
+      </flow>
+    </SingleFragment>
+  </singleMethod>
+  <singleMethod source="&lt;AFragment: void onBuildHeaders(java.util.List)&gt;">
+    <SingleFragment>
+      <setDestinationList value="CFragment"/>
+      <flow>
+        <createList value="$r4 = virtualinvoke r0.&lt;com.csipsimple.ui.calllog.CallLogDetailsActivity: android.support.v4.app.FragmentManager getSupportFragmentManager()&gt;()"/>
         <dataHandleList value="$r5 = virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: android.support.v4.app.FragmentTransaction replace(int,android.support.v4.app.Fragment)&gt;(16908290, r2), $r5 = virtualinvoke $r4.&lt;android.support.v4.app.FragmentManager: android.support.v4.app.FragmentTransaction beginTransaction()&gt;()"/>
         <dataHandleList value="$r8 = virtualinvoke $r7.&lt;android.support.v4.app.FragmentManager: android.support.v4.app.FragmentTransaction beginTransaction()&gt;(), virtualinvoke $r8.&lt;android.support.v4.app.FragmentTransaction: android.support.v4.app.FragmentTransaction addToBackStack(int,android.support.v4.app.Fragment,java.lang.String)&gt;(2131362040, r3, null)"/>
         <sendFragment2Start value="virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: int commit()&gt;()"/>
@@ -24,13 +68,12 @@
       </flow>
     </SingleFragment>
   </singleMethod>
-  <singleMethod source="&lt;BFragment: void onBuildHeaders(java.util.List)&gt;">
+  <singleMethod source="&lt;CFragment: void onBuildHeaders(java.util.List)&gt;">
     <SingleFragment>
-      <setDestinationList value="CFragment"/>
+      <setDestinationList value="BFragment"/>
       <flow>
         <createList value="$r4 = virtualinvoke r0.&lt;com.csipsimple.ui.calllog.CallLogDetailsActivity: android.support.v4.app.FragmentManager getSupportFragmentManager()&gt;()"/>
         <dataHandleList value="$r5 = virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: android.support.v4.app.FragmentTransaction add(int,android.support.v4.app.Fragment)&gt;(16908290, r2), $r5 = virtualinvoke $r4.&lt;android.support.v4.app.FragmentManager: android.support.v4.app.FragmentTransaction beginTransaction()&gt;()"/>
-        <dataHandleList value="$r8 = virtualinvoke $r7.&lt;android.support.v4.app.FragmentManager: android.support.v4.app.FragmentTransaction beginTransaction()&gt;(), virtualinvoke $r8.&lt;android.support.v4.app.FragmentTransaction: android.support.v4.app.FragmentTransaction addToBackStack(int,android.support.v4.app.Fragment,java.lang.String)&gt;(2131362040, r3, null)"/>
         <sendFragment2Start value="virtualinvoke $r5.&lt;android.support.v4.app.FragmentTransaction: int commit()&gt;()"/>
         <sendFragment2Start value="virtualinvoke r0.&lt;com.csipsimple.ui.prefs.hc.MainPrefs: void loadHeadersFromResource(int,java.util.List)&gt;(2131034115, r1)"/>
       </flow>

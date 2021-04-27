@@ -8,10 +8,25 @@ using std::cout, std::endl;
 int main (int argc, char* argv[]) {
     AndroidStackMachine a;
     ASMParser::parseManifest(argv[1], &a);
-    ASMParser::parseFragment(argv[2], &a);
-    FragmentAnalyzer analyzer(2,2);
+    ASMParser::parseATG(argv[2], &a);
+    ASMParser::parseFragment(argv[3], &a);
+    FragmentAnalyzer analyzer(5,2);
     analyzer.loadASM(&a);
-    analyzer.analyzeReachability();
+    for (auto& [name, activity] : a.getActivityMap()) {
+        if (a.getActivityTransactionMap().count(activity) != 0) {
+            if (a.getFragmentTransactionMap(activity).size() > 0) {
+                vector<Fragment*> task({a.getFragment("CFragment"),
+                                        a.getFragment("BFragment"),
+                                        a.getFragment("AFragment"),
+                                        a.getFragment("CFragment"),
+                                        a.getFragment("BFragment"),
+                                        a.getFragment("DFragment")});
+                //vector<Fragment*> task({a.getFragment("CFragment")});
+                analyzer.analyzeReachability(activity, "16908290", task);
+                break;
+            }
+        }
+    }
     //ASMParser::parseATG(argv[2], &a);
     //MultiTaskAnalyzer::analyzeReachability(&a, 5);
     //MultiTaskAnalyzer analyzer(6);

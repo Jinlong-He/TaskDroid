@@ -20,6 +20,7 @@ namespace TaskDroid {
     typedef unordered_map<Activity*, FragmentTransactionVec> ActivityTransactionMap;
     typedef unordered_set<Activity*> Activities;
     typedef unordered_set<Intent*> Intents;
+    typedef unordered_set<Fragment*> Fragments;
     typedef vector<Fragment*> FragmentVec;
     typedef vector<Activity*> ActivityVec;
     typedef vector<Intent*> IntentVec;
@@ -29,6 +30,7 @@ namespace TaskDroid {
     typedef unordered_map<string, Activity*> ActivityMap;
     typedef unordered_map<string, ID> AffinityMap;
     typedef unordered_map<string, ID> ViewMap;
+    typedef unordered_map<ID, FragmentVec> InitFragmentsMap;
     enum ActionMode {PUSH, STOP, CTOP, CTSK, RTOF,
                      PUSH_N, STOP_N, CTOP_N, CTSK_N, RTOF_N};
     class AndroidStackMachine {
@@ -76,17 +78,27 @@ namespace TaskDroid {
         ID getViewID(const string& view) const;
         void addAction(Activity* activity, Intent* intent, bool finish = false);
         void minimize();
+        void fomalize();
         void print() const;
         static ActionMode getMode(Intent* intent);
         static bool isNewMode(Intent* intent);
 
         const FragmentMap& getFragmentMap() const;
+        const FragmentMap& getFragmentMap(Activity* activity) const;
         const FragmentTransactionMap& getFragmentTransactionMap() const;
+        const FragmentTransactionMap& getFragmentTransactionMap(Activity* activity) const;
         const ActivityTransactionMap& getActivityTransactionMap() const;
+        const InitFragmentsMap& getInitFragmentsMap(Activity* activity) const;
+        const ViewMap& getViewMap(Activity* activity) const;
+
         void setFragmentTransactionMap(const FragmentTransactionMap& fragmentTransactionMap);
         void addFragmentTransaction(Fragment* fragment, FragmentTransaction* fragmentTransaction);
         void addFragmentTransaction(Activity* activity, FragmentTransaction* fragmentTransaction);
         FragmentTransaction* mkFragmentTransaction();
+        void formActivity();
+        void formActivity(Fragment* fragment, FragmentTransactionMap& map,
+                          FragmentMap& fragmentMap);
+        void formFragmentTransaction(FragmentTransaction* transaction);
     private:
         Activity* mainActivity;
         ActivityMap activityMap;
@@ -98,6 +110,12 @@ namespace TaskDroid {
         ActivityTransactionMap activityTransactionMap;
         FragmentTransactionMap fragmentTransactionMap;
         FragmentTransactionVec fragmentTransactions;
+        unordered_map<Activity*, FragmentMap> activity2FragmentsMap;
+        unordered_map<Activity*, InitFragmentsMap> activity2InitFragmentsMap;
+        unordered_map<Activity*, FragmentTransactionMap> 
+            activity2FragmentTransactionMap;
+        unordered_map<Activity*, ViewMap> 
+            activity2ViewMap;
     };
 }
 #endif /* AndroidStackMachine_hpp */

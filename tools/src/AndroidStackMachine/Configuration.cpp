@@ -2,8 +2,9 @@
 #include <iostream>
 using std::cout, std::endl;
 namespace TaskDroid {
-    void Configuration::addTask(const string& affinity, 
-                                const vector<Activity*> task) {
-        content.push_back(pair(affinity, task));
+    template <class Symbol>
+    void Configuration<Symbol>::addTask(const string& address, 
+                                        const vector<Symbol*> task) {
+        content.push_back(pair(address, task));
     }
 }
