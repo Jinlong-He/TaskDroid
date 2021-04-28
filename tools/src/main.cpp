@@ -16,9 +16,10 @@ int main (int argc, char* argv[]) {
     for (auto& [name, activity] : a.getActivityMap()) {
         if (a.getActivityTransactionMap().count(activity) != 0) {
             if (a.getFragmentTransactionMap(activity).size() > 0) {
-                ASMParser::parseFragmentConfig(argv[4], &a, &config);
-                auto& content = config.getContent();
-                analyzer.analyzeReachability(activity, content[0].first, content[0].second);
+                analyzer.analyzeBoundedness(activity);
+                //ASMParser::parseFragmentConfig(argv[4], &a, &config);
+                //auto& content = config.getContent();
+                //analyzer.analyzeReachability(activity, content[0].first, content[0].second);
                 break;
             }
         }

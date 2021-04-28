@@ -1,0 +1,9 @@
+
+<root>
+  <view viewID="16908290">
+      <fragment name="AFragment"/> 
+      <fragment name="CFragment"/> 
+      <fragment name="BFragment"/> 
+      <fragment name="DFragment"/> 
+  </view>
+</root>

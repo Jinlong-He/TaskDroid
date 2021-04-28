@@ -664,8 +664,9 @@ namespace TaskDroid {
     }
 
     void FragmentAnalyzer::getGraph(ID viewID, Fragment* fragment,
+                                    typename LoopAnalyzer<Fragment>::Graph& graph,
                                     unordered_map<Fragment*, 
-                                        unordered_map<Fragment*, int> >& graph) {
+                                        typename LoopAnalyzer<Fragment>::Graph>& graphs) {
         if (fragmentTransactionMap.count(fragment) > 0) {
             auto& map = graph[fragment];
             for (auto& transaction : fragmentTransactionMap.at(fragment)) {
@@ -684,12 +685,12 @@ namespace TaskDroid {
 
     void FragmentAnalyzer::analyzeBoundedness(Activity* activity) {
         loadActivity(activity);
-        unordered_map<ID, unordered_map<Fragment*, 
-            unordered_map<Fragment*, int> > > id2Graph;
+        unordered_map<ID, typename LoopAnalyzer<Fragment>::Graph> id2Graph;
         for (auto& [viewID, fragments] : initFragmentsMap) {
+            unordered_map<Fragment*, typename LoopAnalyzer<Fragment>::Graph> graphs;
             auto& graph = id2Graph[viewID];
             auto init = fragments[fragments.size() - 1];
-            getGraph(viewID, init, graph);
+            getGraph(viewID, init, graph, graphs);
             vector<vector<Fragment*> > loops;
             LoopAnalyzer<Fragment>::getLoop(graph, init, loops);
             for (auto& loop : loops) {
