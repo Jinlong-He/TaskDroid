@@ -509,9 +509,6 @@ namespace TaskDroid {
             add_transition(foa, *var, *var, atomic_proposition("TRUE"));
     }
 
-    void FragmentAnalyzer::analyzeBoundedness() {
-    }
-
     void FragmentAnalyzer::translate2FOA() {
         mkFragmentValues();
         mkTransactionValues();
@@ -609,11 +606,9 @@ namespace TaskDroid {
         }
     }
 
-    void FragmentAnalyzer::getStackAP(const string& viewID,
-                                      const vector<Fragment*>& stack,
+    void FragmentAnalyzer::getStackAP(ID viewID, const vector<Fragment*>& stack,
                                       atomic_proposition& ap) {
-        auto vID = viewMap.at(viewID);
-        auto& var = *orderVarMap.at(vID);
+        auto& var = *orderVarMap.at(viewID);
         for (auto& order : orders) {
             vector<ID> stackOrder(k);
             ID num = 0;
@@ -638,7 +633,7 @@ namespace TaskDroid {
                     vector<Fragment*> newStack(stack.begin() + index, 
                                                stack.begin() + index + dev[i]);
                     index += dev[i];
-                    getStackAP(vID, stackOrder[i], newStack, p);
+                    getStackAP(viewID, stackOrder[i], newStack, p);
                     pp = p & pp;
                 }
                 stackAP = stackAP | pp;
@@ -647,15 +642,16 @@ namespace TaskDroid {
         }
     }
 
-
     void FragmentAnalyzer::analyzeReachability(Activity* activity,
                                                const string& viewID,
                                                const vector<Fragment*>& stack) {
-        fragmentMap = a -> getFragmentMap(activity);
-        fragmentTransactionMap = a -> getFragmentTransactionMap(activity);
-        initFragmentsMap = a -> getInitFragmentsMap(activity);
-        viewMap = a -> getViewMap(activity);
-        viewNum = viewMap.size();
+        loadActivity(activity);
+        analyzeReachability(activity, viewMap.at(viewID), stack);
+    }
+
+    void FragmentAnalyzer::analyzeReachability(Activity* activity, ID viewID,
+                                               const vector<Fragment*>& stack) {
+        loadActivity(activity);
         translate2FOA();
         auto ap = atomic_proposition("FALSE");
         getStackAP(viewID, stack, ap);
@@ -667,8 +663,56 @@ namespace TaskDroid {
         }
     }
 
+    void FragmentAnalyzer::getGraph(ID viewID, Fragment* fragment,
+                                    unordered_map<Fragment*, 
+                                        unordered_map<Fragment*, int> >& graph) {
+        if (fragmentTransactionMap.count(fragment) > 0) {
+            auto& map = graph[fragment];
+            for (auto& transaction : fragmentTransactionMap.at(fragment)) {
+                for (auto& action : transaction -> getFragmentActions()) {
+                    if (action.getFragmentMode() == ADD &&
+                        viewMap.at(action.getViewID()) == viewID) {
+                        auto newFragment = action.getFragment();
+                        map[newFragment] = 1;
+                        if (graph.count(newFragment) == 0) 
+                            getGraph(viewID, newFragment, graph);
+                    }
+                }
+            }
+        }
+    }
+
+    void FragmentAnalyzer::analyzeBoundedness(Activity* activity) {
+        loadActivity(activity);
+        unordered_map<ID, unordered_map<Fragment*, 
+            unordered_map<Fragment*, int> > > id2Graph;
+        for (auto& [viewID, fragments] : initFragmentsMap) {
+            auto& graph = id2Graph[viewID];
+            auto init = fragments[fragments.size() - 1];
+            getGraph(viewID, init, graph);
+            vector<vector<Fragment*> > loops;
+            LoopAnalyzer<Fragment>::getLoop(graph, init, loops);
+            for (auto& loop : loops) {
+                vector<Fragment*> path = fragments;
+                path.insert(path.end(), loop.begin() + 1, loop.end());
+                analyzeReachability(activity, viewID, path);
+                break;
+            }
+        }
+    }
+
     void FragmentAnalyzer::loadASM(AndroidStackMachine* a) {
         this -> a = a;
         this -> a -> fomalize();
+    }
+
+    void FragmentAnalyzer::loadActivity(Activity* activity) {
+        if (loads.count(activity) > 0) return;
+        fragmentMap = a -> getFragmentMap(activity);
+        fragmentTransactionMap = a -> getFragmentTransactionMap(activity);
+        initFragmentsMap = a -> getInitFragmentsMap(activity);
+        viewMap = a -> getViewMap(activity);
+        viewNum = viewMap.size();
+        loads.insert(activity);
     }
 }

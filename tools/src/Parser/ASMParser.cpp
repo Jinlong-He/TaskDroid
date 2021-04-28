@@ -223,4 +223,29 @@ namespace TaskDroid {
             }
         }
     }
+
+    void ASMParser::parseFragmentConfig(const char* fileName,
+                                        AndroidStackMachine* a,
+                                        Configuration<Fragment>* config) {
+        XMLDocument doc;
+        doc.LoadFile(fileName);
+        XMLElement* root = doc.RootElement();
+        if (!root -> FirstChildElement()) return;
+        auto viewElement = root -> FirstChildElement();
+        while (viewElement) {
+            string viewID = viewElement -> Attribute("viewID");
+            if (viewElement -> FirstChildElement()) {
+                auto fragmentElement = viewElement -> FirstChildElement();
+                vector<Fragment*> task;
+                while (fragmentElement) {
+                    string fragmentName = fragmentElement -> Attribute("name");
+                    auto fragment = a -> getFragment(fragmentName);
+                    task.emplace_back(fragment);
+                    fragmentElement = fragmentElement -> NextSiblingElement();
+                }
+                config -> addTask(viewID, task);
+            }
+            viewElement = viewElement -> NextSiblingElement();
+        }
+    }
 }

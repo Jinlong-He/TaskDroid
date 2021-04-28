@@ -12,6 +12,7 @@
 
 #include "../AndroidStackMachine/AndroidStackMachine.hpp"
 #include "atl/fomula_automaton/fomula_automaton.hpp"
+#include "LoopAnalyzer.hpp"
 using namespace atl;
 using namespace ll;
 namespace TaskDroid {

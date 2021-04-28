@@ -18,10 +18,16 @@ namespace TaskDroid {
     template <class Symbol>
     class Configuration {
     public:
+        typedef pair<string, vector<Symbol*> > TaskConfigration;
         Configuration() {}
-        void addTask(const string& address, const vector<Symbol*> task);
+        void addTask(const string& address, const vector<Symbol*> task) {
+            content.emplace_back(pair(address, task));
+        }
+        const vector<TaskConfigration>& getContent() const {
+            return content;
+        }
     private:
-        vector<pair<string, vector<Symbol*> > > content;
+        vector<TaskConfigration> content;
     };
 }
 #endif /* Configuration_hpp */

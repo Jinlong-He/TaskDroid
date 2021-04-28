@@ -170,52 +170,6 @@ namespace TaskDroid {
         }
     }
 
-    void getLoop(const unordered_map<Activity*,
-                                     unordered_map<Activity*, int> >& graph,
-                 Activity* init,
-                 vector<vector<Activity*> >& loops) {
-        typedef vector<Activity*> Path;
-        typedef vector<Path> Paths;
-        typedef unordered_map<Activity*, Paths> PathsMap;
-        PathsMap paths({{init, Paths({Path({init})})}});
-        unordered_map<Activity*, int> dis({{init, 0}});
-        queue<Activity*> q({init});
-        Activities visited;
-        while (!q.empty()) {
-            auto source = q.front();
-            q.pop();
-            if (graph.count(source) == 0) return;
-            for (auto& [target, weight] : graph.at(source)) {
-                if (visited.count(target) > 0) continue;
-                q.push(target);
-                if (dis.count(target) == 0) {
-                    dis[target] = dis[source] + weight;
-                    auto& ps = paths.at(source);
-                    for (auto& p : ps) {
-                        Path newPath = p;
-                        newPath.push_back(target);
-                        paths[target].push_back(newPath);
-                    }
-                } else {
-                    int w = dis.at(target);
-                    if (dis.at(source) + weight > w) {
-                        dis[target] = dis.at(source) + weight;
-                        auto& ps = paths.at(source);
-                        Paths newPs;
-                        for (auto& p : ps) {
-                            Path newPath = p;
-                            newPath.push_back(target);
-                            loops.push_back(newPath);
-                            newPs.push_back(newPath);
-                        }
-                        paths[target] = newPs;
-                        visited.insert(target);
-                    } 
-                }
-            }
-        }
-    }
-
     bool MultiTaskAnalyzer::analyzeBoundedness() {
         unordered_map<Activity*, ActionMap> completeActions;
         getCompleteActions(a, completeActions);
@@ -225,7 +179,7 @@ namespace TaskDroid {
             graph.clear();
             loops.clear();
             getGraph(completeGraph, graph);
-            getLoop(graph, realActivity, loops);
+            LoopAnalyzer<Activity>::getLoop(graph, realActivity, loops);
             if (loops.size() == 0) {
                 analyzeReachability(realActivity -> getAffinity(), vector<Activity*>());
                 return 0;

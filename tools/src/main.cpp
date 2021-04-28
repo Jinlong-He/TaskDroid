@@ -12,17 +12,13 @@ int main (int argc, char* argv[]) {
     ASMParser::parseFragment(argv[3], &a);
     FragmentAnalyzer analyzer(5,2);
     analyzer.loadASM(&a);
+    Configuration<Fragment> config;
     for (auto& [name, activity] : a.getActivityMap()) {
         if (a.getActivityTransactionMap().count(activity) != 0) {
             if (a.getFragmentTransactionMap(activity).size() > 0) {
-                vector<Fragment*> task({a.getFragment("CFragment"),
-                                        a.getFragment("BFragment"),
-                                        a.getFragment("AFragment"),
-                                        a.getFragment("CFragment"),
-                                        a.getFragment("BFragment"),
-                                        a.getFragment("DFragment")});
-                //vector<Fragment*> task({a.getFragment("CFragment")});
-                analyzer.analyzeReachability(activity, "16908290", task);
+                ASMParser::parseFragmentConfig(argv[4], &a, &config);
+                auto& content = config.getContent();
+                analyzer.analyzeReachability(activity, content[0].first, content[0].second);
                 break;
             }
         }

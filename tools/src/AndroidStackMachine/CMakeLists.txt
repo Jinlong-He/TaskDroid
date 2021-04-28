@@ -4,7 +4,6 @@ ADD_LIBRARY(AndroidStackMachine Fragment.cpp
                                 FragmentTransaction.cpp 
                                 Activity.cpp 
                                 Intent.cpp 
-                                Configuration.cpp
                                 AndroidStackMachine.cpp)
     
 

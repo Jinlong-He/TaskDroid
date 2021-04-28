@@ -20,6 +20,9 @@ namespace TaskDroid {
         static void parseManifest(const char* fileName, AndroidStackMachine* a);
         static void parseATG(const char* fileName, AndroidStackMachine* a);
         static void parseFragment(const char* fileName, AndroidStackMachine* a);
+        static void parseFragmentConfig(const char* fileName, 
+                                        AndroidStackMachine* a,
+                                        Configuration<Fragment>* config);
     };
 }
 #endif /* ASMParser_hpp */

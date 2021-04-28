@@ -12,6 +12,7 @@
 
 #include "../AndroidStackMachine/AndroidStackMachine.hpp"
 #include "atl/fomula_automaton/fomula_automaton.hpp"
+#include "LoopAnalyzer.hpp"
 using namespace atl;
 using namespace ll;
 namespace TaskDroid {
@@ -39,13 +40,17 @@ namespace TaskDroid {
               backTransactionValues({nullValue}),
               fragmentValues({nullValue, sharpValue}) {}
 
-        void analyzeBoundedness();
+        void analyzeBoundedness(Activity* activity);
         void analyzeReachability(Activity* activity, const string& viewID,
                                  const vector<Fragment*>& task);
         void analyzeReachability(Activity* activity);
+        void analyzeReachability(const char* config);
         void loadASM(AndroidStackMachine* a);
         void setInitFragments(const unordered_map<string, Fragment*>& initFragments);
     private:
+        void analyzeReachability(Activity* activity, ID viewID,
+                                 const vector<Fragment*>& task);
+        void loadActivity(Activity* activity);
         void mkFragmentValues();
         void mkOrderValues();
         void mkOrderValues1();
@@ -91,13 +96,18 @@ namespace TaskDroid {
 
         void getStackAP(ID viewID, ID stackID, const vector<Fragment*>& task,
                        atomic_proposition& ap);
-        void getStackAP(const string& viewID, const vector<Fragment*>& task,
+        void getStackAP(ID viewID, const vector<Fragment*>& task,
                        atomic_proposition& ap);
+        void getGraph(ID viewID, Fragment* fragment,
+                      unordered_map<Fragment*, 
+                                     unordered_map<Fragment*, int> >& graph);
 
         ID k;
         ID h;
         AndroidStackMachine* a;
         fomula_automaton<> foa;
+
+        unordered_set<Activity*> loads;
 
         FragmentMap fragmentMap;
         FragmentTransactionMap fragmentTransactionMap;

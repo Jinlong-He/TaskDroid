@@ -2,9 +2,14 @@
 #include <iostream>
 using std::cout, std::endl;
 namespace TaskDroid {
+
     template <class Symbol>
-    void Configuration<Symbol>::addTask(const string& address, 
-                                        const vector<Symbol*> task) {
-        content.push_back(pair(address, task));
+    const vector<typename Configuration<Symbol>::TaskConfigration>& Configuration<Symbol>::getContent() const {
+        return content;
+    }
+
+    template <class Symbol>
+    void Configuration<Symbol>::addTask(const string& address, const vector<Symbol*> task) {
+        content.emplace_back(pair(address, task));
     }
 }
