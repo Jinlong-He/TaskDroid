@@ -39,7 +39,8 @@ namespace TaskDroid {
             : mainActivity(nullptr),
               activityMap(),
               actionMap(),
-              intents() {}
+              intents(),
+              isFomalize(false) {}
         AndroidStackMachine(Activity* mainActivity_, 
                             const ActivityMap& activityMap_,
                             const ActionMap& actionMap_,
@@ -48,7 +49,9 @@ namespace TaskDroid {
             : mainActivity(mainActivity_),
               activityMap(activityMap_),
               actionMap(actionMap_),
-              intents(intents_) {}
+              intents(),
+              isFomalize(false) {}
+
         ~AndroidStackMachine() {
             for (auto& pair : activityMap) {
                 delete pair.second;
@@ -116,6 +119,7 @@ namespace TaskDroid {
             activity2FragmentTransactionMap;
         unordered_map<Activity*, ViewMap> 
             activity2ViewMap;
+        bool isFomalize;
     };
 }
 #endif /* AndroidStackMachine_hpp */

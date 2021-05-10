@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+  <component name="com.example.intentFlowBench.SubActivity1" type="Activity" exported="true">
+    <manifest>
+      <intent_filter action="intent_sub1" category="android.intent.category.DEFAULT"/>
+    </manifest>
+    <sender destination="com.example.intentFlowBench.SubActivity4" action="sub1Action_right, sub1Action_left" category="sub1Category_right, sub1Category_left" extras="String-source:SubActivity1,boolean-Sub1:1"/>
+    <receive extras="String-source"/>
+  </component>
+  <component name="com.example.intentFlowBench.SubActivity4" type="Activity">
+    <sender destination="com.example.intentFlowBench.SubActivity5, com.example.intentFlowBench.SubActivity2" flags="FLAG_ACTIVITY_NEW_TASK " extras="String-Sub4:opq,String-source:SubActivity4"/>
+    <receive extras="boolean-Sub3,String-source,boolean-Sub1"/>
+  </component>
+  <component name="com.example.intentFlowBench.SubActivity5" type="Activity">
+    <sender destination="com.example.intentFlowBench.SubActivity2, com.example.intentFlowBench.SubActivity3" action="intent_sub2, intent_sub3"/>
+  </component>
+  <component name="com.example.intentFlowBench.SubActivity2" type="Activity" exported="true">
+    <manifest>
+      <intent_filter action="intent_sub2" category="android.intent.category.DEFAULT"/>
+    </manifest>
+    <sender destination="com.example.intentFlowBench.SubActivity3" extras="String-source:SubActivity2,int-Sub2:200"/>
+    <receive action="actionCandidate" category="cateCandidate" data="notEmpty" extras="String-source"/>
+  </component>
+  <component name="com.example.intentFlowBench.SubActivity3" type="Activity" exported="true">
+    <manifest>
+      <intent_filter action="intent_sub3" category="android.intent.category.DEFAULT"/>
+    </manifest>
+    <sender destination="com.example.intentFlowBench.SubActivity4" extras="boolean-Sub3:0,String-source:SubActivity3"/>
+    <receive extras="int-Main,String-source,int-Sub2"/>
+  </component>
+  <component name="com.example.intentFlowBench.AbstractActivity" type="Activity"/>
+  <component name="com.example.intentFlowBench.SubActivity8" type="Activity">
+    <sender destination="com.example.intentFlowBench.SubActivity1" action="intent_sub1" extras="String-call_1:call_1"/>
+  </component>
+  <component name="com.example.intentFlowBench.SubActivity6" type="Activity">
+    <sender destination="com.example.intentFlowBench.SubActivity2, com.example.intentFlowBench.SubActivity3" action="intent_sub2, intent_sub1, intent_sub3" extras="String-call_11:call_11,String-call_22:call_22"/>
+  </component>
+  <component name="com.example.intentFlowBench.SubActivity7" type="Activity">
+    <sender destination="com.example.intentFlowBench.SubActivity1" action="intent_sub1" extras="String-call_1:call_1"/>
+  </component>
+  <component name="com.example.intentFlowBench.SubActivity9_1" type="Activity">
+    <sender destination="com.example.intentFlowBench.SubActivity1" action="intent_sub1"/>
+  </component>
+  <component name="com.example.intentFlowBench.SubActivity9_2" type="Activity">
+    <sender destination="com.example.intentFlowBench.SubActivity2" action="intent_sub2, intent_sub3"/>
+  </component>
+  <component name="com.example.intentFlowBench.MainActivity" type="Activity">
+    <manifest>
+      <intent_filter action="android.intent.action.MAIN" category="android.intent.category.LAUNCHER"/>
+    </manifest>
+    <sender destination="com.example.intentFlowBench.SubActivity2, com.example.intentFlowBench.SubActivity3" action="mainAction" category="mainCategory" flags="FLAG_ACTIVITY_CLEAR_TASK " extras="String-source:MainActivity,int-Main:100,String-Main:abc"/>
+  </component>
+</root>

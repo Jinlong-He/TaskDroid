@@ -1,0 +1,76 @@
+class com.example.intentFlowBench.ObjInfo$1 extends java.lang.Object implements android.os.Parcelable$Creator
+{
+
+    void <init>()
+    {
+        com.example.intentFlowBench.ObjInfo$1 r0;
+
+        r0 := @this: com.example.intentFlowBench.ObjInfo$1;
+
+        specialinvoke r0.<java.lang.Object: void <init>()>();
+
+        return;
+    }
+
+    public com.example.intentFlowBench.ObjInfo createFromParcel(android.os.Parcel)
+    {
+        com.example.intentFlowBench.ObjInfo$1 r0;
+        android.os.Parcel $r1;
+        com.example.intentFlowBench.ObjInfo $r2;
+
+        r0 := @this: com.example.intentFlowBench.ObjInfo$1;
+
+        $r1 := @parameter0: android.os.Parcel;
+
+        $r2 = new com.example.intentFlowBench.ObjInfo;
+
+        specialinvoke $r2.<com.example.intentFlowBench.ObjInfo: void <init>(android.os.Parcel)>($r1);
+
+        return $r2;
+    }
+
+    public volatile java.lang.Object createFromParcel(android.os.Parcel)
+    {
+        com.example.intentFlowBench.ObjInfo$1 r0;
+        android.os.Parcel $r1;
+        com.example.intentFlowBench.ObjInfo $r2;
+
+        r0 := @this: com.example.intentFlowBench.ObjInfo$1;
+
+        $r1 := @parameter0: android.os.Parcel;
+
+        $r2 = virtualinvoke r0.<com.example.intentFlowBench.ObjInfo$1: com.example.intentFlowBench.ObjInfo createFromParcel(android.os.Parcel)>($r1);
+
+        return $r2;
+    }
+
+    public com.example.intentFlowBench.ObjInfo[] newArray(int)
+    {
+        com.example.intentFlowBench.ObjInfo$1 r0;
+        int $i0;
+        com.example.intentFlowBench.ObjInfo[] $r1;
+
+        r0 := @this: com.example.intentFlowBench.ObjInfo$1;
+
+        $i0 := @parameter0: int;
+
+        $r1 = newarray (com.example.intentFlowBench.ObjInfo)[$i0];
+
+        return $r1;
+    }
+
+    public volatile java.lang.Object[] newArray(int)
+    {
+        com.example.intentFlowBench.ObjInfo$1 r0;
+        int $i0;
+        com.example.intentFlowBench.ObjInfo[] $r1;
+
+        r0 := @this: com.example.intentFlowBench.ObjInfo$1;
+
+        $i0 := @parameter0: int;
+
+        $r1 = virtualinvoke r0.<com.example.intentFlowBench.ObjInfo$1: com.example.intentFlowBench.ObjInfo[] newArray(int)>($i0);
+
+        return $r1;
+    }
+}

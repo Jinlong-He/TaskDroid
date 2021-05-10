@@ -1,0 +1,159 @@
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+Complete analysis due to timeout of 2 minutes!
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+Complete analysis due to timeout of 5 minutes!
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+get dummy Main!
+Call Graph has 215 edges.
+Call Graph has 112 edges.
+Successfully analyze with CallGraphClient.
+StaticValueAnalyzer finish.
+Successfully analyze with FragmentClient.
+
+This is the method #100/148
+Successfully analyze with ICTGClient.
+---------------------------------------
+Analyzing IntentFlowBench.apk Finish...
+
+Total time: 3seconds
+ICC Extractor Finish...
+
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+get dummy Main!
+Call Graph has 215 edges.
+Call Graph has 112 edges.
+Successfully analyze with CallGraphClient.
+StaticValueAnalyzer finish.
+Successfully analyze with FragmentClient.
+
+This is the method #100/148
+Successfully analyze with ICTGClient.
+---------------------------------------
+Analyzing IntentFlowBench.apk Finish...
+
+Total time: 3seconds
+ICC Extractor Finish...
+
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+get dummy Main!
+Call Graph has 215 edges.
+Call Graph has 112 edges.
+Successfully analyze with CallGraphClient.
+StaticValueAnalyzer finish.
+Successfully analyze with FragmentClient.
+
+This is the method #100/148
+Successfully analyze with ICTGClient.
+---------------------------------------
+Analyzing IntentFlowBench.apk Finish...
+
+Total time: 3seconds
+ICC Extractor Finish...
+
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+get dummy Main!
+Call Graph has 215 edges.
+Call Graph has 112 edges.
+Successfully analyze with CallGraphClient.
+StaticValueAnalyzer finish.
+Successfully analyze with FragmentClient.
+
+This is the method #100/148
+Successfully analyze with ICTGClient.
+---------------------------------------
+Analyzing IntentFlowBench.apk Finish...
+
+Total time: 3seconds
+ICC Extractor Finish...
+
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+get dummy Main!
+Call Graph has 215 edges.
+Call Graph has 112 edges.
+Successfully analyze with CallGraphClient.
+StaticValueAnalyzer finish.
+Successfully analyze with FragmentClient.
+
+This is the method #100/148
+Successfully analyze with ICTGClient.
+---------------------------------------
+Analyzing IntentFlowBench.apk Finish...
+
+Total time: 3seconds
+ICC Extractor Finish...
+
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+get dummy Main!
+Call Graph has 215 edges.
+Call Graph has 112 edges.
+Successfully analyze with CallGraphClient.
+StaticValueAnalyzer finish.
+Successfully analyze with FragmentClient.
+
+This is the method #100/148
+Successfully analyze with ICTGClient.
+---------------------------------------
+Analyzing IntentFlowBench.apk Finish...
+
+Total time: 3seconds
+ICC Extractor Finish...
+
+Analyzing IntentFlowBench.apk
+using client ICTGClient
+Successfully analyze with IROutputClient.
+Successfully analyze with ManifestClient.
+get dummy Main!
+Call Graph has 215 edges.
+Call Graph has 112 edges.
+Successfully analyze with CallGraphClient.
+StaticValueAnalyzer finish.
+Successfully analyze with FragmentClient.
+
+This is the method #100/148
+Successfully analyze with ICTGClient.
+---------------------------------------
+Analyzing IntentFlowBench.apk Finish...
+
+Total time: 3seconds
+ICC Extractor Finish...
+

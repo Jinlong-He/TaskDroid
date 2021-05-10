@@ -1,0 +1,37 @@
+public final class com.example.intentFlowBench.R$layout extends java.lang.Object
+{
+    public static final int main;
+    public static final int subact1;
+    public static final int subact2;
+    public static final int subact3;
+    public static final int subact4;
+    public static final int subact5;
+
+    public void <init>()
+    {
+        com.example.intentFlowBench.R$layout r0;
+
+        r0 := @this: com.example.intentFlowBench.R$layout;
+
+        specialinvoke r0.<java.lang.Object: void <init>()>();
+
+        return;
+    }
+
+    public static void <clinit>()
+    {
+        <com.example.intentFlowBench.R$layout: int subact5> = 2130903045;
+
+        <com.example.intentFlowBench.R$layout: int subact4> = 2130903044;
+
+        <com.example.intentFlowBench.R$layout: int subact3> = 2130903043;
+
+        <com.example.intentFlowBench.R$layout: int subact2> = 2130903042;
+
+        <com.example.intentFlowBench.R$layout: int subact1> = 2130903041;
+
+        <com.example.intentFlowBench.R$layout: int main> = 2130903040;
+
+        return;
+    }
+}

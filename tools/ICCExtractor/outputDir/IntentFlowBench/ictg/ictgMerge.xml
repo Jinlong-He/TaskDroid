@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+  <source name="com.example.intentFlowBench.SubActivity8">
+    <destination name="com.example.intentFlowBench.SubActivity1" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity8: void firstLevel()&gt;" InstructionId="8" action="intent_sub1" extras="String-call_1:call_1" flags=""/>
+  </source>
+  <source name="com.example.intentFlowBench.SubActivity6">
+    <destination name="com.example.intentFlowBench.SubActivity3" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity6: void analyzeIntentSub3()&gt;" InstructionId="5" action="intent_sub3" extras="" flags=""/>
+    <destination name="com.example.intentFlowBench.SubActivity2" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity6: void onCreate(android.os.Bundle)&gt;" InstructionId="-1" action="intent_sub2, intent_sub2, intent_sub2" extras="String-call_22:call_22" flags=""/>
+  </source>
+  <source name="com.example.intentFlowBench.SubActivity7">
+    <destination name="com.example.intentFlowBench.SubActivity1" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity7: void secondLevel()&gt;" InstructionId="4" action="intent_sub1" extras="String-call_1:call_1" flags=""/>
+  </source>
+  <source name="com.example.intentFlowBench.SubActivity9_1">
+    <destination name="com.example.intentFlowBench.SubActivity1" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity9_1: void onCreate(android.os.Bundle)&gt;" InstructionId="-1" action="intent_sub1, intent_sub1, intent_sub1" extras="" flags=""/>
+  </source>
+  <source name="com.example.intentFlowBench.SubActivity9_2">
+    <destination name="com.example.intentFlowBench.SubActivity2" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity9_2: void onCreate(android.os.Bundle)&gt;" InstructionId="-1" action="intent_sub2, intent_sub2, intent_sub2" extras="" flags=""/>
+  </source>
+  <source name="com.example.intentFlowBench.MainActivity">
+    <destination name="com.example.intentFlowBench.SubActivity3" type="Act2Act" method="&lt;com.example.intentFlowBench.MainActivity$3: void onClick(android.view.View)&gt;" InstructionId="8" extras="String-source:MainActivity,int-Main:100" flags=""/>
+    <destination name="com.example.intentFlowBench.SubActivity2" type="Act2Act" method="&lt;com.example.intentFlowBench.MainActivity$2: void onClick(android.view.View)&gt;" InstructionId="8" extras="String-source:MainActivity,String-Main:abc" flags=""/>
+  </source>
+  <source name="com.example.intentFlowBench.SubActivity1">
+    <destination name="com.example.intentFlowBench.SubActivity4" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity1$1: void onClick(android.view.View)&gt;" InstructionId="14" action="sub1Action_left" category="sub1Category_left" extras="String-source:SubActivity1,boolean-Sub1:1" flags=""/>
+    <destination name="com.example.intentFlowBench.SubActivity4" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity1$1: void onClick(android.view.View)&gt;" InstructionId="14" action="sub1Action_right" category="sub1Category_right" extras="String-source:SubActivity1,boolean-Sub1:1" flags=""/>
+  </source>
+  <source name="com.example.intentFlowBench.SubActivity4">
+    <destination name="com.example.intentFlowBench.SubActivity2" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity4$1: void onClick(android.view.View)&gt;" InstructionId="8" extras="String-Sub4:opq,String-source:SubActivity4" flags=""/>
+    <destination name="com.example.intentFlowBench.SubActivity5" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity4$2: void onClick(android.view.View)&gt;" InstructionId="7" extras="String-source:SubActivity4" flags=""/>
+  </source>
+  <source name="com.example.intentFlowBench.SubActivity5">
+    <destination name="com.example.intentFlowBench.SubActivity2" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity5: void onCreate(android.os.Bundle)&gt;" InstructionId="-1" action="intent_sub2" extras="" flags=""/>
+    <destination name="com.example.intentFlowBench.SubActivity3" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity5: void onCreate(android.os.Bundle)&gt;" InstructionId="-1" action="intent_sub3" extras="" flags=""/>
+  </source>
+  <source name="com.example.intentFlowBench.SubActivity2">
+    <destination name="com.example.intentFlowBench.SubActivity3" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity2$1: void onClick(android.view.View)&gt;" InstructionId="8" extras="String-source:SubActivity2,int-Sub2:200" flags=""/>
+  </source>
+  <source name="com.example.intentFlowBench.SubActivity3">
+    <destination name="com.example.intentFlowBench.SubActivity4" type="Act2Act" method="&lt;com.example.intentFlowBench.SubActivity3$2: void onClick(android.view.View)&gt;" InstructionId="8" extras="boolean-Sub3:0,String-source:SubActivity3" flags=""/>
+  </source>
+</root>

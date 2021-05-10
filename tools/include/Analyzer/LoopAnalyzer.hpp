@@ -17,11 +17,11 @@ namespace TaskDroid {
     template <class Symbol>
     class LoopAnalyzer {
     public:
-        typedef unordered_map<Symbol*, unordered_map<Symbol*, int> > Graph;
         typedef vector<Symbol*> Path;
         typedef vector<Path> Paths;
         typedef unordered_map<Symbol*, Paths> PathsMap;
-        static void getLoop(const Graph& graph, Symbol* init, vector<Path>& loops) {
+        typedef unordered_map<Symbol*, unordered_map<Symbol*, int> > Graph;
+        static void getLoop(const Graph& graph, Symbol* init, Paths& loops) {
             PathsMap paths({{init, Paths({Path({init})})}});
             unordered_map<Symbol*, int> dis({{init, 0}});
             queue<Symbol*> q({init});

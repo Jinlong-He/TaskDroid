@@ -1,0 +1,25 @@
+public final class com.example.intentFlowBench.R$drawable extends java.lang.Object
+{
+    public static final int icon;
+    public static final int imagebutton;
+
+    public void <init>()
+    {
+        com.example.intentFlowBench.R$drawable r0;
+
+        r0 := @this: com.example.intentFlowBench.R$drawable;
+
+        specialinvoke r0.<java.lang.Object: void <init>()>();
+
+        return;
+    }
+
+    public static void <clinit>()
+    {
+        <com.example.intentFlowBench.R$drawable: int imagebutton> = 2130837505;
+
+        <com.example.intentFlowBench.R$drawable: int icon> = 2130837504;
+
+        return;
+    }
+}

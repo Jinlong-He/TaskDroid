@@ -1,0 +1,14 @@
+public final class com.example.intentFlowBench.R$attr extends java.lang.Object
+{
+
+    public void <init>()
+    {
+        com.example.intentFlowBench.R$attr r0;
+
+        r0 := @this: com.example.intentFlowBench.R$attr;
+
+        specialinvoke r0.<java.lang.Object: void <init>()>();
+
+        return;
+    }
+}

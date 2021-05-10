@@ -22,6 +22,7 @@ namespace TaskDroid {
             : k(0),
               h(0),
               a(nullptr),
+              activity(nullptr),
               nullValue("null"),
               popValue("pop"),
               sharpValue("sharp"),
@@ -29,27 +30,36 @@ namespace TaskDroid {
               backTransactionValues({nullValue}),
               fragmentValues({nullValue, sharpValue}) {}
 
-        FragmentAnalyzer(ID k_, ID h_)
+        FragmentAnalyzer(ID k_, ID h_, 
+                         AndroidStackMachine* a_, Activity* activity_)
             : k(k_),
               h(h_),
-              a(nullptr),
+              a(a_),
+              activity(activity_),
               nullValue("null"),
               popValue("pop"),
               sharpValue("sharp"),
               transactionValues({nullValue, popValue}),
               backTransactionValues({nullValue}),
-              fragmentValues({nullValue, sharpValue}) {}
+              fragmentValues({nullValue, sharpValue}) {
+                  loadASM(a);
+                  loadActivity(activity);
+              }
 
-        void analyzeBoundedness(Activity* activity);
-        void analyzeReachability(Activity* activity, const string& viewID,
-                                 const vector<Fragment*>& task);
-        void analyzeReachability(Activity* activity);
-        void analyzeReachability(const char* config);
+        void analyzeBoundedness(std::ostream& os = std::cout);
+        void checkADD(std::ostream& os = std::cout);
+        void checkREP(std::ostream& os = std::cout);
+        void analyzeReachability(std::ostream& os = std::cout);
+        bool analyzeReachability(const string& viewID,
+                                 const vector<Fragment*>& task,
+                                 std::ostream& os = std::cout);
+        bool analyzeReachability(const char* config, std::ostream& os = std::cout);
+        bool analyzeReachability(ID viewID, const vector<Fragment*>& task, 
+                                 bool star = false,
+                                 std::ostream& os = std::cout);
         void loadASM(AndroidStackMachine* a);
         void setInitFragments(const unordered_map<string, Fragment*>& initFragments);
     private:
-        void analyzeReachability(Activity* activity, ID viewID,
-                                 const vector<Fragment*>& task);
         void loadActivity(Activity* activity);
         void mkFragmentValues();
         void mkOrderValues();
@@ -95,9 +105,9 @@ namespace TaskDroid {
                         const atomic_proposition& ap);
 
         void getStackAP(ID viewID, ID stackID, const vector<Fragment*>& task,
-                       atomic_proposition& ap);
+                       atomic_proposition& ap, int type = -1);
         void getStackAP(ID viewID, const vector<Fragment*>& task,
-                       atomic_proposition& ap);
+                       atomic_proposition& ap, bool star = false);
         void getGraph(ID viewID, Fragment* fragment,
                       unordered_map<Fragment*, 
                                      unordered_map<Fragment*, int> >& graph);
@@ -105,9 +115,8 @@ namespace TaskDroid {
         ID k;
         ID h;
         AndroidStackMachine* a;
+        Activity* activity;
         fomula_automaton<> foa;
-
-        unordered_set<Activity*> loads;
 
         FragmentMap fragmentMap;
         FragmentTransactionMap fragmentTransactionMap;
@@ -137,8 +146,7 @@ namespace TaskDroid {
             unordered_map<pair<ID, ID>, enum_variable*> > fragmentVarMap;
         unordered_map<ID, enum_variable*> backTransactionVarMap;
         unordered_map<ID, enum_variable*> orderVarMap;
-
-
+        unordered_map<string, FragmentTransaction*> value2TransactionMap;
     };
 }
 #endif /* FragmentAnalyzer_hpp */

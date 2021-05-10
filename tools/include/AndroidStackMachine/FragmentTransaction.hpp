@@ -23,11 +23,15 @@ namespace TaskDroid {
                 : mode(ADD),
                   fragment(nullptr),
                   viewID("") {}
+
             FragmentAction(FragmentMode mode_, Fragment* fragment_, 
-                           const string viewID_ = "")
+                           const string viewID_ = "",
+                           const vector<Fragment*> fragments_ = vector<Fragment*>())
                 : mode (mode_),
                   fragment(fragment_),
+                  fragments(fragments_),
                   viewID(viewID_) {}
+
             FragmentMode getFragmentMode() const {
                 return mode;
             }
@@ -36,12 +40,25 @@ namespace TaskDroid {
                 return fragment;
             }
 
-            const string getViewID() const {
+            const vector<Fragment*>& getFragments() const {
+                return fragments;
+            }
+
+            const string& getViewID() const {
                 return viewID;
+            }
+
+            string toString() const {
+                string res = "";
+                if (mode == ADD) res += "ADD(";
+                if (mode == REP) res += "REP(";
+                res += viewID + "," + fragment -> getName() + ")";
+                return res;
             }
         private:
             FragmentMode mode;
             Fragment* fragment;
+            vector<Fragment*> fragments;
             string viewID;
         };
         typedef vector<FragmentAction> FragmentActions;
@@ -57,11 +74,16 @@ namespace TaskDroid {
         bool isAddTobackStack() const;
         void setAddTobackStack(bool addToBackStack);
         const FragmentActions& getFragmentActions() const;
+        const FragmentActions& getHighLevelFragmentActions() const;
         void setFragmentActions(const FragmentActions& fragmentActions);
         void addFragmentAction(FragmentMode mode, Fragment* fragment, const string viewID = "");
+        void addHighLevelFragmentAction(FragmentMode mode, Fragment* fragment, const string viewID = "", const vector<Fragment*>& fragments = vector<Fragment*>());
+        void clear();
+        string toString() const;
     private:
         bool addToBackStack;
         FragmentActions fragmentActions;
+        FragmentActions highlevelFragmentActions;
     };
     typedef FragmentTransaction::FragmentAction FragmentAction;
     typedef FragmentTransaction::FragmentActions FragmentActions;

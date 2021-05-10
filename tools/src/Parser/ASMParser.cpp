@@ -11,7 +11,26 @@ namespace TaskDroid {
         cout << root -> FirstChildElement() -> Value();
     }
 
+    void ASMParser::parseManifestTxt(const char* fileName, AndroidStackMachine* a) {
+        std::ifstream fin(fileName);
+        string line;
+        while (getline(fin, line)) {
+            if (line.find("activity")) {
+                string name, launchModeStr;
+                LaunchMode launchMode;
+                getline(fin, name);
+                getline(fin, launchModeStr);
+                if (launchModeStr == "2130968577") launchMode = STD;
+            }
+        }
+    }
+
     void ASMParser::parseManifest(const char* fileName, AndroidStackMachine* a) {
+        string name = fileName;
+        if (name.find(".xml", name.length() - 5) == string::npos) {
+            parseManifestTxt(fileName, a);
+            return;
+        }
         XMLDocument doc;
         doc.LoadFile(fileName);
         XMLElement* root = doc.RootElement();

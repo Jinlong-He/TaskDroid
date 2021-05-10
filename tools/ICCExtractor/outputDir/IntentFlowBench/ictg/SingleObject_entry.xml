@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+  <Component source="&lt;com.example.intentFlowBench.SubActivity7: void onCreate(android.os.Bundle)&gt;">
+    <singleIntent>
+      <method methodtrace="void secondLevel()"/>
+      <source name="com.example.intentFlowBench.SubActivity7"/>
+      <destinition name="com.example.intentFlowBench.SubActivity1"/>
+      <sender action="intent_sub1" extras="String-call_1:call_1"/>
+      <nodes>
+        <node method="SubActivity7 secondLevel" type="CreateMethod" unit="r1 = new android.content.Intent"/>
+        <node method="SubActivity7 secondLevel" type="SetAttribute" unit="specialinvoke r1.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;(&quot;intent_sub1&quot;)"/>
+        <node method="SubActivity7 secondLevel" type="SetIntentExtra" unit="virtualinvoke r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_1&quot;, &quot;call_1&quot;)"/>
+        <node method="SubActivity7 secondLevel" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity7: void startActivity(android.content.Intent)&gt;(r1)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.SubActivity9_1: void onCreate(android.os.Bundle)&gt;">
+    <singleIntent>
+      <method methodtrace="void analyzeIntent(android.content.Context,android.content.Intent)"/>
+      <source name="com.example.intentFlowBench.SubActivity9_1"/>
+      <nodes>
+        <node method="ContextSensi analyzeIntent" type="ReceiveIntentFromParatMethod" unit="$r2 := @parameter1: android.content.Intent"/>
+        <node method="ContextSensi analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke $r1.&lt;android.content.Context: void startActivity(android.content.Intent)&gt;($r2)"/>
+      </nodes>
+    </singleIntent>
+    <singleIntent>
+      <method methodtrace="void onCreate(android.os.Bundle)
+						   &lt;com.example.intentFlowBench.ContextSensi: void analyzeIntent(android.content.Context,android.content.Intent)&gt; --- virtualinvoke r2.&lt;com.example.intentFlowBench.ContextSensi: void analyzeIntent(android.content.Context,android.content.Intent)&gt;(r0, r3)
+						   void analyzeIntent(android.content.Context,android.content.Intent)"/>
+      <source name="com.example.intentFlowBench.SubActivity9_1"/>
+      <destinition name="com.example.intentFlowBench.SubActivity1"/>
+      <sender action="intent_sub1, intent_sub1, intent_sub1"/>
+      <nodes>
+        <node method="SubActivity9_1 onCreate" type="CreateMethod" unit="r3 = new android.content.Intent"/>
+        <node method="SubActivity9_1 onCreate" type="SetAttribute" unit="specialinvoke r3.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;($r5)"/>
+        <node method="SubActivity9_1 onCreate" type="CreateMethod" unit="r3 = new android.content.Intent"/>
+        <node method="SubActivity9_1 onCreate" type="SetAttribute" unit="specialinvoke r3.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;($r5)"/>
+        <node method="SubActivity9_1 onCreate" type="CreateMethod" unit="r3 = new android.content.Intent"/>
+        <node method="SubActivity9_1 onCreate" type="SetAttribute" unit="specialinvoke r3.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;($r5)"/>
+        <node method="ContextSensi analyzeIntent" type="ReceiveIntentFromParatMethod" unit="$r2 := @parameter1: android.content.Intent"/>
+        <node method="ContextSensi analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke $r1.&lt;android.content.Context: void startActivity(android.content.Intent)&gt;($r2)"/>
+        <node method="ContextSensi analyzeIntent" type="ReceiveIntentFromParatMethod" unit="$r2 := @parameter1: android.content.Intent"/>
+        <node method="ContextSensi analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke $r1.&lt;android.content.Context: void startActivity(android.content.Intent)&gt;($r2)"/>
+        <node method="ContextSensi analyzeIntent" type="ReceiveIntentFromParatMethod" unit="$r2 := @parameter1: android.content.Intent"/>
+        <node method="ContextSensi analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke $r1.&lt;android.content.Context: void startActivity(android.content.Intent)&gt;($r2)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.SubActivity9_2: void onCreate(android.os.Bundle)&gt;">
+    <singleIntent>
+      <method methodtrace="void analyzeIntent(android.content.Context,android.content.Intent)"/>
+      <source name="com.example.intentFlowBench.SubActivity9_2"/>
+      <nodes>
+        <node method="ContextSensi analyzeIntent" type="ReceiveIntentFromParatMethod" unit="$r2 := @parameter1: android.content.Intent"/>
+        <node method="ContextSensi analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke $r1.&lt;android.content.Context: void startActivity(android.content.Intent)&gt;($r2)"/>
+      </nodes>
+    </singleIntent>
+    <singleIntent>
+      <method methodtrace="void onCreate(android.os.Bundle)
+						   &lt;com.example.intentFlowBench.ContextSensi: void analyzeIntent(android.content.Context,android.content.Intent)&gt; --- virtualinvoke r2.&lt;com.example.intentFlowBench.ContextSensi: void analyzeIntent(android.content.Context,android.content.Intent)&gt;(r0, r3)
+						   void analyzeIntent(android.content.Context,android.content.Intent)"/>
+      <source name="com.example.intentFlowBench.SubActivity9_2"/>
+      <destinition name="com.example.intentFlowBench.SubActivity2"/>
+      <sender action="intent_sub2, intent_sub2, intent_sub2"/>
+      <nodes>
+        <node method="SubActivity9_2 onCreate" type="CreateMethod" unit="r3 = new android.content.Intent"/>
+        <node method="SubActivity9_2 onCreate" type="SetAttribute" unit="specialinvoke r3.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;($r5)"/>
+        <node method="SubActivity9_2 onCreate" type="CreateMethod" unit="r3 = new android.content.Intent"/>
+        <node method="SubActivity9_2 onCreate" type="SetAttribute" unit="specialinvoke r3.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;($r5)"/>
+        <node method="SubActivity9_2 onCreate" type="CreateMethod" unit="r3 = new android.content.Intent"/>
+        <node method="SubActivity9_2 onCreate" type="SetAttribute" unit="specialinvoke r3.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;($r5)"/>
+        <node method="ContextSensi analyzeIntent" type="ReceiveIntentFromParatMethod" unit="$r2 := @parameter1: android.content.Intent"/>
+        <node method="ContextSensi analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke $r1.&lt;android.content.Context: void startActivity(android.content.Intent)&gt;($r2)"/>
+        <node method="ContextSensi analyzeIntent" type="ReceiveIntentFromParatMethod" unit="$r2 := @parameter1: android.content.Intent"/>
+        <node method="ContextSensi analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke $r1.&lt;android.content.Context: void startActivity(android.content.Intent)&gt;($r2)"/>
+        <node method="ContextSensi analyzeIntent" type="ReceiveIntentFromParatMethod" unit="$r2 := @parameter1: android.content.Intent"/>
+        <node method="ContextSensi analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke $r1.&lt;android.content.Context: void startActivity(android.content.Intent)&gt;($r2)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.SubActivity6: void onCreate(android.os.Bundle)&gt;">
+    <singleIntent>
+      <method methodtrace="void onCreate(android.os.Bundle)
+						   &lt;com.example.intentFlowBench.SubActivity6: void analyzeIntentSub1(android.content.Intent)&gt; --- specialinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void analyzeIntentSub1(android.content.Intent)&gt;(r2)
+						   void analyzeIntentSub1(android.content.Intent)
+						   &lt;com.example.intentFlowBench.SubActivity6: void analyzeIntentSub2(android.content.Intent)&gt; --- specialinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void analyzeIntentSub2(android.content.Intent)&gt;($r1)
+						   void analyzeIntentSub2(android.content.Intent)
+						   &lt;com.example.intentFlowBench.SubActivity6: void analyzeIntentSub2(android.content.Intent)&gt; --- specialinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void analyzeIntentSub2(android.content.Intent)&gt;(r3)"/>
+      <source name="com.example.intentFlowBench.SubActivity6"/>
+      <destinition name="com.example.intentFlowBench.SubActivity2"/>
+      <sender action="intent_sub2, intent_sub2, intent_sub2" extras="String-call_22:call_22"/>
+      <nodes>
+        <node method="SubActivity6 onCreate" type="CreateMethod" unit="r3 = new android.content.Intent"/>
+        <node method="SubActivity6 onCreate" type="SetAttribute" unit="specialinvoke r3.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;($r5)"/>
+        <node method="SubActivity6 onCreate" type="CreateMethod" unit="r3 = new android.content.Intent"/>
+        <node method="SubActivity6 onCreate" type="SetAttribute" unit="specialinvoke r3.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;($r5)"/>
+        <node method="SubActivity6 onCreate" type="CreateMethod" unit="r3 = new android.content.Intent"/>
+        <node method="SubActivity6 onCreate" type="SetAttribute" unit="specialinvoke r3.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;($r5)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="ReceiveIntentFromParatMethod" unit="$r1 := @parameter0: android.content.Intent"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SetIntentExtra" unit="virtualinvoke $r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_22&quot;, &quot;call_22&quot;)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void startActivity(android.content.Intent)&gt;($r1)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="ReceiveIntentFromParatMethod" unit="$r1 := @parameter0: android.content.Intent"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SetIntentExtra" unit="virtualinvoke $r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_22&quot;, &quot;call_22&quot;)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void startActivity(android.content.Intent)&gt;($r1)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="ReceiveIntentFromParatMethod" unit="$r1 := @parameter0: android.content.Intent"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SetIntentExtra" unit="virtualinvoke $r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_22&quot;, &quot;call_22&quot;)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void startActivity(android.content.Intent)&gt;($r1)"/>
+      </nodes>
+    </singleIntent>
+    <singleIntent>
+      <method methodtrace="void analyzeIntentSub2(android.content.Intent)"/>
+      <source name="com.example.intentFlowBench.SubActivity6"/>
+      <sender extras="String-call_22:call_22"/>
+      <nodes>
+        <node method="SubActivity6 analyzeIntentSub2" type="ReceiveIntentFromParatMethod" unit="$r1 := @parameter0: android.content.Intent"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SetIntentExtra" unit="virtualinvoke $r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_22&quot;, &quot;call_22&quot;)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void startActivity(android.content.Intent)&gt;($r1)"/>
+      </nodes>
+    </singleIntent>
+    <singleIntent>
+      <method methodtrace="void analyzeIntentSub3()"/>
+      <source name="com.example.intentFlowBench.SubActivity6"/>
+      <destinition name="com.example.intentFlowBench.SubActivity3"/>
+      <sender action="intent_sub3"/>
+      <nodes>
+        <node method="SubActivity6 analyzeIntentSub3" type="CreateMethod" unit="r1 = new android.content.Intent"/>
+        <node method="SubActivity6 analyzeIntentSub3" type="SetAttribute" unit="specialinvoke r1.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;(r2)"/>
+        <node method="SubActivity6 analyzeIntentSub3" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void startActivity(android.content.Intent)&gt;(r1)"/>
+      </nodes>
+    </singleIntent>
+    <singleIntent>
+      <method methodtrace="void analyzeIntentSub1(android.content.Intent)
+						   &lt;com.example.intentFlowBench.SubActivity6: void analyzeIntentSub2(android.content.Intent)&gt; --- specialinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void analyzeIntentSub2(android.content.Intent)&gt;($r1)
+						   void analyzeIntentSub2(android.content.Intent)"/>
+      <source name="com.example.intentFlowBench.SubActivity6"/>
+      <sender extras="String-call_11:call_11,String-call_22:call_22"/>
+      <nodes>
+        <node method="SubActivity6 analyzeIntentSub1" type="ReceiveIntentFromParatMethod" unit="$r1 := @parameter0: android.content.Intent"/>
+        <node method="SubActivity6 analyzeIntentSub1" type="SetIntentExtra" unit="virtualinvoke $r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_11&quot;, &quot;call_11&quot;)"/>
+        <node method="SubActivity6 analyzeIntentSub1" type="ReceiveIntentFromParatMethod" unit="$r1 := @parameter0: android.content.Intent"/>
+        <node method="SubActivity6 analyzeIntentSub1" type="SetIntentExtra" unit="virtualinvoke $r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_11&quot;, &quot;call_11&quot;)"/>
+        <node method="SubActivity6 analyzeIntentSub1" type="ReceiveIntentFromParatMethod" unit="$r1 := @parameter0: android.content.Intent"/>
+        <node method="SubActivity6 analyzeIntentSub1" type="SetIntentExtra" unit="virtualinvoke $r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_11&quot;, &quot;call_11&quot;)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="ReceiveIntentFromParatMethod" unit="$r1 := @parameter0: android.content.Intent"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SetIntentExtra" unit="virtualinvoke $r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_22&quot;, &quot;call_22&quot;)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void startActivity(android.content.Intent)&gt;($r1)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="ReceiveIntentFromParatMethod" unit="$r1 := @parameter0: android.content.Intent"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SetIntentExtra" unit="virtualinvoke $r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_22&quot;, &quot;call_22&quot;)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void startActivity(android.content.Intent)&gt;($r1)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="ReceiveIntentFromParatMethod" unit="$r1 := @parameter0: android.content.Intent"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SetIntentExtra" unit="virtualinvoke $r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_22&quot;, &quot;call_22&quot;)"/>
+        <node method="SubActivity6 analyzeIntentSub2" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity6: void startActivity(android.content.Intent)&gt;($r1)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.SubActivity8: void onCreate(android.os.Bundle)&gt;">
+    <singleIntent>
+      <method methodtrace="void firstLevel()"/>
+      <source name="com.example.intentFlowBench.SubActivity8"/>
+      <destinition name="com.example.intentFlowBench.SubActivity1"/>
+      <sender action="intent_sub1" extras="String-call_1:call_1"/>
+      <nodes>
+        <node method="SubActivity8 firstLevel" type="CreateMethod" unit="r1 = new android.content.Intent"/>
+        <node method="SubActivity8 firstLevel" type="SetAttribute" unit="specialinvoke r1.&lt;android.content.Intent: void &lt;init&gt;(java.lang.String)&gt;(&quot;intent_sub1&quot;)"/>
+        <node method="SubActivity8 firstLevel" type="SetIntentExtra" unit="virtualinvoke r1.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;call_1&quot;, &quot;call_1&quot;)"/>
+        <node method="SubActivity8 firstLevel" type="pendingIntentCreation" unit="$r2 = staticinvoke &lt;android.app.PendingIntent: android.app.PendingIntent getActivity(android.content.Context,int,android.content.Intent,int)&gt;(r0, -1, r1, 0)"/>
+        <node method="SubActivity8 firstLevel" type="sendOutWrapperredIntent" unit="virtualinvoke r4.&lt;android.app.AlarmManager: void setRepeating(int,long,long,android.app.PendingIntent)&gt;(1, 1L, 1L, $r2)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.SubActivity5: void onCreate(android.os.Bundle)&gt;">
+    <singleIntent>
+      <method methodtrace="void onCreate(android.os.Bundle)
+						   &lt;com.example.intentFlowBench.SubActivity5: void analyzeIntent(java.lang.String)&gt; --- specialinvoke r0.&lt;com.example.intentFlowBench.SubActivity5: void analyzeIntent(java.lang.String)&gt;(&quot;intent_sub3&quot;)
+						   void analyzeIntent(java.lang.String)
+						   &lt;com.example.intentFlowBench.SubActivity5: void analyzeIntent(java.lang.String)&gt; --- specialinvoke r0.&lt;com.example.intentFlowBench.SubActivity5: void analyzeIntent(java.lang.String)&gt;(&quot;intent_sub2&quot;)"/>
+      <source name="com.example.intentFlowBench.SubActivity5"/>
+      <destinition name="com.example.intentFlowBench.SubActivity3"/>
+      <sender action="intent_sub3"/>
+      <nodes>
+        <node method="SubActivity5 analyzeIntent" type="SetAttribute" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent setAction(java.lang.String)&gt;($r1)"/>
+        <node method="SubActivity5 analyzeIntent" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="SubActivity5 analyzeIntent" type="SetAttribute" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent setAction(java.lang.String)&gt;($r1)"/>
+        <node method="SubActivity5 analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity5: void startActivity(android.content.Intent)&gt;(r2)"/>
+        <node method="SubActivity5 analyzeIntent" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="SubActivity5 analyzeIntent" type="SetAttribute" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent setAction(java.lang.String)&gt;($r1)"/>
+        <node method="SubActivity5 analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity5: void startActivity(android.content.Intent)&gt;(r2)"/>
+      </nodes>
+    </singleIntent>
+    <singleIntent>
+      <method methodtrace="void onCreate(android.os.Bundle)
+						   &lt;com.example.intentFlowBench.SubActivity5: void analyzeIntent(java.lang.String)&gt; --- specialinvoke r0.&lt;com.example.intentFlowBench.SubActivity5: void analyzeIntent(java.lang.String)&gt;(&quot;intent_sub3&quot;)
+						   void analyzeIntent(java.lang.String)
+						   &lt;com.example.intentFlowBench.SubActivity5: void analyzeIntent(java.lang.String)&gt; --- specialinvoke r0.&lt;com.example.intentFlowBench.SubActivity5: void analyzeIntent(java.lang.String)&gt;(&quot;intent_sub2&quot;)"/>
+      <source name="com.example.intentFlowBench.SubActivity5"/>
+      <destinition name="com.example.intentFlowBench.SubActivity2"/>
+      <sender action="intent_sub2"/>
+      <nodes>
+        <node method="SubActivity5 analyzeIntent" type="SetAttribute" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent setAction(java.lang.String)&gt;($r1)"/>
+        <node method="SubActivity5 analyzeIntent" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="SubActivity5 analyzeIntent" type="SetAttribute" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent setAction(java.lang.String)&gt;($r1)"/>
+        <node method="SubActivity5 analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity5: void startActivity(android.content.Intent)&gt;(r2)"/>
+        <node method="SubActivity5 analyzeIntent" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="SubActivity5 analyzeIntent" type="SetAttribute" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent setAction(java.lang.String)&gt;($r1)"/>
+        <node method="SubActivity5 analyzeIntent" type="SendIntent2ICC" unit="virtualinvoke r0.&lt;com.example.intentFlowBench.SubActivity5: void startActivity(android.content.Intent)&gt;(r2)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.SubActivity1$1: void onClick(android.view.View)&gt;">
+    <singleIntent>
+      <method methodtrace="void onClick(android.view.View)"/>
+      <source name="com.example.intentFlowBench.SubActivity1$1"/>
+      <destinition name="com.example.intentFlowBench.SubActivity4"/>
+      <sender action="sub1Action_left" category="sub1Category_left" extras="String-source:SubActivity1,boolean-Sub1:1"/>
+      <nodes>
+        <node method="SubActivity1$1 onClick" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="SubActivity1$1 onClick" type="SetAttribute" unit="specialinvoke r2.&lt;android.content.Intent: void &lt;init&gt;(android.content.Context,java.lang.Class)&gt;($r4, class &quot;Lcom/example/intentFlowBench/SubActivity4;&quot;)"/>
+        <node method="SubActivity1$1 onClick" type="SetAttribute" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent setAction(java.lang.String)&gt;(&quot;sub1Action_left&quot;)"/>
+        <node method="SubActivity1$1 onClick" type="SetAttribute" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent addCategory(java.lang.String)&gt;(&quot;sub1Category_left&quot;)"/>
+        <node method="SubActivity1$1 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;source&quot;, &quot;SubActivity1&quot;)"/>
+        <node method="SubActivity1$1 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,boolean)&gt;(&quot;Sub1&quot;, 1)"/>
+        <node method="SubActivity1$1 onClick" type="SendIntent2ICC" unit="virtualinvoke $r4.&lt;com.example.intentFlowBench.SubActivity1: void startActivity(android.content.Intent)&gt;(r2)"/>
+      </nodes>
+    </singleIntent>
+    <singleIntent>
+      <method methodtrace="void onClick(android.view.View)"/>
+      <source name="com.example.intentFlowBench.SubActivity1$1"/>
+      <destinition name="com.example.intentFlowBench.SubActivity4"/>
+      <sender action="sub1Action_right" category="sub1Category_right" extras="String-source:SubActivity1,boolean-Sub1:1"/>
+      <nodes>
+        <node method="SubActivity1$1 onClick" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="SubActivity1$1 onClick" type="SetAttribute" unit="specialinvoke r2.&lt;android.content.Intent: void &lt;init&gt;(android.content.Context,java.lang.Class)&gt;($r4, class &quot;Lcom/example/intentFlowBench/SubActivity4;&quot;)"/>
+        <node method="SubActivity1$1 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;source&quot;, &quot;SubActivity1&quot;)"/>
+        <node method="SubActivity1$1 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,boolean)&gt;(&quot;Sub1&quot;, 1)"/>
+        <node method="SubActivity1$1 onClick" type="SendIntent2ICC" unit="virtualinvoke $r4.&lt;com.example.intentFlowBench.SubActivity1: void startActivity(android.content.Intent)&gt;(r2)"/>
+        <node method="SubActivity1$1 onClick" type="SetAttribute" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent setAction(java.lang.String)&gt;(&quot;sub1Action_right&quot;)"/>
+        <node method="SubActivity1$1 onClick" type="SetAttribute" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent addCategory(java.lang.String)&gt;(&quot;sub1Category_right&quot;)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.SubActivity4$2: void onClick(android.view.View)&gt;">
+    <singleIntent>
+      <method methodtrace="void onClick(android.view.View)"/>
+      <source name="com.example.intentFlowBench.SubActivity4$2"/>
+      <destinition name="com.example.intentFlowBench.SubActivity5"/>
+      <sender extras="String-source:SubActivity4"/>
+      <nodes>
+        <node method="SubActivity4$2 onClick" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="SubActivity4$2 onClick" type="SetAttribute" unit="specialinvoke r2.&lt;android.content.Intent: void &lt;init&gt;(android.content.Context,java.lang.Class)&gt;($r3, class &quot;Lcom/example/intentFlowBench/SubActivity5;&quot;)"/>
+        <node method="SubActivity4$2 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;source&quot;, &quot;SubActivity4&quot;)"/>
+        <node method="SubActivity4$2 onClick" type="SendIntent2ICC" unit="virtualinvoke $r3.&lt;com.example.intentFlowBench.SubActivity4: void startActivity(android.content.Intent)&gt;(r2)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.MainActivity$2: void onClick(android.view.View)&gt;">
+    <singleIntent>
+      <method methodtrace="void onClick(android.view.View)"/>
+      <source name="com.example.intentFlowBench.MainActivity$2"/>
+      <destinition name="com.example.intentFlowBench.SubActivity2"/>
+      <sender extras="String-source:MainActivity,String-Main:abc"/>
+      <nodes>
+        <node method="MainActivity$2 onClick" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="MainActivity$2 onClick" type="SetAttribute" unit="specialinvoke r2.&lt;android.content.Intent: void &lt;init&gt;(android.content.Context,java.lang.Class)&gt;($r3, class &quot;Lcom/example/intentFlowBench/SubActivity2;&quot;)"/>
+        <node method="MainActivity$2 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;source&quot;, &quot;MainActivity&quot;)"/>
+        <node method="MainActivity$2 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;Main&quot;, &quot;abc&quot;)"/>
+        <node method="MainActivity$2 onClick" type="SendIntent2ICC" unit="virtualinvoke $r3.&lt;com.example.intentFlowBench.MainActivity: void startActivity(android.content.Intent)&gt;(r2)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.SubActivity3$2: void onClick(android.view.View)&gt;">
+    <singleIntent>
+      <method methodtrace="void onClick(android.view.View)"/>
+      <source name="com.example.intentFlowBench.SubActivity3$2"/>
+      <destinition name="com.example.intentFlowBench.SubActivity4"/>
+      <sender extras="boolean-Sub3:0,String-source:SubActivity3"/>
+      <nodes>
+        <node method="SubActivity3$2 onClick" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="SubActivity3$2 onClick" type="SetAttribute" unit="specialinvoke r2.&lt;android.content.Intent: void &lt;init&gt;(android.content.Context,java.lang.Class)&gt;($r3, class &quot;Lcom/example/intentFlowBench/SubActivity4;&quot;)"/>
+        <node method="SubActivity3$2 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;source&quot;, &quot;SubActivity3&quot;)"/>
+        <node method="SubActivity3$2 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,boolean)&gt;(&quot;Sub3&quot;, 0)"/>
+        <node method="SubActivity3$2 onClick" type="SendIntent2ICC" unit="virtualinvoke $r3.&lt;com.example.intentFlowBench.SubActivity3: void startActivity(android.content.Intent)&gt;(r2)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.SubActivity2$1: void onClick(android.view.View)&gt;">
+    <singleIntent>
+      <method methodtrace="void onClick(android.view.View)"/>
+      <source name="com.example.intentFlowBench.SubActivity2$1"/>
+      <destinition name="com.example.intentFlowBench.SubActivity3"/>
+      <sender extras="String-source:SubActivity2,int-Sub2:200"/>
+      <nodes>
+        <node method="SubActivity2$1 onClick" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="SubActivity2$1 onClick" type="SetAttribute" unit="specialinvoke r2.&lt;android.content.Intent: void &lt;init&gt;(android.content.Context,java.lang.Class)&gt;($r3, class &quot;Lcom/example/intentFlowBench/SubActivity3;&quot;)"/>
+        <node method="SubActivity2$1 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;source&quot;, &quot;SubActivity2&quot;)"/>
+        <node method="SubActivity2$1 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,int)&gt;(&quot;Sub2&quot;, 200)"/>
+        <node method="SubActivity2$1 onClick" type="SendIntent2ICC" unit="virtualinvoke $r3.&lt;com.example.intentFlowBench.SubActivity2: void startActivity(android.content.Intent)&gt;(r2)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.MainActivity$3: void onClick(android.view.View)&gt;">
+    <singleIntent>
+      <method methodtrace="void onClick(android.view.View)"/>
+      <source name="com.example.intentFlowBench.MainActivity$3"/>
+      <destinition name="com.example.intentFlowBench.SubActivity3"/>
+      <sender extras="String-source:MainActivity,int-Main:100"/>
+      <nodes>
+        <node method="MainActivity$3 onClick" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="MainActivity$3 onClick" type="SetAttribute" unit="specialinvoke r2.&lt;android.content.Intent: void &lt;init&gt;(android.content.Context,java.lang.Class)&gt;($r3, class &quot;Lcom/example/intentFlowBench/SubActivity3;&quot;)"/>
+        <node method="MainActivity$3 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;source&quot;, &quot;MainActivity&quot;)"/>
+        <node method="MainActivity$3 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,int)&gt;(&quot;Main&quot;, 100)"/>
+        <node method="MainActivity$3 onClick" type="SendIntent2ICC" unit="virtualinvoke $r3.&lt;com.example.intentFlowBench.MainActivity: void startActivity(android.content.Intent)&gt;(r2)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+  <Component source="&lt;com.example.intentFlowBench.SubActivity4$1: void onClick(android.view.View)&gt;">
+    <singleIntent>
+      <method methodtrace="void onClick(android.view.View)"/>
+      <source name="com.example.intentFlowBench.SubActivity4$1"/>
+      <destinition name="com.example.intentFlowBench.SubActivity2"/>
+      <sender extras="String-Sub4:opq,String-source:SubActivity4"/>
+      <nodes>
+        <node method="SubActivity4$1 onClick" type="CreateMethod" unit="r2 = new android.content.Intent"/>
+        <node method="SubActivity4$1 onClick" type="SetAttribute" unit="specialinvoke r2.&lt;android.content.Intent: void &lt;init&gt;(android.content.Context,java.lang.Class)&gt;($r3, class &quot;Lcom/example/intentFlowBench/SubActivity2;&quot;)"/>
+        <node method="SubActivity4$1 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;source&quot;, &quot;SubActivity4&quot;)"/>
+        <node method="SubActivity4$1 onClick" type="SetIntentExtra" unit="virtualinvoke r2.&lt;android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)&gt;(&quot;Sub4&quot;, &quot;opq&quot;)"/>
+        <node method="SubActivity4$1 onClick" type="SendIntent2ICC" unit="virtualinvoke $r3.&lt;com.example.intentFlowBench.SubActivity4: void startActivity(android.content.Intent)&gt;(r2)"/>
+      </nodes>
+    </singleIntent>
+  </Component>
+</root>

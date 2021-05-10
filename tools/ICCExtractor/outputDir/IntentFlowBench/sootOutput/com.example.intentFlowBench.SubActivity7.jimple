@@ -1,0 +1,72 @@
+public class com.example.intentFlowBench.SubActivity7 extends android.app.Activity
+{
+
+    public void <init>()
+    {
+        com.example.intentFlowBench.SubActivity7 r0;
+
+        r0 := @this: com.example.intentFlowBench.SubActivity7;
+
+        specialinvoke r0.<android.app.Activity: void <init>()>();
+
+        return;
+    }
+
+    private void firstLevel()
+    {
+        com.example.intentFlowBench.SubActivity7 r0;
+
+        r0 := @this: com.example.intentFlowBench.SubActivity7;
+
+        specialinvoke r0.<com.example.intentFlowBench.SubActivity7: void secondLevel()>();
+
+        return;
+    }
+
+    private void secondLevel()
+    {
+        com.example.intentFlowBench.SubActivity7 r0;
+        android.content.Intent r1;
+
+        r0 := @this: com.example.intentFlowBench.SubActivity7;
+
+        r1 = new android.content.Intent;
+
+        specialinvoke r1.<android.content.Intent: void <init>(java.lang.String)>("intent_sub1");
+
+        virtualinvoke r1.<android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)>("call_1", "call_1");
+
+        virtualinvoke r0.<com.example.intentFlowBench.SubActivity7: void startActivity(android.content.Intent)>(r1);
+
+        return;
+    }
+
+    public void onBackPressed()
+    {
+        com.example.intentFlowBench.SubActivity7 r0;
+
+        r0 := @this: com.example.intentFlowBench.SubActivity7;
+
+        specialinvoke r0.<android.app.Activity: void onBackPressed()>();
+
+        return;
+    }
+
+    protected void onCreate(android.os.Bundle)
+    {
+        com.example.intentFlowBench.SubActivity7 r0;
+        android.os.Bundle $r1;
+
+        r0 := @this: com.example.intentFlowBench.SubActivity7;
+
+        $r1 := @parameter0: android.os.Bundle;
+
+        specialinvoke r0.<android.app.Activity: void onCreate(android.os.Bundle)>($r1);
+
+        virtualinvoke r0.<com.example.intentFlowBench.SubActivity7: void setContentView(int)>(2130903045);
+
+        specialinvoke r0.<com.example.intentFlowBench.SubActivity7: void firstLevel()>();
+
+        return;
+    }
+}

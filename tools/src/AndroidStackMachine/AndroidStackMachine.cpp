@@ -170,8 +170,10 @@ namespace TaskDroid {
     }
 
     void AndroidStackMachine::fomalize() {
+        if (isFomalize) return;
         minimize();
         formActivity();
+        isFomalize = true;
     }
 
     ActionMode AndroidStackMachine::getMode(Intent* intent) {
@@ -234,15 +236,21 @@ namespace TaskDroid {
         for (auto& action : transaction -> getFragmentActions()) {
             fragmentActionsMap[action.getViewID()].emplace_back(action);
         }
+        transaction -> clear();
         for (auto& [view, actions] : fragmentActionsMap) {
-            ID pos = -1;
+            ID pos = 0;
             for (ID i = 0; i < actions.size(); i++) {
                 if (actions[i].getFragmentMode() == REP) pos = i;
             }
-            if (pos != -1) {
-                FragmentActions newActions(actions.begin() + pos, actions.end());
-                transaction -> setFragmentActions(newActions);
+            vector<Fragment*> fragments;
+            auto mode = actions[pos].getFragmentMode();
+            for (ID i = pos; i < actions.size(); i++) {
+                auto fragment = actions[i].getFragment();
+                auto mode = actions[i].getFragmentMode();
+                transaction -> addFragmentAction(mode, fragment, view);
+                fragments.emplace_back(fragment);
             }
+            transaction -> addHighLevelFragmentAction(mode, fragments[fragments.size() - 1], view, fragments);
         }
     }
 

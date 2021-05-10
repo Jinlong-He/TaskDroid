@@ -1,0 +1,31 @@
+public class com.example.intentFlowBench.ContextSensi extends java.lang.Object
+{
+
+    public void <init>()
+    {
+        com.example.intentFlowBench.ContextSensi r0;
+
+        r0 := @this: com.example.intentFlowBench.ContextSensi;
+
+        specialinvoke r0.<java.lang.Object: void <init>()>();
+
+        return;
+    }
+
+    public void analyzeIntent(android.content.Context, android.content.Intent)
+    {
+        com.example.intentFlowBench.ContextSensi r0;
+        android.content.Context $r1;
+        android.content.Intent $r2;
+
+        r0 := @this: com.example.intentFlowBench.ContextSensi;
+
+        $r1 := @parameter0: android.content.Context;
+
+        $r2 := @parameter1: android.content.Intent;
+
+        virtualinvoke $r1.<android.content.Context: void startActivity(android.content.Intent)>($r2);
+
+        return;
+    }
+}

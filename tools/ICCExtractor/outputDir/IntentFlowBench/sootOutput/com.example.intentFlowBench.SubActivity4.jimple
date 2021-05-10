@@ -1,0 +1,134 @@
+public class com.example.intentFlowBench.SubActivity4 extends android.app.Activity
+{
+
+    public void <init>()
+    {
+        com.example.intentFlowBench.SubActivity4 r0;
+
+        r0 := @this: com.example.intentFlowBench.SubActivity4;
+
+        specialinvoke r0.<android.app.Activity: void <init>()>();
+
+        return;
+    }
+
+    private void analyzeIntent()
+    {
+        com.example.intentFlowBench.SubActivity4 r0;
+        android.content.Intent $r1;
+        java.lang.String $r2;
+        boolean $z0;
+        java.lang.StringBuilder $r3;
+
+        r0 := @this: com.example.intentFlowBench.SubActivity4;
+
+        $r1 = virtualinvoke r0.<com.example.intentFlowBench.SubActivity4: android.content.Intent getIntent()>();
+
+        $r2 = virtualinvoke $r1.<android.content.Intent: java.lang.String getStringExtra(java.lang.String)>("source");
+
+        staticinvoke <android.util.Log: int i(java.lang.String,java.lang.String)>("IntentFlow", $r2);
+
+        $z0 = virtualinvoke $r1.<android.content.Intent: boolean hasExtra(java.lang.String)>("Sub1");
+
+        if $z0 == 0 goto label1;
+
+        $r3 = new java.lang.StringBuilder;
+
+        $z0 = virtualinvoke $r1.<android.content.Intent: boolean getBooleanExtra(java.lang.String,boolean)>("Sub1", 1);
+
+        $r2 = staticinvoke <java.lang.String: java.lang.String valueOf(boolean)>($z0);
+
+        specialinvoke $r3.<java.lang.StringBuilder: void <init>(java.lang.String)>($r2);
+
+        $r2 = virtualinvoke $r3.<java.lang.StringBuilder: java.lang.String toString()>();
+
+        staticinvoke <android.util.Log: int i(java.lang.String,java.lang.String)>("IntentFlow", $r2);
+
+     label1:
+        $z0 = virtualinvoke $r1.<android.content.Intent: boolean hasExtra(java.lang.String)>("Sub3");
+
+        if $z0 == 0 goto label2;
+
+        $r3 = new java.lang.StringBuilder;
+
+        $z0 = virtualinvoke $r1.<android.content.Intent: boolean getBooleanExtra(java.lang.String,boolean)>("Sub3", 1);
+
+        $r2 = staticinvoke <java.lang.String: java.lang.String valueOf(boolean)>($z0);
+
+        specialinvoke $r3.<java.lang.StringBuilder: void <init>(java.lang.String)>($r2);
+
+        $r2 = virtualinvoke $r3.<java.lang.StringBuilder: java.lang.String toString()>();
+
+        staticinvoke <android.util.Log: int i(java.lang.String,java.lang.String)>("IntentFlow", $r2);
+
+     label2:
+        return;
+    }
+
+    public void onBackPressed()
+    {
+        com.example.intentFlowBench.SubActivity4 r0;
+
+        r0 := @this: com.example.intentFlowBench.SubActivity4;
+
+        specialinvoke r0.<android.app.Activity: void onBackPressed()>();
+
+        return;
+    }
+
+    protected void onCreate(android.os.Bundle)
+    {
+        com.example.intentFlowBench.SubActivity4 r0;
+        android.os.Bundle $r1;
+        android.content.ComponentName r2;
+        android.content.Intent r3;
+        android.view.View $r4;
+        android.widget.Button r5;
+        com.example.intentFlowBench.SubActivity4$1 $r6;
+        com.example.intentFlowBench.SubActivity4$2 $r7;
+
+        r0 := @this: com.example.intentFlowBench.SubActivity4;
+
+        $r1 := @parameter0: android.os.Bundle;
+
+        specialinvoke r0.<android.app.Activity: void onCreate(android.os.Bundle)>($r1);
+
+        virtualinvoke r0.<com.example.intentFlowBench.SubActivity4: void setContentView(int)>(2130903044);
+
+        $r4 = virtualinvoke r0.<com.example.intentFlowBench.SubActivity4: android.view.View findViewById(int)>(2131034131);
+
+        r5 = (android.widget.Button) $r4;
+
+        $r6 = new com.example.intentFlowBench.SubActivity4$1;
+
+        specialinvoke $r6.<com.example.intentFlowBench.SubActivity4$1: void <init>(com.example.intentFlowBench.SubActivity4)>(r0);
+
+        virtualinvoke r5.<android.widget.Button: void setOnClickListener(android.view.View$OnClickListener)>($r6);
+
+        $r4 = virtualinvoke r0.<com.example.intentFlowBench.SubActivity4: android.view.View findViewById(int)>(2131034132);
+
+        r5 = (android.widget.Button) $r4;
+
+        $r7 = new com.example.intentFlowBench.SubActivity4$2;
+
+        specialinvoke $r7.<com.example.intentFlowBench.SubActivity4$2: void <init>(com.example.intentFlowBench.SubActivity4)>(r0);
+
+        virtualinvoke r5.<android.widget.Button: void setOnClickListener(android.view.View$OnClickListener)>($r7);
+
+        r3 = new android.content.Intent;
+
+        specialinvoke r3.<android.content.Intent: void <init>()>();
+
+        virtualinvoke r3.<android.content.Intent: android.content.Intent setFlags(int)>(268435456);
+
+        r2 = new android.content.ComponentName;
+
+        specialinvoke r2.<android.content.ComponentName: void <init>(java.lang.String,java.lang.String)>("com.example.intentFlowBench", "com.example.intentFlowBench.SubActivity5");
+
+        virtualinvoke r3.<android.content.Intent: android.content.Intent setComponent(android.content.ComponentName)>(r2);
+
+        specialinvoke r0.<com.example.intentFlowBench.SubActivity4: void analyzeIntent()>();
+
+        return;
+    }
+}

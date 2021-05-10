@@ -1,0 +1,83 @@
+manifest
+- package: com.example.intentFlowBench
+- platformBuildVersionName: 4.2.2-1425461
+- versionName: 1.0
+- platformBuildVersionCode: 17
+- versionCode: 1
+	uses-sdk
+	- minSdkVersion: 8
+	application
+	- icon: 2130837504
+	- label: 2130968577
+		activity
+		- name: com.example.intentFlowBench.MainActivity
+		- label: 2130968577
+			intent-filter
+				action
+				- name: android.intent.action.MAIN
+				category
+				- name: android.intent.category.LAUNCHER
+		activity
+		- exported: true
+		- icon: 2130837504
+		- name: com.example.intentFlowBench.SubActivity1
+		- label: 2130968577
+			intent-filter
+				action
+				- name: intent_sub1
+				category
+				- name: android.intent.category.DEFAULT
+		activity
+		- exported: true
+		- icon: 2130837504
+		- name: com.example.intentFlowBench.SubActivity2
+		- label: 2130968577
+			intent-filter
+				action
+				- name: intent_sub2
+				category
+				- name: android.intent.category.DEFAULT
+		activity
+		- exported: true
+		- icon: 2130837504
+		- name: com.example.intentFlowBench.SubActivity3
+		- label: 2130968577
+			intent-filter
+				action
+				- name: intent_sub3
+				category
+				- name: android.intent.category.DEFAULT
+		activity
+		- icon: 2130837504
+		- name: com.example.intentFlowBench.SubActivity4
+		- label: 2130968577
+		activity
+		- icon: 2130837504
+		- name: com.example.intentFlowBench.SubActivity5
+		- label: 2130968577
+		activity
+		- icon: 2130837504
+		- name: com.example.intentFlowBench.AbstractActivity
+		- label: 2130968577
+		activity
+		- icon: 2130837504
+		- name: com.example.intentFlowBench.SubActivity6
+		- label: 2130968577
+		activity
+		- icon: 2130837504
+		- name: com.example.intentFlowBench.SubActivity7
+		- label: 2130968577
+		activity
+		- icon: 2130837504
+		- name: com.example.intentFlowBench.SubActivity8
+		- label: 2130968577
+		activity
+		- icon: 2130837504
+		- name: com.example.intentFlowBench.SubActivity9_1
+		- label: 2130968577
+		activity
+		- icon: 2130837504
+		- name: com.example.intentFlowBench.SubActivity9_2
+		- label: 2130968577
+	uses-permission
+	- name: android.permission.WRITE_EXTERNAL_STORAGE

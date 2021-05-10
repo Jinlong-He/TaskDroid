@@ -1,0 +1,40 @@
+digraph G {
+subgraph cluster_legend{ 
+bgcolor=mintcream;
+_Activity[color = red];
+_Service[color = royalblue];
+_Provider[color = violet];
+_Reciever[color = peru];
+_Fragment[color = teal];
+_Main[style=filled, fillcolor=wheat, color = mintcream];
+_Exported[style=filled, fillcolor=lightpink, color = mintcream];
+_Main -> _Exported -> _Activity -> _Service -> _Reciever -> _Provider -> _Fragment; 
+}
+SubActivity8[color = red];
+SubActivity6[color = red];
+SubActivity7[color = red];
+SubActivity9_1[color = red];
+SubActivity9_2[color = red];
+MainActivity[style=filled, fillcolor=orange, color = red];
+SubActivity1[style=filled, fillcolor=pink, color = red];
+SubActivity4[color = red];
+SubActivity5[color = red];
+SubActivity2[style=filled, fillcolor=pink, color = red];
+SubActivity3[style=filled, fillcolor=pink, color = red];
+AbstractActivity[color = red];
+SubActivity8->SubActivity1;
+SubActivity6->SubActivity3;
+SubActivity6->SubActivity2;
+SubActivity7->SubActivity1;
+SubActivity9_1->SubActivity1;
+SubActivity9_2->SubActivity2;
+MainActivity->SubActivity3;
+MainActivity->SubActivity2;
+SubActivity1->SubActivity4;
+SubActivity4->SubActivity2;
+SubActivity4->SubActivity5;
+SubActivity5->SubActivity2;
+SubActivity5->SubActivity3;
+SubActivity2->SubActivity3;
+SubActivity3->SubActivity4;
+}
