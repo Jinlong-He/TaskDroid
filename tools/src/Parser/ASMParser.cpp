@@ -1,6 +1,7 @@
 #include "Parser/ASMParser.hpp"
 #include "util/util.hpp"
 #include <iostream>
+#include <fstream>
 #include <regex>
 using std::cout, std::endl;
 namespace TaskDroid {
@@ -13,16 +14,42 @@ namespace TaskDroid {
 
     void ASMParser::parseManifestTxt(const char* fileName, AndroidStackMachine* a) {
         std::ifstream fin(fileName);
-        string line;
+        string line, name, launchModeStr, affinity = "";
+        LaunchMode launchMode = STD;
+        bool mainFlag = false;
+        ID count = 0;
         while (getline(fin, line)) {
-            if (line.find("activity")) {
-                string name, launchModeStr;
-                LaunchMode launchMode;
-                getline(fin, name);
-                getline(fin, launchModeStr);
-                if (launchModeStr == "2130968577") launchMode = STD;
+            if (line.find("		activity") != string::npos) {
+                if (count > 0) {
+                    auto activity = a -> mkActivity(name, affinity, launchMode);
+                    if (mainFlag) {
+                        a -> setMainActivity(activity);
+                        mainFlag = false;
+                    }
+                }
+                count ++;
+            }
+            if (line.find("		- name:") == 0) {
+                auto pos = line.find(": ") + 2;
+                name = line.substr(pos, line.length() - pos);
+            }
+            if (line.find("				- name: android.intent.action.MAIN") == 0)
+                    mainFlag = true;
+            if (line.find("		- launchMode") == 0) {
+                auto pos = line.find(": ") + 2;
+                launchModeStr = line.substr(pos, line.length() - pos);
+                if (launchModeStr == "0") launchMode = STD;
+                if (launchModeStr == "1") launchMode = STP;
+                if (launchModeStr == "2") launchMode = STK;
+                if (launchModeStr == "3") launchMode = SIT;
+            }
+            if (line.find("		- taskAffinity") == 0) {
+                auto pos = line.find(": ") + 2;
+                affinity = line.substr(pos, line.length() - pos);
             }
         }
+        if (count > a -> getActivityMap().size())
+            a -> mkActivity(name, affinity, launchMode);
     }
 
     void ASMParser::parseManifest(const char* fileName, AndroidStackMachine* a) {

@@ -10,7 +10,8 @@ def analyzeApk(path, sdk):
                 outPath = "outputDir/" +apk[:-4]+ "/"
                 print("java -jar ICCExtractor/ICCExtractor.jar  -path "+ path +" -name "+apk+" -androidJar "+ sdk +"/platforms -time 2 -maxPathNumber 100 >> logs/"+apk+".txt")
                 os.system("java -jar ICCExtractor/ICCExtractor.jar  -path "+ path +" -name "+apk+" -androidJar "+ sdk +"/platforms -time 2 -maxPathNumber 100 >> logs/"+apk+".txt")
-                os.system("cd result && mkdir " + apk[:-4] + " && cd ..")
+                if not os.path.exists("result/" + apk[:-4]) :
+                    os.system("cd result && mkdir " + apk[:-4] + " && cd ..")
                 print("./build/bin/TaskDroid " + 
                         outPath + "manifest/AndroidManifest.txt " +
                         outPath + "ictg/ictgMerge.xml " +
@@ -20,7 +21,7 @@ def analyzeApk(path, sdk):
                         outPath + "manifest/AndroidManifest.txt " +
                         outPath + "ictg/ictgMerge.xml " +
                         outPath + "fragment/SingleObject_all.xml " +
-                        "../../../result/" + apk[:-4] + "/loop")
+                        "../../../result/" + apk[:-4])
 
 if __name__ == '__main__' :
     path = sys.argv[1]
