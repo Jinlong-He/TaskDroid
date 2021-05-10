@@ -12,6 +12,7 @@
 #include <iostream> 
 #include <unordered_set>
 #include <set>
+#include <cstring>
 #include <vector>
 using std::vector, std::string;
 using std::cout;
