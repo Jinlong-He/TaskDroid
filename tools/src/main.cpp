@@ -25,6 +25,9 @@ int main (int argc, char* argv[]) {
     if (flag) {
         out << "No Fragments" << endl;
     }
+    if (!flag) {
+        out << "Has Fragments" << endl;
+    }
     //ASMParser::parseATG(argv[2], &a);
     //MultiTaskAnalyzer::analyzeReachability(&a, 5);
     //MultiTaskAnalyzer analyzer(6);
