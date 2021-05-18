@@ -170,9 +170,6 @@ namespace TaskDroid {
                     singleMethod = singleMethod -> NextSiblingElement();
                     continue;
                 }
-                string source = singleMethod -> Attribute("source");
-                string name = source.substr(1,source.find(":") - 1);
-                if (name.find("Fragment") != string::npos) a -> mkFragment(name);
                 auto singleFragment = singleMethod -> FirstChildElement();
                 while (singleFragment) {
                     if (!singleFragment -> FirstChildElement()) {
@@ -181,9 +178,14 @@ namespace TaskDroid {
                     }
                     auto element = singleFragment -> FirstChildElement();
                     while (element) {
-                        string list = element -> Name();
-                        if (list == "setDestinationList") {
-                            string names = element -> Attribute("value");
+                        string elementName = element -> Name();
+                        if (elementName == "source") {
+                            string source = element -> Attribute("name");
+                            if (source.find("Fragment") != string::npos)
+                                a -> mkFragment(source);
+                        }
+                        if (elementName == "destinition") {
+                            string names = element -> Attribute("name");
                             for (auto& name : util::split(names, ", ")) {
                                 a -> mkFragment(name);
                             }
@@ -206,10 +208,6 @@ namespace TaskDroid {
                     singleMethod = singleMethod -> NextSiblingElement();
                     continue;
                 }
-                string source = singleMethod -> Attribute("source");
-                string name = source.substr(1,source.find(":") - 1);
-                auto activity = a -> getActivity(name);
-                auto fragment = a -> getFragment(name);
                 auto singleFragment = singleMethod -> FirstChildElement();
                 while (singleFragment) {
                     if (!singleFragment -> FirstChildElement()) {
@@ -219,12 +217,19 @@ namespace TaskDroid {
                     auto element = singleFragment -> FirstChildElement();
                     vector<string> nameVec;
                     while (element) {
-                        string list = element -> Name();
+                        string elementName = element -> Name();
                         auto transaction = a -> mkFragmentTransaction();
-                        if (list == "setDestinationList") {
-                            string names = element -> Attribute("value");
+                        Activity* activity = nullptr;
+                        Fragment* fragment = nullptr;
+                        if (elementName == "source") {
+                            string source = element -> Attribute("name");
+                            activity = a -> getActivity(source);
+                            fragment = a -> getFragment(source);
+                        }
+                        else if (elementName == "destinition") {
+                            string names = element -> Attribute("name");
                             nameVec = util::split(names, ", ");
-                        } else if (list == "flow") {
+                        } else if (elementName == "nodes") {
                             if (!element -> FirstChildElement()) {
                                 element = element -> NextSiblingElement();
                                 continue;
@@ -232,8 +237,8 @@ namespace TaskDroid {
                             auto data = element -> FirstChildElement();
                             ID index = 0;
                             while (data) {
-                                if (((string) data -> Name()) == "dataHandleList" ) {
-                                    string value = data -> Attribute("value");
+                                if (((string) data -> Name()) == "node" ) {
+                                    string value = data -> Attribute("unit");
                                     std::smatch m;
                                     if (std::regex_search(value, m, addPatten)) {
                                         string result = m[0];
@@ -245,6 +250,7 @@ namespace TaskDroid {
                                                 nameVec[index++]);
                                         transaction -> addFragmentAction(
                                                 mode, newFragment, viewId);
+                                        cout << mode << " " << newFragment -> getName() << " " << viewId << endl;
                                     } else if (std::regex_search(value, m, a2bPatten)) {
                                         transaction -> setAddTobackStack(1);
                                     }
