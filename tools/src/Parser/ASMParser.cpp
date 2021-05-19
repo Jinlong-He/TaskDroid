@@ -216,11 +216,11 @@ namespace TaskDroid {
                     }
                     auto element = singleFragment -> FirstChildElement();
                     vector<string> nameVec;
+                    FragmentTransaction* transaction = nullptr;
+                    Activity* activity = nullptr;
+                    Fragment* fragment = nullptr;
                     while (element) {
                         string elementName = element -> Name();
-                        auto transaction = a -> mkFragmentTransaction();
-                        Activity* activity = nullptr;
-                        Fragment* fragment = nullptr;
                         if (elementName == "source") {
                             string source = element -> Attribute("name");
                             activity = a -> getActivity(source);
@@ -229,6 +229,7 @@ namespace TaskDroid {
                         else if (elementName == "destinition") {
                             string names = element -> Attribute("name");
                             nameVec = util::split(names, ", ");
+                            transaction = a -> mkFragmentTransaction();
                         } else if (elementName == "nodes") {
                             if (!element -> FirstChildElement()) {
                                 element = element -> NextSiblingElement();
@@ -236,33 +237,39 @@ namespace TaskDroid {
                             }
                             auto data = element -> FirstChildElement();
                             ID index = 0;
+                            bool flag = false;
                             while (data) {
                                 if (((string) data -> Name()) == "node" ) {
                                     string value = data -> Attribute("unit");
+                                    string type = data -> Attribute("type");
+                                    if (type == "beginTransaction") flag = true;
+                                    if (type == "commit") flag = false;
                                     std::smatch m;
-                                    if (std::regex_search(value, m, addPatten)) {
+                                    if (std::regex_search(value, m, addPatten) && flag) {
                                         string result = m[0];
                                         string viewId = result.substr(result.find(">(")+2);
                                         auto mode = 
                                             result.find("add") != string::npos ?
                                             ADD : REP;
-                                        auto newFragment = a -> getFragment(
-                                                nameVec[index++]);
-                                        transaction -> addFragmentAction(
-                                                mode, newFragment, viewId);
-                                        cout << mode << " " << newFragment -> getName() << " " << viewId << endl;
+                                        if (transaction) {
+                                            auto newFragment = a -> getFragment(
+                                                    nameVec[index++]);
+                                            transaction -> addFragmentAction(
+                                                    mode, newFragment, viewId);
+                                        }
                                     } else if (std::regex_search(value, m, a2bPatten)) {
-                                        transaction -> setAddTobackStack(1);
+                                        if (transaction)
+                                            transaction -> setAddTobackStack(1);
                                     }
                                         
                                 }
                                 data = data -> NextSiblingElement();
                             }
-                            if (fragment && 
+                            if (fragment && transaction &&
                                 transaction -> getFragmentActions().size() > 0) {
                                 a -> addFragmentTransaction(fragment, transaction);
                             }
-                            if (activity && 
+                            if (activity && transaction &&
                                 transaction -> getFragmentActions().size() > 0) {
                                 a -> addFragmentTransaction(activity, transaction);
                             }

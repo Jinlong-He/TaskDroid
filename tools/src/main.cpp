@@ -17,8 +17,8 @@ int main (int argc, char* argv[]) {
         if (a.getActivityTransactionMap().count(activity) != 0) {
             if (a.getFragmentTransactionMap(activity).size() > 0) {
                 flag = false;
-                FragmentAnalyzer analyzer(2,3,&a,activity);
-                analyzer.analyzeBoundedness(out);
+                //FragmentAnalyzer analyzer(2,3,&a,activity);
+                //analyzer.analyzeBoundedness(out);
             }
         }
     }
