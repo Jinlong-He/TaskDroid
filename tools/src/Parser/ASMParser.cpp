@@ -19,6 +19,9 @@ namespace TaskDroid {
         bool mainFlag = false;
         ID count = 0;
         while (getline(fin, line)) {
+            if (line.find("- package: ") != string::npos) {
+                a -> setPackageName(line.substr(11, line.length() - 11));
+            }
             if (line.find("		activity") != string::npos) {
                 if (count > 0) {
                     auto activity = a -> mkActivity(name, affinity, launchMode);
@@ -31,7 +34,8 @@ namespace TaskDroid {
             }
             if (line.find("		- name:") == 0) {
                 auto pos = line.find(": ") + 2;
-                name = line.substr(pos, line.length() - pos);
+                name = a -> getPackageName() + "." +
+                       line.substr(pos, line.length() - pos);
             }
             if (line.find("				- name: android.intent.action.MAIN") == 0)
                     mainFlag = true;

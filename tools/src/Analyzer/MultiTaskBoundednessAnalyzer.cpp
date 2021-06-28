@@ -41,7 +41,7 @@ namespace TaskDroid {
         getRealActivities(a, mainAffinity, mainActivity, realActivities, visited);
     }
 
-    void getPort(AndroidStackMachine*a, 
+    void getPort(AndroidStackMachine* a, 
                  Activity* masterActivity, Activity* slaveActivity,
                  ActionMap& masterOutPort, ActionMap& slaveInPort,
                  ActionMap& completeActionMap) {
@@ -170,9 +170,13 @@ namespace TaskDroid {
         }
     }
 
-    bool MultiTaskAnalyzer::analyzeBoundedness() {
+    bool MultiTaskAnalyzer::analyzeBoundedness(std::ostream& os) {
         unordered_map<Activity*, ActionMap> completeActions;
-        getCompleteActions(a, completeActions);
+        if (taskNum == 1) {
+            completeActions[a -> getMainActivity()] = a -> getActionMap();
+        } else {
+            getCompleteActions(a, completeActions);
+        }
         unordered_map<Activity*, unordered_map<Activity*, int> > graph;
         vector<vector<Activity*> > loops;
         for (auto& [realActivity, completeGraph] : completeActions) {
@@ -181,11 +185,11 @@ namespace TaskDroid {
             getGraph(completeGraph, graph);
             LoopAnalyzer<Activity>::getLoop(graph, realActivity, loops);
             if (loops.size() == 0) {
-                analyzeReachability(realActivity -> getAffinity(), vector<Activity*>());
+                analyzeReachability(realActivity -> getAffinity(), vector<Activity*>(), os);
                 return 0;
             }
             for (auto& loop : loops) {
-                analyzeReachability(realActivity -> getAffinity(), loop);
+                analyzeReachability(realActivity -> getAffinity(), loop, os);
                 return 0;
             }
         }

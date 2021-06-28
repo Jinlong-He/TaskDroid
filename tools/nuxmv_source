@@ -2,5 +2,5 @@ go_msat
 build_boolean_model
 bmc_setup
 check_invar_inc_coi_bmc
-show_traces -o "result" -p 3
+show_traces -o "nuxmv_result" -p 3
 quit

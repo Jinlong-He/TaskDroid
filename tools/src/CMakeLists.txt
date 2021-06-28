@@ -6,5 +6,5 @@ ADD_SUBDIRECTORY(Analyzer)
 ADD_EXECUTABLE(TaskDroid main.cpp)
 TARGET_LINK_LIBRARIES(TaskDroid AndroidStackMachine 
                                 Parser 
-                                Analyzer)
-
+                                Analyzer
+                                -lboost_program_options)

@@ -256,7 +256,7 @@ namespace TaskDroid {
     void MultiTaskAnalyzer::loadASM(AndroidStackMachine* a) {
         this -> a = a;
         this -> a -> minimize();
-        taskNum = this -> a -> getAffnityMap().size();
+        taskNum = this -> a -> getAffinityMap().size();
     }
 
     void MultiTaskAnalyzer::mkOrderValues() {
@@ -296,6 +296,7 @@ namespace TaskDroid {
                 actionValues.emplace_back(*v);
                 actionValueMap[pair(activity, intent)] = v;
                 items.emplace_back(v);
+                value2ActionMap[name] = pair(activity, intent);
             }
         }
     }
@@ -410,15 +411,17 @@ namespace TaskDroid {
     }
 
     void MultiTaskAnalyzer::analyzeReachability(const string& affinity,
-                                                const vector<Activity*>& task) {
+                                                const vector<Activity*>& task,
+                                                std::ostream& os) {
         translate2FOA();
         atomic_proposition ap("TRUE");
         getTaskAP(affinity, task, ap);
-        verify_invar_nuxmv(foa, ap, "source");
+        verify_invar_nuxmv(foa, ap, "nuxmv_source");
         unordered_map<string, vector<string> > trace_table;
-        parse_trace_nuxmv(foa, "result", trace_table);
+        parse_trace_nuxmv(foa, "nuxmv_result", trace_table);
+        os << "Activity loop Found!:" << endl;
         for (auto& value : trace_table.at("t")) {
-            cout << value << " -> ";
+            os << value2ActionMap[value].second -> getActivity() -> getName() << endl;
         }
     }
 }

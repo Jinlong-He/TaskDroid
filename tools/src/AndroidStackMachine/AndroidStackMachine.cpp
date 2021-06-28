@@ -2,6 +2,14 @@
 #include <iostream>
 using std::cout, std::endl;
 namespace TaskDroid {
+    void AndroidStackMachine::setPackageName(const string& packageName) {
+        this -> packageName = packageName;
+    }
+
+    const string& AndroidStackMachine::getPackageName() const {
+        return packageName;
+    }
+
     void AndroidStackMachine::setMainActivity(Activity* activity) {
         mainActivity = activity;
     }
@@ -10,7 +18,7 @@ namespace TaskDroid {
         return mainActivity;
     }
 
-    const AffinityMap& AndroidStackMachine::getAffnityMap() const {
+    const AffinityMap& AndroidStackMachine::getAffinityMap() const {
         return affinityMap;
     }
 
@@ -134,18 +142,14 @@ namespace TaskDroid {
         activityMap.clear();
         for (auto& [source, actions] : actionMap) {
             activityMap[source -> getName()] = source;
-            if (source -> getAffinity() != "") {
-                if (affinityMap.count(source -> getAffinity()) == 0) {
-                    affinityMap[source -> getAffinity()] = affinityMap.size();
-                }
+            if (affinityMap.count(source -> getAffinity()) == 0) {
+                affinityMap[source -> getAffinity()] = affinityMap.size();
             }
             for (auto& [intent, finish] : actions) {
                 auto target = intent -> getActivity();
                 activityMap[target -> getName()] = target;
-                if (target -> getAffinity() != "") {
-                    if (affinityMap.count(target -> getAffinity()) == 0) {
-                        affinityMap[target -> getAffinity()] = affinityMap.size();
-                    }
+                if (affinityMap.count(target -> getAffinity()) == 0) {
+                    affinityMap[target -> getAffinity()] = affinityMap.size();
                 }
             }
         }

@@ -45,11 +45,13 @@ namespace TaskDroid {
 
         void loadASM(AndroidStackMachine* a);
         void analyze(AndroidStackMachine* a);
-        bool analyzeBoundedness();
+        bool analyzeBoundedness(std::ostream& os = std::cout);
         void analyzeReachability(AndroidStackMachine* a, int k, 
-                                 const Configuration<Activity>& configuration);
+                                 const Configuration<Activity>& configuration,
+                                 std::ostream& os = std::cout);
         void analyzeReachability(const string& affinity, 
-                                 const vector<Activity*>& task);
+                                 const vector<Activity*>& task,
+                                 std::ostream& os = std::cout);
         void translate2FOA();
     private:
         void mkPUSH(Activity* activity, Intent* intent, bool finish, 
@@ -105,6 +107,7 @@ namespace TaskDroid {
         unordered_map<Activity*, enum_value*> activityValueMap;
         unordered_map<pair<ID, ID>, enum_variable*> activityVarMap;
         unordered_map<pair<Activity*, Intent*>, enum_value*> actionValueMap;
+        unordered_map<string, pair<Activity*, Intent*>> value2ActionMap;
     };
 }
 #endif /* MultiTaskAnalyzer_hpp */

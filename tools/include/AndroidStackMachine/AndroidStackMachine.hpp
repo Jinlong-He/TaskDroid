@@ -71,9 +71,11 @@ namespace TaskDroid {
         Fragment* mkFragment(const string& name);
         Activity* getActivity(const string& name) const;
         Fragment* getFragment(const string& name) const;
+        void setPackageName(const string& packegeName);
+        const string& getPackageName() const;
         void setMainActivity(Activity* activity);
         Activity* getMainActivity() const;
-        const AffinityMap& getAffnityMap() const;
+        const AffinityMap& getAffinityMap() const;
         const ActivityMap& getActivityMap() const;
         const ActionMap& getActionMap() const;
         const ViewMap& getViewMap() const;
@@ -103,6 +105,7 @@ namespace TaskDroid {
                           FragmentMap& fragmentMap);
         void formFragmentTransaction(FragmentTransaction* transaction);
     private:
+        string packageName;
         Activity* mainActivity;
         ActivityMap activityMap;
         ActionMap actionMap;
