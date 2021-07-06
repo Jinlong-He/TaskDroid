@@ -76,8 +76,8 @@ namespace TaskDroid {
         return activityTransactionMap;
     }
 
-    const InitFragmentsMap& AndroidStackMachine::getInitFragmentsMap(Activity* activity) const {
-        return activity2InitFragmentsMap.at(activity);
+    const InitFragmentActionMap& AndroidStackMachine::getInitFragmentActionMap(Activity* activity) const {
+        return activity2InitFragmentActionMap.at(activity);
     }
 
     const ViewMap& AndroidStackMachine::getViewMap(Activity* activity) const {
@@ -86,7 +86,7 @@ namespace TaskDroid {
 
     Intent* AndroidStackMachine::mkIntent(Activity* activity) {
         Intent* intent = new Intent(activity);
-        intents.emplace_back(intent);
+        intents.insert(intent);
         return intent;
     }
 
@@ -126,38 +126,158 @@ namespace TaskDroid {
     }
 
     void AndroidStackMachine::addAction(Activity* activity, Intent* intent, bool finish) {
-        actionMap[activity].emplace_back(pair(intent, finish));
+        bool flag = true;
+        if (actionMap.count(activity)) {
+            for (auto& [i, f] : actionMap.at(activity)) {
+                if (i -> getActivity() == intent -> getActivity() &&
+                    i -> getFlags() == intent -> getFlags() &&
+                    f == finish) {
+                    flag = false;
+                    continue;
+                }
+            }
+        }
+        if (flag) {
+            actionMap[activity].emplace_back(pair(intent, finish));
+        }
     }
 
-    void AndroidStackMachine::print() const {
+    void AndroidStackMachine::print(std::ostream& os) const {
+        os << "-Package: " << packageName << endl;
+        os << "-Main Activity: " << mainActivity -> getName() << endl;
+        os << "-Activitis: " << endl;
+        for (auto& [name, activity] : activityMap) {
+            os << name << endl;
+        }
+        os << "-Activity Transition: " << endl;
         for (auto& [activity, actions] : actionMap) {
             for (auto& [intent, finish]  : actions) {
-                cout << activity -> getName() << "->" << intent -> getActivity() -> getName() << endl;
+                os << activity -> getName() << " -> " << intent -> toString();
+                if (finish) os << " [finish]";
+                os << endl;
+            }
+        }
+        os << "-Fragments: " << endl;
+        for (auto& [name, fragment] : fragmentMap) {
+            os << name << endl;
+        }
+        os << "-Fragment Transition: " << endl;
+        for (auto& [activity, transactions] : activityTransactionMap) {
+            for (auto transaction : transactions) {
+                os << activity -> getName() << " -> " << endl
+                   << transaction -> toString() << endl;
+            }
+        }
+        for (auto& [fragment, transactions] : fragmentTransactionMap) {
+            for (auto transaction : transactions) {
+                os << fragment -> getName() << " -> " << endl 
+                   << transaction -> toString() << endl;
             }
         }
     }
 
     void AndroidStackMachine::minimize() {
-        affinityMap.clear();
-        activityMap.clear();
+        Activities work({mainActivity}), newWork, acts({mainActivity});
+        Fragments fwork, fnewWork, frags;
+        while (work.size()) {
+            for (auto act : work) {
+                if (actionMap.count(act) == 0) continue;
+                for (auto& [intent, finish] : actionMap.at(act)) {
+                    if (acts.insert(intent -> getActivity()).second)
+                        newWork.insert(intent -> getActivity());
+                }
+            } 
+            work.clear();
+            if (newWork.size() > 0) work = newWork;
+            newWork.clear();
+        }
         for (auto& [source, actions] : actionMap) {
-            activityMap[source -> getName()] = source;
-            if (affinityMap.count(source -> getAffinity()) == 0) {
-                affinityMap[source -> getAffinity()] = affinityMap.size();
-            }
-            for (auto& [intent, finish] : actions) {
-                auto target = intent -> getActivity();
-                activityMap[target -> getName()] = target;
-                if (affinityMap.count(target -> getAffinity()) == 0) {
-                    affinityMap[target -> getAffinity()] = affinityMap.size();
+            if (acts.count(source) == 0) {
+                for (auto& [intent, finish] : actions) {
+                    intents.erase(intent);
+                    delete intent;
+                    intent = nullptr;
                 }
             }
         }
         for (auto& [activity, transactions] : activityTransactionMap) {
+            for (auto transaction : transactions) {
+                if (acts.count(activity) == 0) {
+                    delete transaction;
+                    transaction = nullptr;
+                } else {
+                    for (auto action : transaction -> getFragmentActions()) {
+                        fwork.insert(action -> getFragment());
+                        frags.insert(action -> getFragment());
+                    }
+                }
+            }
+        }
+        for (auto& [name, activity] : activityMap) {
+            if (acts.count(activity) == 0) {
+                if (actionMap.count(activity)) 
+                    actionMap.erase(activity);
+                if (activityTransactionMap.count(activity))
+                    activityTransactionMap.erase(activity);
+                delete activity;
+                activity = nullptr;
+            }
+        }
+        affinityMap.clear();
+        activityMap.clear();
+        for (auto activity : acts) {
+            activityMap[activity -> getName()] = activity;
+            if (affinityMap.count(activity -> getAffinity()) == 0)
+                affinityMap[activity -> getAffinity()] = affinityMap.size();
+        }
+        if (activityMap.count(getMainActivity() -> getName()) == 0) {
+            delete mainActivity;
+            mainActivity = nullptr;
+            setMainActivity(nullptr);
+        }
+
+        while (fwork.size()) {
+            for (auto fragment : fwork) {
+                if (fragmentTransactionMap.count(fragment) == 0) continue;
+                for (auto transaction : fragmentTransactionMap.at(fragment)) {
+                    for (auto action : transaction -> getFragmentActions()) {
+                        if (frags.insert(action -> getFragment()).second)
+                            fnewWork.insert(action -> getFragment());
+                    }
+                }
+            } 
+            fwork.clear();
+            if (fnewWork.size() > 0) fwork = fnewWork;
+            fnewWork.clear();
+        }
+        for (auto& [fragment, transactions] : fragmentTransactionMap) {
+            if (frags.count(fragment) == 0) {
+                for (auto transaction : transactions) {
+                    delete transaction;
+                    transaction = nullptr;
+                } 
+            }
+        }
+        for (auto& [name, fragment] : fragmentMap) {
+            if (frags.count(fragment) == 0 &&
+                fragmentTransactionMap.count(fragment)) 
+                fragmentTransactionMap.erase(fragment);
+        }
+        for (auto& [name, fragment] : fragmentMap) {
+            if (frags.count(fragment) == 0) {
+                delete fragment;
+                fragment = nullptr;
+            }
+        }
+
+        fragmentMap.clear();
+        for (auto fragment : frags) 
+            fragmentMap[fragment -> getName()] = fragment;
+        for (auto& [activity, transactions] : activityTransactionMap) {
             for (auto& transaction : transactions) {
                 for (auto& action : transaction -> getFragmentActions()) {
-                    if (viewMap.count(action.getViewID()) == 0) {
-                        viewMap[action.getViewID()] = viewMap.size();
+                    if (viewMap.count(action -> getViewID()) == 0) {
+                        viewMap[action -> getViewID()] = viewMap.size();
                     }
                 }
             }
@@ -165,8 +285,8 @@ namespace TaskDroid {
         for (auto& [fragment, transactions] : fragmentTransactionMap) {
             for (auto& transaction : transactions) {
                 for (auto& action : transaction -> getFragmentActions()) {
-                    if (viewMap.count(action.getViewID()) == 0) {
-                        viewMap[action.getViewID()] = viewMap.size();
+                    if (viewMap.count(action -> getViewID()) == 0) {
+                        viewMap[action -> getViewID()] = viewMap.size();
                     }
                 }
             }
@@ -237,20 +357,20 @@ namespace TaskDroid {
 
     void AndroidStackMachine::formFragmentTransaction(FragmentTransaction* transaction) {
         unordered_map<string, FragmentActions> fragmentActionsMap;
-        for (auto& action : transaction -> getFragmentActions()) {
-            fragmentActionsMap[action.getViewID()].emplace_back(action);
+        for (auto action : transaction -> getFragmentActions()) {
+            fragmentActionsMap[action -> getViewID()].emplace_back(action);
         }
         transaction -> clear();
         for (auto& [view, actions] : fragmentActionsMap) {
             ID pos = 0;
             for (ID i = 0; i < actions.size(); i++) {
-                if (actions[i].getFragmentMode() == REP) pos = i;
+                if (actions[i] -> getFragmentMode() == REP) pos = i;
             }
             vector<Fragment*> fragments;
-            auto mode = actions[pos].getFragmentMode();
+            auto mode = actions[pos] -> getFragmentMode();
             for (ID i = pos; i < actions.size(); i++) {
-                auto fragment = actions[i].getFragment();
-                auto mode = actions[i].getFragmentMode();
+                auto fragment = actions[i] -> getFragment();
+                auto mode = actions[i] -> getFragmentMode();
                 transaction -> addFragmentAction(mode, fragment, view);
                 fragments.emplace_back(fragment);
             }
@@ -267,7 +387,7 @@ namespace TaskDroid {
             map[fragment] = transactions;
             for (auto& transaction : transactions) {
                 for (auto action : transaction -> getFragmentActions()) {
-                    formActivity(action.getFragment(), map, fragmentMap);
+                    formActivity(action -> getFragment(), map, fragmentMap);
                 }
             }
         }
@@ -285,24 +405,28 @@ namespace TaskDroid {
             }
         }
         for (auto& [activity, transactions] : activityTransactionMap) {
-            auto& initFragments = activity2InitFragmentsMap[activity];
+            auto& initFragmentActionMap = activity2InitFragmentActionMap[activity];
             auto& fragmentMap = activity2FragmentsMap[activity];
             auto& fragmentTransactionMap = 
                 activity2FragmentTransactionMap[activity];
             auto& viewMap = activity2ViewMap[activity];
-            for (auto& transaction : transactions) {
+            for (auto transaction : transactions) {
+                auto& initMap = initFragmentActionMap[transaction];
+                for (auto action : transaction -> getHighLevelFragmentActions()) {
+                    auto viewID = getViewID(action -> getViewID());
+                    initMap[viewID] = action;
+                }
                 for (auto action : transaction -> getFragmentActions()) {
-                    auto fragment = action.getFragment();
-                    auto viewID = getViewID(action.getViewID());
-                    initFragments[viewID].emplace_back(fragment);
+                    auto fragment = action -> getFragment();
+                    auto viewID = getViewID(action -> getViewID());
                     formActivity(fragment, fragmentTransactionMap, fragmentMap);
                 }
             }
             for (auto& [fragment, transactions] : fragmentTransactionMap) {
                 for (auto& transaction : transactions) {
                     for (auto& action : transaction -> getFragmentActions()) {
-                        if (viewMap.count(action.getViewID()) == 0) {
-                            viewMap[action.getViewID()] = viewMap.size();
+                        if (viewMap.count(action -> getViewID()) == 0) {
+                            viewMap[action -> getViewID()] = viewMap.size();
                         }
                     }
                 }

@@ -10,25 +10,30 @@ namespace TaskDroid {
 
     void FragmentAnalyzer::mkFragmentValues() {
         ID i = 0, j = 0;
-        for (auto& [name, fragment] : fragmentMap) {
-            enum_value* v = new enum_value("f" + to_string(i++));
-            fragmentValues.emplace_back(*v);
-            fragmentValueMap[fragment] = v;
-            fragmentValuesMap[fragment].emplace_back(v);
-            items.emplace_back(v);
+        fragmentActionValueMap[nullptr] = &nullValue;
+        for (auto& [transaction, map] : initFragmentActionMap) {
+            for (auto& [viewID, action] : map) {
+                auto v = transaction -> isAddTobackStack() ?
+                    new enum_value("bf" + to_string(j++)) :
+                    new enum_value("f" + to_string(i++));
+                fragmentActionValues.emplace_back(*v);
+                items.emplace_back(v);
+                fragmentActionValueMap[action] = v;
+                const auto& fragments = action -> getFragments();
+                fragmentValuesMap[fragments[fragments.size() - 1]].push_back(v);
+            }
         }
-        fragmentValueMap[nullptr] = &nullValue;
         for (auto& [f, transactions] : fragmentTransactionMap) {
             for (auto transaction : transactions) {
-                if (transaction -> isAddTobackStack()) {
-                    auto& actions = transaction -> getFragmentActions();
-                    auto fragment = actions[actions.size() - 1].getFragment();
-                    auto v = new enum_value("bf" + to_string(i) + "_" + to_string(j++));
-                    //backTransactionValues.emplace_back(*v);
-                    backFragmentValueMap[pair(fragment, transaction)] = v;
-                    fragmentValues.emplace_back(*v);
-                    fragmentValuesMap[fragment].emplace_back(v);
+                for (auto action : transaction -> getHighLevelFragmentActions()) {
+                    auto v = transaction -> isAddTobackStack() ?
+                        new enum_value("bf" + to_string(j++)) :
+                        new enum_value("f" + to_string(i++));
+                    fragmentActionValues.emplace_back(*v);
                     items.emplace_back(v);
+                    fragmentActionValueMap[action] = v;
+                    const auto& fragments = action -> getFragments();
+                    fragmentValuesMap[fragments[fragments.size() - 1]].push_back(v);
                 }
             }
         }
@@ -176,15 +181,9 @@ namespace TaskDroid {
             for (ID l = 0; l < h; l++) {
                 for (ID j = 0; j < k; j++) {
                     string name = "f_" + to_string(i) + "_" + to_string(l) + "_" + to_string(j);
-                    auto v = new enum_variable(name, fragmentValues.begin(),
-                                                     fragmentValues.end());
-                    auto& initFragments = initFragmentsMap.at(i);
-                    if (l == 0 && j < initFragments.size()) {
-                        auto& value = *fragmentValueMap.at(initFragments.at(j));
-                        add_control_state(foa, *v, (*v==value));
-                    } else {
-                        add_control_state(foa, *v, (*v==nullValue));
-                    }
+                    auto v = new enum_variable(name, fragmentActionValues.begin(),
+                                                     fragmentActionValues.end());
+                    add_control_state(foa, *v, (*v==nullValue));
                     map[pair(l,j)] = v;
                     items.emplace_back(v);
                 }
@@ -241,9 +240,8 @@ namespace TaskDroid {
     }
 
     void FragmentAnalyzer::getFragmentTopAP(ID viewID, ID stackID,
-                                            Fragment* fragment,
+                                            const vector<enum_value*>& values,
                                             atomic_proposition& ap) {
-        auto& values = fragmentValuesMap.at(fragment);
         auto& map = fragmentVarMap.at(viewID);
         auto pp = atomic_proposition("FALSE");
         for (ID i = 0; i < k; i++) {
@@ -384,11 +382,11 @@ namespace TaskDroid {
                                    FragmentAction* action,
                                    FragmentTransaction* transaction,
                                    const atomic_proposition& ap) {
+        const auto& sourceValues = fragmentValuesMap.at(sourceFragment);
         auto viewID = viewMap.at(action -> getViewID());
         mkREP_BOrder(action, transaction, ap);
         mkA2B(action, transaction, ap);
-        auto fragment = action -> getFragment();
-        auto& newValue = *backFragmentValueMap.at(pair(fragment, transaction));
+        auto& newValue = *fragmentActionValueMap.at(action);
         const auto& map = fragmentVarMap.at(viewID);
         for (ID i = 0; i < h; i++) {
             auto topAPs = atomic_proposition("FALSE");
@@ -396,7 +394,7 @@ namespace TaskDroid {
                 if (j == i) continue;
                 auto topAP = atomic_proposition("FALSE");
                 getREP_BOrderAP(viewID, i, j, topAP);
-                getFragmentTopAP(viewID, j, sourceFragment, topAP);
+                getFragmentTopAP(viewID, j, sourceValues, topAP);
                 topAPs = topAPs | topAP;
             }
             auto& newVar = *map.at(pair(i, 0));
@@ -412,20 +410,18 @@ namespace TaskDroid {
             mkREP_B(sourceFragment, action, transaction, ap);
             return;
         }
+        const auto& sourceValues = fragmentValuesMap.at(sourceFragment);
         auto viewID = viewMap.at(action -> getViewID());
         mkREPOrder(action, ap);
-        auto fragment = action -> getFragment();
-        auto& newValue = transaction -> isAddTobackStack() ?
-                         *backFragmentValueMap.at(pair(fragment, transaction)) :
-                         *fragmentValueMap.at(fragment);
+        auto& newValue = *fragmentActionValueMap.at(action);
         const auto& map = fragmentVarMap.at(viewID);
         for (ID i = 0; i < h; i++) {
             auto topAP = atomic_proposition("FALSE");
             auto repAP = atomic_proposition("FALSE");
             getTopOrderAP(viewID, i, topAP);
             getREPOrderAP(viewID, i, repAP);
-            getFragmentTopAP(viewID, i, sourceFragment, topAP);
-            getFragmentTopAP(viewID, i, sourceFragment, repAP);
+            getFragmentTopAP(viewID, i, sourceValues, topAP);
+            getFragmentTopAP(viewID, i, sourceValues, repAP);
             for (ID j = 1; j < k; j++) {
                 auto& var = *map.at(pair(i, j));
                 add_transition(foa, var, nullValue, repAP & ap);
@@ -454,17 +450,15 @@ namespace TaskDroid {
                                  FragmentAction* action,
                                  FragmentTransaction* transaction,
                                  const atomic_proposition& ap) {
+        const auto& sourceValues = fragmentValuesMap.at(sourceFragment);
         auto viewID = viewMap.at(action -> getViewID());
-        auto fragment = action -> getFragment();
-        auto& newValue = transaction -> isAddTobackStack() ?
-                         *backFragmentValueMap.at(pair(fragment, transaction)) :
-                         *fragmentValueMap.at(fragment);
+        auto& newValue = *fragmentActionValueMap.at(action);
         if (transaction -> isAddTobackStack()) mkA2B(action, transaction, ap);
         const auto& map = fragmentVarMap.at(viewID);
         for (ID i = 0; i < h; i++) {
             auto topAP = atomic_proposition("FALSE");
             getTopOrderAP(viewID, i, topAP);
-            getFragmentTopAP(viewID, i, sourceFragment, topAP);
+            getFragmentTopAP(viewID, i, sourceValues, topAP);
             for (ID j = 0; j < k; j++) {
                 auto& newVar = *map.at(pair(i, j));
                 auto p = newVar == nullValue;
@@ -482,8 +476,8 @@ namespace TaskDroid {
                                     const atomic_proposition& ap) {
         if (!transaction -> isAddTobackStack()) return;
         auto viewID = viewMap.at(action -> getViewID());
-        auto fragment = action -> getFragment();
-        auto& value = *backFragmentValueMap.at(pair(fragment, transaction));
+        //auto fragment = action -> getFragment();
+        auto& value = *fragmentActionValueMap.at(action);
         auto& map = fragmentVarMap.at(viewID);
         for (ID i = 0; i < h; i++) {
             auto topAP = atomic_proposition("FALSE");
@@ -515,6 +509,8 @@ namespace TaskDroid {
     }
 
     void FragmentAnalyzer::translate2FOA() {
+        if (isTranslate2Foa) return;
+        isTranslate2Foa = true;
         mkFragmentValues();
         mkTransactionValues();
         mkOrderValues();
@@ -524,19 +520,23 @@ namespace TaskDroid {
         for (auto& [fragment, transactions] : fragmentTransactionMap) {
             for (auto& transaction : transactions) {
                 auto& value = *transactionValueMap.at(transaction);
-                for (auto action : transaction -> getFragmentActions()) {
-                    auto mode = action.getFragmentMode();
+                for (auto action : transaction -> getHighLevelFragmentActions()) {
+                    auto mode = action -> getFragmentMode();
                     auto ap = transactionVar == value;
                     auto popAP = transactionVar == popValue;
                     getPopTopAP(transaction, popAP);
                     switch (mode) {
                         case ADD :
-                            mkADD(fragment, &action, transaction, ap);
-                            mkADDPOP(&action, transaction, popAP);
+                            cout << "ADD" << endl;
+                            mkADD(fragment, action, transaction, ap);
+                            cout << "ADD END" << endl;
+                            cout << "ADDPOP" << endl;
+                            mkADDPOP(action, transaction, popAP);
+                            cout << "ADDPOP END" << endl;
                             break;
                         case REP :
-                            mkREP(fragment, &action, transaction, ap);
-                            mkREPPOP(&action, transaction, popAP);
+                            mkREP(fragment, action, transaction, ap);
+                            mkREPPOP(action, transaction, popAP);
                             break;
                         case REM :
                             break;
@@ -589,7 +589,7 @@ namespace TaskDroid {
     }
 
     void FragmentAnalyzer::getStackAP(ID viewID, ID stackID,
-                                     const vector<Fragment*>& stack,
+                                     const vector<FragmentAction*>& stack,
                                      atomic_proposition& ap,
                                      int type) {
         auto& map = fragmentVarMap.at(viewID);
@@ -615,11 +615,8 @@ namespace TaskDroid {
                 ID pos = *(iter++);
                 auto p = atomic_proposition("FALSE");
                 auto& var = *map.at(pair(stackID, pos));
-                auto& values = fragmentValuesMap.at(stack[j]);
-                for (auto value : values) {
-                    p = var == *value | p;
-                }
-                pp = p & pp;
+                auto& value = *fragmentActionValueMap.at(stack[j]);
+                pp = (var == value) & pp;
                 maxPos = pos > maxPos ? pos : maxPos;
                 minPos = pos < maxPos ? pos : minPos;
             }
@@ -638,7 +635,8 @@ namespace TaskDroid {
         }
     }
 
-    void FragmentAnalyzer::getStackAP(ID viewID, const vector<Fragment*>& stack,
+    void FragmentAnalyzer::getStackAP(ID viewID, 
+                                      const vector<FragmentAction*>& stack,
                                       atomic_proposition& ap,
                                       bool star) {
         auto& var = *orderVarMap.at(viewID);
@@ -664,8 +662,8 @@ namespace TaskDroid {
                 bool flag = true;
                 for (ID i = 0; i < dev.size(); i++) {
                     auto p = atomic_proposition("FALSE");
-                    vector<Fragment*> newStack(stack.begin() + index, 
-                                               stack.begin() + index + dev[i]);
+                    vector<FragmentAction*> newStack(stack.begin() + index, 
+                                                stack.begin() + index + dev[i]);
                     index += dev[i];
                     if (dev[i] == 0) {
                         if (star && (flag || index == h - 1)) continue;
@@ -689,28 +687,57 @@ namespace TaskDroid {
     }
 
     bool FragmentAnalyzer::analyzeReachability(const string& viewID,
-                                               const vector<Fragment*>& stack,
+                                               const vector<FragmentAction*>& stack,
                                                std::ostream& os) {
         return analyzeReachability(viewMap.at(viewID), stack, 0, os);
     }
 
     bool FragmentAnalyzer::analyzeReachability(ID viewID,
-                                               const vector<Fragment*>& stack, 
+                                               const vector<FragmentAction*>& stack, 
                                                bool star, std::ostream& os) {
-        translate2FOA();
         auto ap = atomic_proposition("FALSE");
         getStackAP(viewID, stack, ap, star);
-        system("rm result");
-        verify_invar_nuxmv(foa, ap, "source");
-        std::ifstream fin("result");
-        if (!fin) return false;
-        unordered_map<string, vector<string> > trace_table;
-        parse_trace_nuxmv(foa, "result", trace_table);
-        os << "nuXmv trace found: " << endl;
-        for (auto& value : trace_table.at("t")) {
-            if (value == "pop") os << "back()" << endl;
-            else os << value2TransactionMap[value] -> toString() << endl;
-        }
+        for (auto& [transaction, map] : initFragmentActionMap) {
+            clear_init_list(foa);
+            for (auto& [viewID, action] : map) {
+                auto& var = *fragmentVarMap.at(viewID).at(pair(0,0));
+                auto& value = *fragmentActionValueMap.at(action);
+                add_init_list(foa, var == value);
+            } 
+            for (ID i = 0; i < viewNum; i++) {
+                for (ID l = 0; l < h; l++) {
+                    for (ID j = 0; j < k; j++) {
+                        auto& var = *fragmentVarMap.at(i).at(pair(l,j));
+                        if (map.count(i) == 0) {
+                            add_init_list(foa, var == nullValue);
+                        } else {
+                            if (l > 0 || j > 0)
+                                add_init_list(foa, var == nullValue);
+                        }
+                    }
+                }
+                auto& var = *orderVarMap[i];
+                vector<pair<ID, pair<enum_value*, ID> > > nullOrder(h, pair(0, pair(nullptr, -1)));
+                nullOrder[0] = pair(0, pair(nullptr, 0));
+                auto& nullValue = *orderValueMap.at(nullOrder);
+                add_init_list(foa, var == nullValue);
+            }
+            for (ID j = 0; j < h; j++) {
+                auto& var = *backTransactionVarMap.at(j);
+                add_init_list(foa, var == nullValue);
+            }
+            system("rm nuxmv_result");
+            verify_invar_nuxmv(foa, ap, "nuxmv_source");
+            std::ifstream fin("nuxmv_result");
+            if (!fin) return false;
+            unordered_map<string, vector<string> > trace_table;
+            parse_trace_nuxmv(foa, "nuxmv_result", trace_table);
+            os << "-Fragment Trace Found: " << endl;
+            for (auto& value : trace_table.at("t")) {
+                if (value == "pop") os << "back()" << endl;
+                else os << value2TransactionMap[value] -> toString() << endl;
+            }
+        } 
         return true;
     }
 
@@ -732,54 +759,69 @@ namespace TaskDroid {
     //    }
     //}
 
-    void FragmentAnalyzer::checkREP(std::ostream& os) {
-        unordered_map<ID, unordered_set<vector<Fragment*> > > loopsMap;
-        for (auto& [source, transactions] : fragmentTransactionMap) {
-            for (auto& transaction : transactions) {
-                if (transaction -> isAddTobackStack()) {
-                    unordered_map<ID, Fragment*> topFragments;
-                    unordered_map<ID, Fragment*> repFragments;
-                    for (auto& action : transaction -> getHighLevelFragmentActions()) {
-                        auto& viewID = viewMap.at(action.getViewID());
-                        auto fragment = action.getFragment();
-                        topFragments[viewID] = fragment;
-                        if (action.getFragmentMode() == REP)
-                            repFragments[viewID] = fragment;
-                    }
-                    for (auto& [viewID, fragment] : topFragments) {
-                        if (fragmentTransactionMap.count(fragment) == 0) continue;
-                        for (auto& transaction : fragmentTransactionMap.at(fragment)) {
-                            for (auto& action : transaction -> getHighLevelFragmentActions()) {
-                                if (action.getFragmentMode() == REP) continue;
-                                auto& viewID = viewMap.at(action.getViewID());
-                                if (repFragments.count(viewID) > 0) {
-                                    loopsMap[viewID].insert(action.getFragments());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        for (auto& [viewID, loops] : loopsMap) {
-            for (auto& loop : loops) {
-                vector<Fragment*> path = loop;
-                path.insert(path.end(), loop.begin(), loop.end());
-                if (path.size() > k * h) continue;
-                atomic_proposition ap("TRUE");
-                os << "REP Loop on " + activity -> getName() + " found: ";
-                for (auto f : path) {
-                    os << f -> getName() << " ";
-                }
-                os << endl;
-                if (!analyzeReachability(viewID, path, 1, os)) 
-                    os << "nuXmv trace not found!" << endl;
-            }
-        }
-    }
+    //void FragmentAnalyzer::checkREP(std::ostream& os) {
+    //    unordered_map<ID, unordered_set<vector<Fragment*> > > loopsMap;
+    //    for (auto& [source, transactions] : fragmentTransactionMap) {
+    //        for (auto& transaction : transactions) {
+    //            if (transaction -> isAddTobackStack()) {
+    //                unordered_map<ID, Fragment*> topFragments;
+    //                unordered_map<ID, Fragment*> repFragments;
+    //                for (auto& action : transaction -> getHighLevelFragmentActions()) {
+    //                    auto& viewID = viewMap.at(action.getViewID());
+    //                    auto fragment = action.getFragment();
+    //                    topFragments[viewID] = fragment;
+    //                    if (action.getFragmentMode() == REP)
+    //                        repFragments[viewID] = fragment;
+    //                }
+    //                for (auto& [viewID, fragment] : topFragments) {
+    //                    if (fragmentTransactionMap.count(fragment) == 0) continue;
+    //                    for (auto& transaction : fragmentTransactionMap.at(fragment)) {
+    //                        for (auto& action : transaction -> getHighLevelFragmentActions()) {
+    //                            if (action.getFragmentMode() == REP) continue;
+    //                            auto& viewID = viewMap.at(action.getViewID());
+    //                            if (repFragments.count(viewID) > 0) {
+    //                                loopsMap[viewID].insert(action.getFragments());
+    //                            }
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //    for (auto& [viewID, loops] : loopsMap) {
+    //        for (auto& loop : loops) {
+    //            vector<Fragment*> path = loop;
+    //            path.insert(path.end(), loop.begin(), loop.end());
+    //            if (path.size() > k * h) continue;
+    //            atomic_proposition ap("TRUE");
+    //            os << "REP Loop on " + activity -> getName() + " found: ";
+    //            for (auto f : path) {
+    //                os << f -> getName() << " ";
+    //            }
+    //            os << endl;
+    //            if (!analyzeReachability(viewID, path, 1, os)) 
+    //                os << "nuXmv trace not found!" << endl;
+    //        }
+    //    }
+    //}
 
-    void FragmentAnalyzer::analyzeBoundedness(std::ostream& os) {
-        checkREP(os);
+    bool FragmentAnalyzer::analyzeBoundedness(std::ostream& os) {
+        bool flag = false;
+        for (auto& [f, transactions] : fragmentTransactionMap) {
+            for (auto transaction : transactions) {
+                for (auto action : transaction -> getHighLevelFragmentActions()) {
+                    auto viewID = viewMap.at(action -> getViewID());
+                    vector<FragmentAction*> stack({action, action});
+                    os << "- Fragment Boundedness Patten Found:" << endl;
+                    for (auto fragment : action -> getFragments()) {
+                        os << fragment -> getName() << endl;
+                    }
+                    os << "---END---" << endl;
+                    flag = flag | analyzeReachability(viewID, stack, 1, os);
+                }
+            }
+        }
+        return flag;
     }
 
     void FragmentAnalyzer::loadASM(AndroidStackMachine* a) {
@@ -789,8 +831,9 @@ namespace TaskDroid {
     void FragmentAnalyzer::loadActivity(Activity* activity) {
         fragmentMap = a -> getFragmentMap(activity);
         fragmentTransactionMap = a -> getFragmentTransactionMap(activity);
-        initFragmentsMap = a -> getInitFragmentsMap(activity);
+        initFragmentActionMap = a -> getInitFragmentActionMap(activity);
         viewMap = a -> getViewMap(activity);
         viewNum = viewMap.size();
+        translate2FOA();
     }
 }

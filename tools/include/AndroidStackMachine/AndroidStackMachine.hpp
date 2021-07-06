@@ -10,6 +10,7 @@
 #ifndef AndroidStackMachine_hpp 
 #define AndroidStackMachine_hpp 
 
+#include <iostream>
 #include "Configuration.hpp"
 #include "Intent.hpp"
 using std::unordered_map, std::unordered_set, std::pair;
@@ -30,7 +31,8 @@ namespace TaskDroid {
     typedef unordered_map<string, Activity*> ActivityMap;
     typedef unordered_map<string, ID> AffinityMap;
     typedef unordered_map<string, ID> ViewMap;
-    typedef unordered_map<ID, FragmentVec> InitFragmentsMap;
+    typedef unordered_map<FragmentTransaction*,
+                unordered_map<ID, FragmentAction*> > InitFragmentActionMap;
     enum ActionMode {PUSH, STOP, CTOP, CTSK, RTOF,
                      PUSH_N, STOP_N, CTOP_N, CTSK_N, RTOF_N};
     class AndroidStackMachine {
@@ -65,6 +67,18 @@ namespace TaskDroid {
                 delete pair.second;
                 pair.second = nullptr;
             }
+            for (auto& pair : activityTransactionMap) {
+                for (auto t : pair.second) {
+                    delete t;
+                    t = nullptr;
+                }
+            }
+            for (auto& pair : fragmentTransactionMap) {
+                for (auto t : pair.second) {
+                    delete t;
+                    t = nullptr;
+                }
+            }
         }
         Activity* mkActivity(const string& name, const string& affinity, const LaunchMode& launchMode);
         Intent* mkIntent(Activity* activity);
@@ -84,7 +98,7 @@ namespace TaskDroid {
         void addAction(Activity* activity, Intent* intent, bool finish = false);
         void minimize();
         void fomalize();
-        void print() const;
+        void print(std::ostream& os = std::cout) const;
         static ActionMode getMode(Intent* intent);
         static bool isNewMode(Intent* intent);
 
@@ -93,7 +107,7 @@ namespace TaskDroid {
         const FragmentTransactionMap& getFragmentTransactionMap() const;
         const FragmentTransactionMap& getFragmentTransactionMap(Activity* activity) const;
         const ActivityTransactionMap& getActivityTransactionMap() const;
-        const InitFragmentsMap& getInitFragmentsMap(Activity* activity) const;
+        const InitFragmentActionMap& getInitFragmentActionMap(Activity* activity) const;
         const ViewMap& getViewMap(Activity* activity) const;
 
         void setFragmentTransactionMap(const FragmentTransactionMap& fragmentTransactionMap);
@@ -112,12 +126,12 @@ namespace TaskDroid {
         AffinityMap affinityMap;
         ViewMap viewMap;
         FragmentMap fragmentMap;
-        IntentVec intents;
+        Intents intents;
         ActivityTransactionMap activityTransactionMap;
         FragmentTransactionMap fragmentTransactionMap;
         FragmentTransactionVec fragmentTransactions;
         unordered_map<Activity*, FragmentMap> activity2FragmentsMap;
-        unordered_map<Activity*, InitFragmentsMap> activity2InitFragmentsMap;
+        unordered_map<Activity*, InitFragmentActionMap> activity2InitFragmentActionMap;
         unordered_map<Activity*, FragmentTransactionMap> 
             activity2FragmentTransactionMap;
         unordered_map<Activity*, ViewMap> 

@@ -179,19 +179,23 @@ namespace TaskDroid {
         }
         unordered_map<Activity*, unordered_map<Activity*, int> > graph;
         vector<vector<Activity*> > loops;
+        bool flag = false;
         for (auto& [realActivity, completeGraph] : completeActions) {
             graph.clear();
             loops.clear();
             getGraph(completeGraph, graph);
-            LoopAnalyzer<Activity>::getLoop(graph, realActivity, loops);
-            if (loops.size() == 0) {
-                analyzeReachability(realActivity -> getAffinity(), vector<Activity*>(), os);
-                return 0;
-            }
+            LoopAnalyzer<Activity>::getPositiveLoop(graph, loops);
+            if (loops.size()) flag = true;
             for (auto& loop : loops) {
-                analyzeReachability(realActivity -> getAffinity(), loop, os);
-                return 0;
+                os << "-Boundedness Patten Found:" << endl;
+                for (auto act : loop) {
+                    os << act -> getName() << endl;
+                }
+                os << "---END---" << endl;
+                loop.push_back(loop[0]);
+                analyzePattenReachability(realActivity -> getAffinity(), loop, os);
             }
         }
+        return flag;
     }
 }

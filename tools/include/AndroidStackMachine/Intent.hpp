@@ -31,6 +31,7 @@ namespace TaskDroid {
         void setFlags(const FLAGs& flags);
         void addFlag(const FLAG& flag);
         void addFlag(const string& flag);
+        string toString() const;
     private:
         Activity* activity;
         FLAGs flags;

@@ -38,6 +38,14 @@ namespace TaskDroid {
         }
     }
 
+    void MultiTaskAnalyzer::getTopOrderAP(ID task0ID, ID task1ID,
+                                          atomic_proposition& ap) {
+        for (auto& [order, v] : orderValueMap) {
+            if (order[task0ID] == 0 && order[task1ID] == 1) 
+                ap = ap | orderVar == *v;
+        }
+    }
+
     void MultiTaskAnalyzer::getNewOrder(const vector<ID>& order, ID newTaskID,
                                         vector<ID>& newOrder) {
         newOrder = order;
@@ -255,8 +263,9 @@ namespace TaskDroid {
 
     void MultiTaskAnalyzer::loadASM(AndroidStackMachine* a) {
         this -> a = a;
-        this -> a -> minimize();
+        this -> a -> fomalize();
         taskNum = this -> a -> getAffinityMap().size();
+        translate2FOA();
     }
 
     void MultiTaskAnalyzer::mkOrderValues() {
@@ -332,6 +341,8 @@ namespace TaskDroid {
     }
 
     void MultiTaskAnalyzer::translate2FOA() {
+        if (isTranslate2Foa) return;
+        isTranslate2Foa = true;
         mkOrderValues();
         mkActivityValues();
         mkActionValues();
@@ -395,9 +406,26 @@ namespace TaskDroid {
         add_transition(foa, orderVar, orderVar, atomic_proposition("TRUE"));
     }
 
+    void MultiTaskAnalyzer::getPattenTaskAP(const string& affinity,
+                                            const vector<Activity*>& task,
+                                            atomic_proposition& ap) {
+        if (task.size() > k || task.size() == 0) return;
+        auto taskID = a -> getTaskID(affinity);
+        for (ID i = 0; i <= k - task.size(); i++) {
+            atomic_proposition p("TRUE");
+            for (ID j = i; j - i < task.size(); j++) {
+                auto& var = *activityVarMap.at(pair(taskID, j));
+                auto& value = *activityValueMap.at(task[j - i]);
+                p = p & var == value;
+            }
+            ap = ap | p;
+        }
+    }
+
     void MultiTaskAnalyzer::getTaskAP(const string& affinity,
                                       const vector<Activity*>& task,
                                       atomic_proposition& ap) {
+        if (task.size() > k) return;
         auto taskID = a -> getTaskID(affinity);
         for (ID j = 0; j < k; j++) {
             auto& var = *activityVarMap.at(pair(taskID, j));
@@ -410,19 +438,36 @@ namespace TaskDroid {
         }
     }
 
-    void MultiTaskAnalyzer::analyzeReachability(const string& affinity,
+    bool MultiTaskAnalyzer::analyzePattenReachability(const string& affinity,
+                                                      const vector<Activity*>& task,
+                                                      std::ostream& os) {
+        atomic_proposition ap("FALSE");
+        getPattenTaskAP(affinity, task, ap);
+        return analyzeReachability(ap, os);
+    }
+
+    bool MultiTaskAnalyzer::analyzeReachability(const string& affinity,
                                                 const vector<Activity*>& task,
                                                 std::ostream& os) {
-        translate2FOA();
         atomic_proposition ap("TRUE");
         getTaskAP(affinity, task, ap);
+        return analyzeReachability(ap, os);
+    }
+
+    bool MultiTaskAnalyzer::analyzeReachability(const atomic_proposition& ap,
+                                                std::ostream& os) {
+        system("rm nuxmv_result");
         verify_invar_nuxmv(foa, ap, "nuxmv_source");
+        std::ifstream fin("nuxmv_result");
+        if (!fin) return false;
         unordered_map<string, vector<string> > trace_table;
         parse_trace_nuxmv(foa, "nuxmv_result", trace_table);
-        os << "Activity loop Found!:" << endl;
+        os << "-Activity Trace Found:" << endl;
         for (auto& value : trace_table.at("t")) {
             os << value2ActionMap[value].second -> getActivity() -> getName() << endl;
         }
+        os << "---END---" << endl;
+        return true;
     }
 }
 

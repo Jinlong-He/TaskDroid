@@ -14,32 +14,38 @@ namespace TaskDroid {
 
     void ASMParser::parseManifestTxt(const char* fileName, AndroidStackMachine* a) {
         std::ifstream fin(fileName);
-        string line, name, launchModeStr, affinity = "";
+        string line, name, launchModeStr, affinity = "__";
         LaunchMode launchMode = STD;
-        bool mainFlag = false;
+        string mainActivityName = "";
         ID count = 0;
+        bool nameFlag = false, lmFlag = false, affinityFlag = false;
         while (getline(fin, line)) {
             if (line.find("- package: ") != string::npos) {
                 a -> setPackageName(line.substr(11, line.length() - 11));
             }
             if (line.find("		activity") != string::npos) {
-                if (count > 0) {
-                    auto activity = a -> mkActivity(name, affinity, launchMode);
-                    if (mainFlag) {
-                        a -> setMainActivity(activity);
-                        mainFlag = false;
-                    }
-                }
+                nameFlag = true;
+                lmFlag = true;
+                affinityFlag = true;
+                if (count > 0) 
+                    a -> mkActivity(name, affinity, launchMode);
                 count ++;
             }
-            if (line.find("		- name:") == 0) {
+            if (nameFlag && line.find("		- name:") == 0) {
+                nameFlag = false;
                 auto pos = line.find(": ") + 2;
-                name = a -> getPackageName() + "." +
-                       line.substr(pos, line.length() - pos);
+                name = line.substr(pos, line.length() - pos);
+                if (name.find(".") == string::npos) {
+                    name = a -> getPackageName() + "." + name;
+                }
+                else if (name.find(".") == 0) {
+                    name = a -> getPackageName() + name;
+                }
             }
-            if (line.find("				- name: android.intent.action.MAIN") == 0)
-                    mainFlag = true;
-            if (line.find("		- launchMode") == 0) {
+            if (line.find("				- name: android.intent.category.LAUNCHER") == 0)
+                    mainActivityName = name;
+            if (lmFlag && line.find("		- launchMode") == 0) {
+                lmFlag = false;
                 auto pos = line.find(": ") + 2;
                 launchModeStr = line.substr(pos, line.length() - pos);
                 if (launchModeStr == "0") launchMode = STD;
@@ -47,13 +53,15 @@ namespace TaskDroid {
                 if (launchModeStr == "2") launchMode = STK;
                 if (launchModeStr == "3") launchMode = SIT;
             }
-            if (line.find("		- taskAffinity") == 0) {
+            if (affinityFlag && line.find("		- taskAffinity") == 0) {
+                affinityFlag = false;
                 auto pos = line.find(": ") + 2;
                 affinity = line.substr(pos, line.length() - pos);
             }
         }
         if (count > a -> getActivityMap().size())
             a -> mkActivity(name, affinity, launchMode);
+        a -> setMainActivity(a -> getActivity(mainActivityName));
     }
 
     void ASMParser::parseManifest(const char* fileName, AndroidStackMachine* a) {
@@ -203,7 +211,7 @@ namespace TaskDroid {
         }
 
         root = doc.RootElement();
-        std::regex addPatten("(add|replace)\\(.*\\)>\\([0-9]+");
+        std::regex addPatten("(add|replace)\\(.*\\)>\\(.*\\)");
         std::regex a2bPatten("(addToBackStack)\\(.*\\)");
         if (root -> FirstChildElement()) {
             auto singleMethod = root -> FirstChildElement();
@@ -251,7 +259,8 @@ namespace TaskDroid {
                                     std::smatch m;
                                     if (std::regex_search(value, m, addPatten) && flag) {
                                         string result = m[0];
-                                        string viewId = result.substr(result.find(">(")+2);
+                                        string args = result.substr(result.find(">(")+2);
+                                        string viewID = util::split(args, ",")[0];
                                         auto mode = 
                                             result.find("add") != string::npos ?
                                             ADD : REP;
@@ -259,7 +268,7 @@ namespace TaskDroid {
                                             auto newFragment = a -> getFragment(
                                                     nameVec[index++]);
                                             transaction -> addFragmentAction(
-                                                    mode, newFragment, viewId);
+                                                    mode, newFragment, viewID);
                                         }
                                     } else if (std::regex_search(value, m, a2bPatten)) {
                                         if (transaction)

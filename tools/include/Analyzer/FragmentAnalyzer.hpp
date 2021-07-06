@@ -21,40 +21,42 @@ namespace TaskDroid {
         FragmentAnalyzer()
             : k(0),
               h(0),
+              isTranslate2Foa(false),
               a(nullptr),
               activity(nullptr),
               nullValue("null"),
               popValue("pop"),
               sharpValue("sharp"),
               transactionValues({nullValue, popValue}),
-              backTransactionValues({nullValue}),
-              fragmentValues({nullValue, sharpValue}) {}
+              backTransactionValues({nullValue, sharpValue}),
+              fragmentActionValues({nullValue, sharpValue}) {}
 
         FragmentAnalyzer(ID k_, ID h_, 
                          AndroidStackMachine* a_, Activity* activity_)
             : k(k_),
               h(h_),
+              isTranslate2Foa(false),
               a(a_),
               activity(activity_),
               nullValue("null"),
               popValue("pop"),
               sharpValue("sharp"),
               transactionValues({nullValue, popValue}),
-              backTransactionValues({nullValue}),
-              fragmentValues({nullValue, sharpValue}) {
+              backTransactionValues({nullValue, sharpValue}),
+              fragmentActionValues({nullValue, sharpValue}) {
                   loadASM(a);
                   loadActivity(activity);
               }
 
-        void analyzeBoundedness(std::ostream& os = std::cout);
-        void checkADD(std::ostream& os = std::cout);
-        void checkREP(std::ostream& os = std::cout);
+        bool analyzeBoundedness(std::ostream& os = std::cout);
+        //void checkADD(std::ostream& os = std::cout);
+        //void checkREP(std::ostream& os = std::cout);
         void analyzeReachability(std::ostream& os = std::cout);
         bool analyzeReachability(const string& viewID,
-                                 const vector<Fragment*>& task,
+                                 const vector<FragmentAction*>& task,
                                  std::ostream& os = std::cout);
         bool analyzeReachability(const char* config, std::ostream& os = std::cout);
-        bool analyzeReachability(ID viewID, const vector<Fragment*>& task, 
+        bool analyzeReachability(ID viewID, const vector<FragmentAction*>& task, 
                                  bool star = false,
                                  std::ostream& os = std::cout);
         void loadASM(AndroidStackMachine* a);
@@ -94,7 +96,8 @@ namespace TaskDroid {
                              atomic_proposition& ap);
         void getPopTopAP(FragmentTransaction* transaction, 
                          atomic_proposition& ap);
-        void getFragmentTopAP(ID viewID, ID taskID, Fragment* fragment,
+        void getFragmentTopAP(ID viewID, ID taskID, 
+                              const vector<enum_value*>& values,
                               atomic_proposition& ap);
         void mkREPOrder(FragmentAction* action, const atomic_proposition& ap);
         void mkREP_BOrder(FragmentAction* action, 
@@ -104,23 +107,25 @@ namespace TaskDroid {
                         FragmentTransaction* transaction, 
                         const atomic_proposition& ap);
 
-        void getStackAP(ID viewID, ID stackID, const vector<Fragment*>& task,
-                       atomic_proposition& ap, int type = -1);
-        void getStackAP(ID viewID, const vector<Fragment*>& task,
-                       atomic_proposition& ap, bool star = false);
+        void getStackAP(ID viewID, ID stackID, 
+                        const vector<FragmentAction*>& task,
+                        atomic_proposition& ap, int type = -1);
+        void getStackAP(ID viewID, const vector<FragmentAction*>& task,
+                        atomic_proposition& ap, bool star = false);
         void getGraph(ID viewID, Fragment* fragment,
                       unordered_map<Fragment*, 
                                      unordered_map<Fragment*, int> >& graph);
 
         ID k;
         ID h;
+        bool isTranslate2Foa;
         AndroidStackMachine* a;
         Activity* activity;
         fomula_automaton<> foa;
 
         FragmentMap fragmentMap;
         FragmentTransactionMap fragmentTransactionMap;
-        InitFragmentsMap initFragmentsMap;
+        InitFragmentActionMap initFragmentActionMap;
         ViewMap viewMap;
 
         ID viewNum;
@@ -135,6 +140,7 @@ namespace TaskDroid {
         vector<enum_value> transactionValues;
         vector<enum_value> backTransactionValues;
         vector<enum_value> fragmentValues;
+        vector<enum_value> fragmentActionValues;
         vector<enum_value> orderValues;
         unordered_map<string, ID> viewIDMap;
         unordered_map<vector<pair<ID, pair<enum_value*, ID> > >, enum_value*> orderValueMap;
@@ -147,6 +153,10 @@ namespace TaskDroid {
         unordered_map<ID, enum_variable*> backTransactionVarMap;
         unordered_map<ID, enum_variable*> orderVarMap;
         unordered_map<string, FragmentTransaction*> value2TransactionMap;
+
+        unordered_map<FragmentAction*, vector<enum_value*> > fragmentActionValuesMap;
+        unordered_map<FragmentAction*, enum_value*> fragmentActionValueMap;
+        unordered_map<pair<FragmentAction*, FragmentTransaction*>, enum_value*> backFragmentActionValueMap;
     };
 }
 #endif /* FragmentAnalyzer_hpp */

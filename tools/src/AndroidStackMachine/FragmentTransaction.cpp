@@ -21,11 +21,11 @@ namespace TaskDroid {
     }
 
     void FragmentTransaction::addFragmentAction(FragmentMode mode, Fragment* fragment, const string viewID) {
-        fragmentActions.emplace_back(FragmentTransaction::FragmentAction(mode, fragment, viewID));
+        fragmentActions.emplace_back(new FragmentAction(mode, fragment, viewID));
     }
 
     void FragmentTransaction::addHighLevelFragmentAction(FragmentMode mode, Fragment* fragment, const string viewID, const vector<Fragment*>& fragments) {
-        highlevelFragmentActions.emplace_back(FragmentTransaction::FragmentAction(mode, fragment, viewID, fragments));
+        highlevelFragmentActions.emplace_back(new FragmentAction(mode, fragment, viewID, fragments));
     }
 
     void FragmentTransaction::clear() {
@@ -34,8 +34,8 @@ namespace TaskDroid {
 
     string FragmentTransaction::toString() const {
         string res = "";
-        for (auto& action : fragmentActions) {
-            res += action.toString() + "\n";
+        for (auto action : fragmentActions) {
+            res += action -> toString() + "\n";
         }
         if (isAddTobackStack()) res += "addToBackStack()\n";
         res += "commit()";

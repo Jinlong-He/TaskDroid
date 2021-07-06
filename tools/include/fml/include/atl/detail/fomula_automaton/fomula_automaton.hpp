@@ -137,6 +137,10 @@ namespace atl::detail {
             init_list_ = list;
         }
 
+        void clear_init_list() {
+            init_list_.clear();
+        }
+
         const unordered_map<Item const*, State>&
         item_map() const {
             return item_map_();
@@ -250,6 +254,19 @@ namespace atl {
         foa.set_variable(p);
         foa.add_init_list(ap);
         return s;
+    }
+
+    template <FOA_PARAMS>
+    inline void
+    add_init_list(FOA& foa,
+                  const ll::atomic_proposition& ap) {
+        foa.add_init_list(ap);
+    }
+
+    template <FOA_PARAMS>
+    inline void
+    clear_init_list(FOA& foa) {
+        foa.clear_init_list();
     }
 
     template <FOA_PARAMS>

@@ -61,7 +61,7 @@ namespace TaskDroid {
             vector<Fragment*> fragments;
             string viewID;
         };
-        typedef vector<FragmentAction> FragmentActions;
+        typedef vector<FragmentAction*> FragmentActions;
 
         FragmentTransaction()
             : addToBackStack(0),
@@ -69,7 +69,16 @@ namespace TaskDroid {
         FragmentTransaction(bool addToBackStack_, const FragmentActions& fragmentActions_)
             : addToBackStack(addToBackStack_),
               fragmentActions(fragmentActions_) {}
-        ~FragmentTransaction() {}
+        ~FragmentTransaction() {
+            for (auto action : fragmentActions) {
+                delete action;
+                action = nullptr;
+            }
+            for (auto action : highlevelFragmentActions) {
+                delete action;
+                action = nullptr;
+            }
+        }
 
         bool isAddTobackStack() const;
         void setAddTobackStack(bool addToBackStack);

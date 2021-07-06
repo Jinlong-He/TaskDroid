@@ -20,6 +20,7 @@ namespace TaskDroid {
     public:
         MultiTaskAnalyzer()
             : k(0),
+              isTranslate2Foa(false),
               a(nullptr),
               nullValue("null"),
               popValue("pop"),
@@ -27,14 +28,17 @@ namespace TaskDroid {
               actionValues({nullValue, popValue}),
               activityValues({nullValue}) {}
 
-        MultiTaskAnalyzer(ID k_)
+        MultiTaskAnalyzer(ID k_, AndroidStackMachine* a_)
             : k(k_),
-              a(nullptr),
+              isTranslate2Foa(false),
+              a(a_),
               nullValue("null"),
               popValue("pop"),
               orderValues({nullValue}),
               actionValues({nullValue, popValue}),
-              activityValues({nullValue}) {}
+              activityValues({nullValue}) {
+                  loadASM(a);
+              }
 
         ~MultiTaskAnalyzer() {
             for (auto v : items) {
@@ -46,12 +50,18 @@ namespace TaskDroid {
         void loadASM(AndroidStackMachine* a);
         void analyze(AndroidStackMachine* a);
         bool analyzeBoundedness(std::ostream& os = std::cout);
-        void analyzeReachability(AndroidStackMachine* a, int k, 
+        bool analyzeBackHijacking(std::ostream& os = std::cout);
+        bool analyzeReachability(AndroidStackMachine* a, int k, 
                                  const Configuration<Activity>& configuration,
                                  std::ostream& os = std::cout);
-        void analyzeReachability(const string& affinity, 
+        bool analyzeReachability(const string& affinity, 
                                  const vector<Activity*>& task,
                                  std::ostream& os = std::cout);
+        bool analyzeReachability(const atomic_proposition& ap,
+                                 std::ostream& os = std::cout);
+        bool analyzePattenReachability(const string& affinity, 
+                                       const vector<Activity*>& task,
+                                       std::ostream& os = std::cout);
         void translate2FOA();
     private:
         void mkPUSH(Activity* activity, Intent* intent, bool finish, 
@@ -77,10 +87,16 @@ namespace TaskDroid {
         void mkActionValues();
         void mkActivityVars();
         void getTopOrderAP(ID taskID, atomic_proposition& ap);
+        void getTopOrderAP(ID task0ID, ID task1ID, atomic_proposition& ap);
         void getNewOrder(const vector<ID>& order, ID newTaskID,
                          vector<ID>& newOrder);
         void getPopOrder(const vector<ID>& order, vector<ID>& newOrder);
         enum_value* getMainOrderValue();
+        void getPattenTaskAP(const string& affinity, 
+                             const vector<Activity*>& task,
+                             atomic_proposition& ap);
+        void getBackHijackingAP(Activity* source, Activity* target,
+                                atomic_proposition& ap);
         void getTaskAP(const string& affinity, const vector<Activity*>& task,
                        atomic_proposition& ap);
         void setActivity(ID taskID, ID actID, Activity* activity,
@@ -88,6 +104,7 @@ namespace TaskDroid {
         void switchTask(Intent* intent, ID taskID, const atomic_proposition& ap);
 
         ID k;
+        bool isTranslate2Foa;
         AndroidStackMachine* a;
         fomula_automaton<> foa;
 
