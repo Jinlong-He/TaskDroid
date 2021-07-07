@@ -47,6 +47,12 @@ namespace TaskDroid {
                   loadASM(a);
                   loadActivity(activity);
               }
+        ~FragmentAnalyzer() {
+            for (auto v : items) {
+                delete v;
+                v = nullptr;
+            }
+        }
 
         bool analyzeBoundedness(std::ostream& os = std::cout);
         //void checkADD(std::ostream& os = std::cout);

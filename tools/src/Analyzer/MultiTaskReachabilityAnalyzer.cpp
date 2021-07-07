@@ -456,7 +456,8 @@ namespace TaskDroid {
 
     bool MultiTaskAnalyzer::analyzeReachability(const atomic_proposition& ap,
                                                 std::ostream& os) {
-        system("rm nuxmv_result");
+        std::ifstream f("nuxmv_result");
+        if (f) system("rm nuxmv_result");
         verify_invar_nuxmv(foa, ap, "nuxmv_source");
         std::ifstream fin("nuxmv_result");
         if (!fin) return false;
