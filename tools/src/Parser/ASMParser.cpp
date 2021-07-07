@@ -31,7 +31,7 @@ namespace TaskDroid {
                     a -> mkActivity(name, affinity, launchMode);
                 count ++;
             }
-            if (nameFlag && line.find("		- name:") == 0) {
+            if (nameFlag && line.find("- name:") != string::npos) {
                 nameFlag = false;
                 auto pos = line.find(": ") + 2;
                 name = line.substr(pos, line.length() - pos);
@@ -42,9 +42,9 @@ namespace TaskDroid {
                     name = a -> getPackageName() + name;
                 }
             }
-            if (line.find("				- name: android.intent.category.LAUNCHER") == 0)
+            if (line.find("- name: android.intent.category.LAUNCHER") != string::npos)
                     mainActivityName = name;
-            if (lmFlag && line.find("		- launchMode") == 0) {
+            if (lmFlag && line.find("- launchMode") != string::npos) {
                 lmFlag = false;
                 auto pos = line.find(": ") + 2;
                 launchModeStr = line.substr(pos, line.length() - pos);
@@ -53,10 +53,10 @@ namespace TaskDroid {
                 if (launchModeStr == "2") launchMode = STK;
                 if (launchModeStr == "3") launchMode = SIT;
             }
-            if (affinityFlag && line.find("		- taskAffinity") == 0) {
+            if (affinityFlag && line.find("- taskAffinity") != string::npos) {
                 affinityFlag = false;
                 auto pos = line.find(": ") + 2;
-                affinity = line.substr(pos, line.length() - pos);
+                affinity = line.substr(pos);
             }
         }
         if (count > a -> getActivityMap().size())
@@ -140,28 +140,31 @@ namespace TaskDroid {
                 if (element -> FirstChildElement()) {
                     auto des = element -> FirstChildElement();
                     while (des) {
-                        string targetName = des -> Attribute("name");
-                        auto targetActivity = a -> getActivity(targetName);
-                        if (!targetActivity) {
-                            des = des -> NextSiblingElement();
-                            continue;
-                        }
-                        auto intent = a -> mkIntent(targetActivity);
-                        if (des -> FindAttribute("flags")) {
-                            string flags = des -> Attribute("flags");
-                            for (auto& flag : util::split(flags, " ")) {
-                                intent -> addFlag(flag);
+                        string type = des -> Attribute("type");
+                        if (type == "Act2Act") {
+                            string targetName = des -> Attribute("name");
+                            auto targetActivity = a -> getActivity(targetName);
+                            if (!targetActivity) {
+                                des = des -> NextSiblingElement();
+                                continue;
                             }
-                        }
-                        if (des -> FindAttribute("finish")) {
-                            string finish = des -> Attribute("finish");
-                            if (finish == "true") {
-                                a -> addAction(sourceActivity, intent, true);
+                            auto intent = a -> mkIntent(targetActivity);
+                            if (des -> FindAttribute("flags")) {
+                                string flags = des -> Attribute("flags");
+                                for (auto& flag : util::split(flags, " ")) {
+                                    intent -> addFlag(flag);
+                                }
+                            }
+                            if (des -> FindAttribute("finish")) {
+                                string finish = des -> Attribute("finish");
+                                if (finish == "true") {
+                                    a -> addAction(sourceActivity, intent, true);
+                                } else {
+                                    a -> addAction(sourceActivity, intent, false);
+                                }
                             } else {
                                 a -> addAction(sourceActivity, intent, false);
                             }
-                        } else {
-                            a -> addAction(sourceActivity, intent, false);
                         }
                         des = des -> NextSiblingElement();
                     }

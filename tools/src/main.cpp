@@ -15,7 +15,7 @@ int main (int argc, char* argv[]) {
     ("help,h", "produce help message")
     ("verify,v", po::value<string>(), "")
     ("act", po::value<string>(), "")
-    ("engine,e", po::value<string>(), "")
+    ("engine,e", po::value<string>()->default_value("nuxmv"), "")
     ("k", po::value<int>(&k)->default_value(10), "k")
     ("h", po::value<int>(&h)->default_value(3), "h")
     ("output-file,o", po::value<string>(), "")
@@ -58,16 +58,18 @@ int main (int argc, char* argv[]) {
         ASMParser::parseATG(aftmFileName.c_str(), &a);
         ASMParser::parseFragment(fragmentFileName.c_str(), &a);
         a.fomalize();
+        //a.print();
         if (vm.count("output-file")) {
             outputFileName = vm["output-file"].as<std::string>();
         }
         std::ofstream out(outputFileName);
         if (a.getAffinityMap().size() == 0 || !a.getMainActivity()) {
             out << "no graph" << endl;
-            cout << manifestFileName << endl;
+            //cout << manifestFileName << endl;
             return 0;
         }
         a.print(out);
+        if (a.getAffinityMap().size() > 1) cout << manifestFileName << endl;
         if (vm.count("verify")) {
             string verify = vm["verify"].as<string>();
             if (verify == "boundedness") {
@@ -106,35 +108,5 @@ int main (int argc, char* argv[]) {
         out.close();
     } catch(string str) {
     }
-    //AndroidStackMachine a;
-    //ASMParser::parseManifest(argv[1], &a);
-    //ASMParser::parseATG(argv[2], &a);
-    //ASMParser::parseFragment(argv[3], &a);
-    //a.fomalize();
-    //std::ofstream out(argv[4]);
-    //out << "package: " + a.getPackageName() << endl;
-    //out << "mainActivity: " + a.getMainActivity() -> getName() << endl;
-
-    //bool flag = true;
-    //for (auto& [name, activity] : a.getActivityMap()) {
-    //    if (a.getActivityTransactionMap().count(activity) != 0) {
-    //        if (a.getFragmentTransactionMap(activity).size() > 0) {
-    //            flag = false;
-    //            //FragmentAnalyzer analyzer(2,3,&a,activity);
-    //            //analyzer.analyzeBoundedness(out);
-    //        }
-    //    }
-    //}
-    //if (flag) {
-    //    out << "No Fragments" << endl;
-    //}
-    //if (!flag) {
-    //    out << "Has Fragments" << endl;
-    //}
-    //ASMParser::parseATG(argv[2], &a);
-    //MultiTaskAnalyzer::analyzeReachability(&a, 5);
-    //MultiTaskAnalyzer analyzer(6);
-    //analyzer.loadASM(&a);
-    //analyzer.analyzeBoundedness();
     return 0;
 }

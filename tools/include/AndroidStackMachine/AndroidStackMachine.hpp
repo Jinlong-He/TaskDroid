@@ -13,7 +13,7 @@
 #include <iostream>
 #include "Configuration.hpp"
 #include "Intent.hpp"
-using std::unordered_map, std::unordered_set, std::pair;
+using std::unordered_map, std::unordered_set, std::pair, std::cout, std::endl;
 namespace TaskDroid {
     typedef unordered_map<string, Fragment*> FragmentMap;
     typedef vector<FragmentTransaction*> FragmentTransactionVec;
@@ -22,6 +22,7 @@ namespace TaskDroid {
     typedef unordered_set<Activity*> Activities;
     typedef unordered_set<Intent*> Intents;
     typedef unordered_set<Fragment*> Fragments;
+    typedef unordered_set<FragmentTransaction*> FragmentTransactions;
     typedef vector<Fragment*> FragmentVec;
     typedef vector<Activity*> ActivityVec;
     typedef vector<Intent*> IntentVec;
@@ -67,17 +68,9 @@ namespace TaskDroid {
                 delete pair.second;
                 pair.second = nullptr;
             }
-            for (auto& pair : activityTransactionMap) {
-                for (auto t : pair.second) {
-                    delete t;
-                    t = nullptr;
-                }
-            }
-            for (auto& pair : fragmentTransactionMap) {
-                for (auto t : pair.second) {
-                    delete t;
-                    t = nullptr;
-                }
+            for (auto ft : fragmentTransactions) {
+                delete ft;
+                ft = nullptr;
             }
         }
         Activity* mkActivity(const string& name, const string& affinity, const LaunchMode& launchMode);
@@ -96,7 +89,7 @@ namespace TaskDroid {
         ID getTaskID(const string& affinity) const;
         ID getViewID(const string& view) const;
         void addAction(Activity* activity, Intent* intent, bool finish = false);
-        void minimize();
+        bool minimize();
         void fomalize();
         void print(std::ostream& os = std::cout) const;
         static ActionMode getMode(Intent* intent);
@@ -129,7 +122,7 @@ namespace TaskDroid {
         Intents intents;
         ActivityTransactionMap activityTransactionMap;
         FragmentTransactionMap fragmentTransactionMap;
-        FragmentTransactionVec fragmentTransactions;
+        FragmentTransactions fragmentTransactions;
         unordered_map<Activity*, FragmentMap> activity2FragmentsMap;
         unordered_map<Activity*, InitFragmentActionMap> activity2InitFragmentActionMap;
         unordered_map<Activity*, FragmentTransactionMap> 

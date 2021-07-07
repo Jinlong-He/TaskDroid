@@ -101,7 +101,7 @@ namespace TaskDroid {
 
     FragmentTransaction* AndroidStackMachine::mkFragmentTransaction() {
         FragmentTransaction* transaction = new FragmentTransaction();
-        fragmentTransactions.emplace_back(transaction);
+        fragmentTransactions.insert(transaction);
         return transaction;
     }
 
@@ -145,7 +145,7 @@ namespace TaskDroid {
     void AndroidStackMachine::print(std::ostream& os) const {
         os << "-Package: " << packageName << endl;
         os << "-Main Activity: " << mainActivity -> getName() << endl;
-        os << "-Activitis: " << endl;
+        os << "-Activities: " << endl;
         for (auto& [name, activity] : activityMap) {
             os << name << endl;
         }
@@ -176,7 +176,7 @@ namespace TaskDroid {
         }
     }
 
-    void AndroidStackMachine::minimize() {
+    bool AndroidStackMachine::minimize() {
         Activities work({mainActivity}), newWork, acts({mainActivity});
         Fragments fwork, fnewWork, frags;
         while (work.size()) {
@@ -191,49 +191,49 @@ namespace TaskDroid {
             if (newWork.size() > 0) work = newWork;
             newWork.clear();
         }
+        Activities dels;
         for (auto& [source, actions] : actionMap) {
-            if (acts.count(source) == 0) {
-                for (auto& [intent, finish] : actions) {
-                    intents.erase(intent);
-                    delete intent;
-                    intent = nullptr;
-                }
-            }
+            if (acts.count(source) == 0) dels.insert(source);
         }
+        for (auto del : dels)
+            actionMap.erase(del);
+        dels.clear();
         for (auto& [activity, transactions] : activityTransactionMap) {
+            if (acts.count(activity) == 0) {
+                dels.insert(activity);
+                continue;
+            }
             for (auto transaction : transactions) {
-                if (acts.count(activity) == 0) {
-                    delete transaction;
-                    transaction = nullptr;
-                } else {
-                    for (auto action : transaction -> getFragmentActions()) {
-                        fwork.insert(action -> getFragment());
-                        frags.insert(action -> getFragment());
-                    }
+                for (auto action : transaction -> getFragmentActions()) {
+                    fwork.insert(action -> getFragment());
+                    frags.insert(action -> getFragment());
                 }
             }
         }
+        for (auto del : dels)
+            activityTransactionMap.erase(del);
+        dels.clear();
         for (auto& [name, activity] : activityMap) {
-            if (acts.count(activity) == 0) {
-                if (actionMap.count(activity)) 
-                    actionMap.erase(activity);
-                if (activityTransactionMap.count(activity))
-                    activityTransactionMap.erase(activity);
-                delete activity;
-                activity = nullptr;
-            }
+            if (acts.count(activity) == 0) dels.insert(activity);
+        }
+        for (auto del : dels) {
+            activityMap.erase(del -> getName());
+            delete del;
+            del = nullptr;
         }
         affinityMap.clear();
+        if (acts.size() == 1 && frags.size() == 0) {
+            activityMap.erase(mainActivity -> getName());
+            delete mainActivity;
+            mainActivity = nullptr;
+            setMainActivity(nullptr);
+            return false;
+        }
         activityMap.clear();
         for (auto activity : acts) {
             activityMap[activity -> getName()] = activity;
             if (affinityMap.count(activity -> getAffinity()) == 0)
                 affinityMap[activity -> getAffinity()] = affinityMap.size();
-        }
-        if (activityMap.count(getMainActivity() -> getName()) == 0) {
-            delete mainActivity;
-            mainActivity = nullptr;
-            setMainActivity(nullptr);
         }
 
         while (fwork.size()) {
@@ -250,24 +250,19 @@ namespace TaskDroid {
             if (fnewWork.size() > 0) fwork = fnewWork;
             fnewWork.clear();
         }
+        Fragments fdels;
         for (auto& [fragment, transactions] : fragmentTransactionMap) {
-            if (frags.count(fragment) == 0) {
-                for (auto transaction : transactions) {
-                    delete transaction;
-                    transaction = nullptr;
-                } 
-            }
+            if (frags.count(fragment) == 0) fdels.insert(fragment);
         }
+        for (auto del : fdels) fragmentTransactionMap.erase(del);
+        fdels.clear();
         for (auto& [name, fragment] : fragmentMap) {
-            if (frags.count(fragment) == 0 &&
-                fragmentTransactionMap.count(fragment)) 
-                fragmentTransactionMap.erase(fragment);
+            if (frags.count(fragment) == 0) fdels.insert(fragment);
         }
-        for (auto& [name, fragment] : fragmentMap) {
-            if (frags.count(fragment) == 0) {
-                delete fragment;
-                fragment = nullptr;
-            }
+        for (auto del : fdels) {
+            fragmentMap.erase(del -> getName());
+            delete del;
+            del = nullptr;
         }
 
         fragmentMap.clear();
@@ -291,12 +286,12 @@ namespace TaskDroid {
                 }
             }
         }
+        return true;
     }
 
     void AndroidStackMachine::fomalize() {
         if (isFomalize) return;
-        minimize();
-        formActivity();
+        if (minimize()) formActivity();
         isFomalize = true;
     }
 

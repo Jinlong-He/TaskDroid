@@ -464,7 +464,11 @@ namespace TaskDroid {
         parse_trace_nuxmv(foa, "nuxmv_result", trace_table);
         os << "-Activity Trace Found:" << endl;
         for (auto& value : trace_table.at("t")) {
-            os << value2ActionMap[value].second -> getActivity() -> getName() << endl;
+            if (value == "pop") {
+                os << "back" << endl;
+            } else {
+                os << value2ActionMap[value].second -> getActivity() -> getName() << endl;
+            }
         }
         os << "---END---" << endl;
         return true;
