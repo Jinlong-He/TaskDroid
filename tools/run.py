@@ -1,28 +1,55 @@
+import uiautomator2 as u2
+import argparse
+import time
 import os
 import sys
-import shutil
 
-def analyzeApk(path, sdk):
-    if(os.path.exists(path)): 
-        apks = os.listdir(path)
-        for apk in apks:
-            if apk[-4:] ==".apk":
-                outPath = "outputDir/" +apk[:-4]+ "/"
-                print("java -jar ICCExtractor/ICCExtractor.jar  -path "+ path +" -name "+apk+" -androidJar "+ sdk +"/platforms -time 2 -maxPathNumber 100 >> logs/"+apk+".txt")
-                os.system("java -jar ICCExtractor/ICCExtractor.jar  -path "+ path +" -name "+apk+" -androidJar "+ sdk +"/platforms -time 2 -maxPathNumber 100 >> logs/"+apk+".txt")
-                if not os.path.exists("result/" + apk[:-4]) :
-                    os.system("cd result && mkdir " + apk[:-4] + " && cd ..")
-                os.system("./build/bin/TaskDroid " + 
-                        outPath + "manifest/AndroidManifest.txt " +
-                        outPath + "ictg/ictgMerge.xml " +
-                        outPath + "fragment/SingleObject_entry.xml " +
-                        "result/" + apk[:-4] + "/loop")
+from ui_binder import activity_finder 
+from ui_binder import trace_reader 
 
 if __name__ == '__main__' :
-    path = sys.argv[1]
-    sdk = "/Users/hejl/Library/Android/sdk"    
-    #os.system("mvn clean package")
-    #shutil.copy("target/ICCExtractor-1.0-SNAPSHOT.one-jar.jar", "ICCExtractor.jar")
-    if(not os.path.exists("logs")): 
-        os.makedirs("logs") 
-    analyzeApk(path, sdk)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', '-i')
+    parser.add_argument('--timeout', '-t')
+    parser.add_argument('--verify', '-v')
+    parser.add_argument('--sdk', '-s')
+    args = parser.parse_args()
+    apk = ''
+    verify = ''
+    sdk = ''
+    timeout = 10
+    if (args.timeout) :
+        timeout = args.timeout
+    if (args.sdk) :
+        sdk = args.sdk
+    if (args.input) :
+        (apk_dir, apk) = os.path.split(args.input)
+    os.system("java -jar ICCExtractor/ICCExtractor.jar  -path "+ apk_dir +" -name "+ apk + " -androidJar "+ sdk +"/platforms -time " + timeout + " -maxPathNumber 100 >> logs/"+ apk + ".txt")
+    if (args.verify) :
+        verify = args.verify
+        if verify == 'boundedness' :
+    apk_name = os.path.split(apk)[1][:-4]
+    reader = trace_reader("result/"+apk_name+"/out.txt")
+    (package, main_activity, pattens, traces) = reader.read()
+    os.system("python3 -m uiautomator2 init")
+    device = u2.connect()
+    path_dic = {}
+    for i in range(len(traces)) :
+        if (len(traces[i]) == 0) : continue
+        os.system("adb install " + apk)
+        time.sleep(3)
+        device.app_start(package)
+        time.sleep(3)
+        finder = activity_finder(package, apk, main_activity, device, device.app_current()['activity'], path_dic, 1)
+        (click_path, path_dic) = finder.find(traces[i])
+        device.app_stop(package)
+        os.system("adb uninstall " + package)
+        time.sleep(3)
+        if (len(click_path)) :
+            os.system("adb install " + apk)
+            time.sleep(3)
+            device.app_start(package)
+            time.sleep(3)
+            finder.execute(click_path, traces[i], pattens[i], 2)
+            device.app_stop(package)
+            os.system("adb uninstall " + package)
