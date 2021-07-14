@@ -1,5 +1,6 @@
 import uiautomator2 as u2
 import time
+import os
 
 class activity_finder :
     def __init__(self, package, apk, main_activity, device, init_activity, path_dic, sleep_time = 2) :

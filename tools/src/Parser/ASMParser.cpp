@@ -140,31 +140,28 @@ namespace TaskDroid {
                 if (element -> FirstChildElement()) {
                     auto des = element -> FirstChildElement();
                     while (des) {
-                        string type = des -> Attribute("type");
-                        if (type == "Act2Act") {
-                            string targetName = des -> Attribute("name");
-                            auto targetActivity = a -> getActivity(targetName);
-                            if (!targetActivity) {
-                                des = des -> NextSiblingElement();
-                                continue;
+                        string targetName = des -> Attribute("name");
+                        auto targetActivity = a -> getActivity(targetName);
+                        if (!targetActivity) {
+                            des = des -> NextSiblingElement();
+                            continue;
+                        }
+                        auto intent = a -> mkIntent(targetActivity);
+                        if (des -> FindAttribute("flags")) {
+                            string flags = des -> Attribute("flags");
+                            for (auto& flag : util::split(flags, " ")) {
+                                intent -> addFlag(flag);
                             }
-                            auto intent = a -> mkIntent(targetActivity);
-                            if (des -> FindAttribute("flags")) {
-                                string flags = des -> Attribute("flags");
-                                for (auto& flag : util::split(flags, " ")) {
-                                    intent -> addFlag(flag);
-                                }
-                            }
-                            if (des -> FindAttribute("finish")) {
-                                string finish = des -> Attribute("finish");
-                                if (finish == "true") {
-                                    a -> addAction(sourceActivity, intent, true);
-                                } else {
-                                    a -> addAction(sourceActivity, intent, false);
-                                }
+                        }
+                        if (des -> FindAttribute("finish")) {
+                            string finish = des -> Attribute("finish");
+                            if (finish == "true") {
+                                a -> addAction(sourceActivity, intent, true);
                             } else {
                                 a -> addAction(sourceActivity, intent, false);
                             }
+                        } else {
+                            a -> addAction(sourceActivity, intent, false);
                         }
                         des = des -> NextSiblingElement();
                     }

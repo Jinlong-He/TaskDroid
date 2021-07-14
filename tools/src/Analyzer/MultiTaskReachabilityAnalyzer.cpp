@@ -471,7 +471,7 @@ namespace TaskDroid {
                 os << value2ActionMap[value].second -> getActivity() -> getName() << endl;
             }
         }
-        os << "---END---" << endl;
+        os << "---Trace END---" << endl;
         return true;
     }
 }

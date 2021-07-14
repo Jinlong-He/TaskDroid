@@ -55,7 +55,7 @@ namespace TaskDroid {
                 os << "-BackHijacking Patten Found:" << endl;
                 os << source -> getName() << endl;
                 os << target -> getName() << endl;
-                os << "---END---" << endl;
+                os << "---Pattem END---" << endl;
                 atomic_proposition ap("TRUE");
                 getBackHijackingAP(source, target, ap);
                 analyzeReachability(ap, os);

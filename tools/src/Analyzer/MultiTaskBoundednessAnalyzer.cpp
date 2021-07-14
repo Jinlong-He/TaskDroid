@@ -191,7 +191,7 @@ namespace TaskDroid {
                 for (auto act : loop) {
                     os << act -> getName() << endl;
                 }
-                os << "---END---" << endl;
+                os << "---Patten END---" << endl;
                 loop.push_back(loop[0]);
                 analyzePattenReachability(realActivity -> getAffinity(), loop, os);
             }

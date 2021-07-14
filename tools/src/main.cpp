@@ -58,7 +58,6 @@ int main (int argc, char* argv[]) {
         ASMParser::parseATG(aftmFileName.c_str(), &a);
         ASMParser::parseFragment(fragmentFileName.c_str(), &a);
         a.fomalize();
-        //a.print();
         if (vm.count("output-file")) {
             outputFileName = vm["output-file"].as<std::string>();
         }

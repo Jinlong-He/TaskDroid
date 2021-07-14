@@ -822,7 +822,7 @@ namespace TaskDroid {
                     for (auto fragment : action -> getFragments()) {
                         os << fragment -> getName() << endl;
                     }
-                    os << "---END---" << endl;
+                    os << "---Patten END---" << endl;
                     flag = flag | analyzeReachability(viewID, stack, 1, os);
                 }
             }
