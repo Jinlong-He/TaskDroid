@@ -115,9 +115,14 @@ namespace TaskDroid {
                 setActivity(taskID, actID, nullptr, ap);
             }
         }
+        auto& newValue = *activityValueMap.at(intent -> getActivity());
+        if (actID == 0) {
+            auto& newVar = *activityVarMap.at(pair(taskID, actID));
+            add_transition(foa, newVar, newValue, ap & (newVar == nullValue));
+            return;
+        }
         auto& var = *activityVarMap.at(pair(taskID, actID));
         auto& value = *activityValueMap.at(activity);
-        auto& newValue = *activityValueMap.at(intent -> getActivity());
         auto topAP = atomic_proposition("TRUE");
         for (ID i = 0; i <= actID; i++) {
             auto& newVar = *activityVarMap.at(pair(taskID, i));
@@ -218,7 +223,8 @@ namespace TaskDroid {
         if (newTaskID == taskID) {
             mkCTOP(activity, intent, finish, taskID, actID, ap);
         } else {
-            mkCTOP(nullptr, intent, false, newTaskID, k - 1, ap);
+            for (ID i = 0; i < k; i++)
+                mkCTOP(nullptr, intent, false, newTaskID, i, ap);
             if (finish) setActivity(taskID, actID, nullptr, ap);
         }
     }
@@ -379,6 +385,9 @@ namespace TaskDroid {
                             case CTSK :
                                 mkCTSK(activity, intent, finish, i, j, ap);
                                 break;
+                            case RTOF :
+                                mkPUSH(activity, intent, finish, i, j, ap);
+                                break;
                             case PUSH_N :
                                 switchTask(intent, i, ap_N);
                                 mkPUSH_N(activity, intent, finish, i, j, ap);
@@ -392,6 +401,9 @@ namespace TaskDroid {
                             case CTSK_N :
                                 switchTask(intent, i, ap_N);
                                 mkCTSK_N(activity, intent, finish, i, j, ap);
+                                break;
+                            case RTOF_N :
+                                mkPUSH_N(activity, intent, finish, i, j, ap);
                                 break;
                             default :
                                 break;

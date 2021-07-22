@@ -16,7 +16,7 @@
 #include "FragmentTransaction.hpp"
 using std::string, std::unordered_set, std::unordered_map;
 namespace TaskDroid {
-    enum LaunchMode {STD, STK, STP, SIT};
+    enum LaunchMode {STD, STP, STK, SIT};
     class Activity {
     public:
         Activity()

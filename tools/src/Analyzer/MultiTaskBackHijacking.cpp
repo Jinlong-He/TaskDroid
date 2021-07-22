@@ -10,14 +10,13 @@ namespace TaskDroid {
     void MultiTaskAnalyzer::getBackHijackingAP(Activity* source, 
                                                Activity* target,
                                                atomic_proposition& ap) {
-        if (k < 3) return;
+        if (k < 2) return;
         auto targetTaskID = a -> getTaskID(target -> getAffinity());
         auto& var0 = *activityVarMap.at(pair(targetTaskID, 0));
         auto& var1 = *activityVarMap.at(pair(targetTaskID, 1));
-        auto& var2 = *activityVarMap.at(pair(targetTaskID, 2));
         auto& targetValue = *activityValueMap.at(target);
         auto& sourceValue = *activityValueMap.at(source);
-        ap = ap & (var0 != nullValue) & (var1 == targetValue) & (var2 == nullValue);
+        ap = ap & (var0 == targetValue) & (var1 == nullValue);
         auto sourceAP = atomic_proposition("FALSE");
         for (ID taskID = 0; taskID < taskNum; taskID++) {
             if (taskID == targetTaskID) continue;

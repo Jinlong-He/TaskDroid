@@ -27,6 +27,11 @@ namespace TaskDroid {
                     getRealActivities(a, affinity, newActivity, 
                                       realActivities, visited);
                 }
+                if (AndroidStackMachine::getMode(intent) == CTSK ||
+                    AndroidStackMachine::getMode(intent) == CTSK_N &&
+                    newAffinity == affinity) {
+                    realActivities[affinity].insert(newActivity);
+                }
             }
         }
     }
@@ -113,6 +118,12 @@ namespace TaskDroid {
                             unordered_map<Activity*, ActionMap>& completeActions) {
         unordered_map<string, Activities> realActivities;
         getRealActivities(a, realActivities);
+        if (realActivities.size() == 1) {
+            for (auto& [affinity, realActivities] :realActivities) 
+                for (auto realActivity : realActivities)
+                    completeActions[realActivity] = a -> getActionMap();
+            return;
+        }
         for (auto& [masterAffinity, masterActivities] : realActivities) {
             for (auto& [slaveAffinity, slaveActivities] : realActivities) {
                 if (slaveAffinity == masterAffinity) continue;
@@ -137,7 +148,7 @@ namespace TaskDroid {
                 auto& map = graph[activity];
                 if (mode == PUSH || mode == PUSH_N ||
                    (activity != newActivity) && 
-                   (mode == CTOP || mode == CTOP_N)) {
+                   (mode == STOP || mode == STOP_N)) {
                     if (finish) {
                         if (map.count(newActivity) == 0) {
                             map[activity] = 0;
@@ -149,7 +160,7 @@ namespace TaskDroid {
                         map[newActivity] = 1;
                     }
                 } else if (activity == newActivity &&
-                           (mode == CTOP || mode == CTOP_N)) {
+                           (mode == STOP || mode == STOP_N)) {
                     if (finish) {
                         if (map.count(newActivity) == 0) {
                             map[activity] = -1;
@@ -172,11 +183,7 @@ namespace TaskDroid {
 
     bool MultiTaskAnalyzer::analyzeBoundedness(std::ostream& os) {
         unordered_map<Activity*, ActionMap> completeActions;
-        if (taskNum == 1) {
-            completeActions[a -> getMainActivity()] = a -> getActionMap();
-        } else {
-            getCompleteActions(a, completeActions);
-        }
+        getCompleteActions(a, completeActions);
         unordered_map<Activity*, unordered_map<Activity*, int> > graph;
         vector<vector<Activity*> > loops;
         bool flag = false;

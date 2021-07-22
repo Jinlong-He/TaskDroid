@@ -22,7 +22,8 @@ int main (int argc, char* argv[]) {
     ("input-files,i", po::value<string>(), "input files")
     ("manifest-input-file,m", po::value<string>(), "manifest file")
     ("fragment-input-file,f", po::value<string>(), "fragment file")
-    ("aftm-input-file,a", po::value<string>(), "activity fragment transition model file");
+    ("aftm-input-file,a", po::value<string>(), "activity fragment transition model file")
+    ("main-activity", po::value<string>(), "activity fragment transition model file");
     string manifestFileName = "", aftmFileName = "", fragmentFileName = "",
            outputFileName = "out.txt";
     try {
@@ -57,17 +58,21 @@ int main (int argc, char* argv[]) {
         ASMParser::parseManifest(manifestFileName.c_str(), &a);
         ASMParser::parseATG(aftmFileName.c_str(), &a);
         ASMParser::parseFragment(fragmentFileName.c_str(), &a);
+        if (vm.count("main-activity")) {
+            string mainActivityName = vm["main-activity"].as<std::string>();
+            a.setMainActivity(a.getActivity(mainActivityName));
+        }
         a.fomalize();
         if (vm.count("output-file")) {
             outputFileName = vm["output-file"].as<std::string>();
         }
         std::ofstream out(outputFileName);
+        a.print(out);
         if (a.getAffinityMap().size() == 0 || !a.getMainActivity()) {
             out << "no graph" << endl;
             //cout << manifestFileName << endl;
             return 0;
         }
-        a.print(out);
         if (a.getAffinityMap().size() > 1) cout << manifestFileName << endl;
         if (vm.count("verify")) {
             string verify = vm["verify"].as<string>();

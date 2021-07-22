@@ -27,8 +27,11 @@ namespace TaskDroid {
                 nameFlag = true;
                 lmFlag = true;
                 affinityFlag = true;
-                if (count > 0) 
+                if (count > 0) {
                     a -> mkActivity(name, affinity, launchMode);
+                    affinity = "__";
+                    launchMode = STD;
+                }
                 count ++;
             }
             if (nameFlag && line.find("- name:") != string::npos) {

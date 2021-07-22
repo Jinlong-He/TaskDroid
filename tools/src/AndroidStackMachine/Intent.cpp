@@ -50,7 +50,7 @@ namespace TaskDroid {
                     res += "FLAG_ACTIVITY_CLEAR_TASK,";
                     break;
                 case F_CTP :
-                    res += "FLAG_ACTIVITY_CLEAR_TASK,";
+                    res += "FLAG_ACTIVITY_CLEAR_TOP,";
                     break;
                 case F_STP :
                     res += "FLAG_ACTIVITY_SINGLE_TOP,";

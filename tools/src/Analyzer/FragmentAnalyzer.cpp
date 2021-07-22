@@ -692,21 +692,14 @@ namespace TaskDroid {
                                                const vector<FragmentAction*>& stack, 
                                                bool star, std::ostream& os) {
         auto ap = atomic_proposition("FALSE");
-        cout << 111 << endl;
         getStackAP(viewID, stack, ap, star);
-        cout << 222 << endl;
         for (auto& [transaction, map] : initFragmentActionMap) {
             clear_init_list(foa);
             for (auto& [viewID, action] : map) {
-                cout << viewID << endl;
-                cout << fragmentVarMap.size() << endl;
                 auto& var = *fragmentVarMap.at(viewID).at(pair(0,0));
-                cout << var.identifier() << endl;
                 auto& value = *fragmentActionValueMap.at(action);
-                cout << value.identifier() << endl;
                 add_init_list(foa, var == value);
             } 
-            cout << 123123 << endl;
             for (ID i = 0; i < viewNum; i++) {
                 for (ID l = 0; l < h; l++) {
                     for (ID j = 0; j < k; j++) {
@@ -725,25 +718,23 @@ namespace TaskDroid {
                 auto& nullValue = *orderValueMap.at(nullOrder);
                 add_init_list(foa, var == nullValue);
             }
-            cout << 2222222 << endl;
             for (ID j = 0; j < h; j++) {
                 auto& var = *backTransactionVarMap.at(j);
                 add_init_list(foa, var == nullValue);
             }
-            //std::ifstream f("nuxmv_result");
-            //if (f) system("rm nuxmv_result");
-            //verify_invar_nuxmv(foa, ap, "nuxmv_source");
-            //std::ifstream fin("nuxmv_result");
-            //if (!fin) return false;
-            //unordered_map<string, vector<string> > trace_table;
-            //parse_trace_nuxmv(foa, "nuxmv_result", trace_table);
-            //os << "-Fragment Trace Found: " << endl;
-            //for (auto& value : trace_table.at("t")) {
-            //    if (value == "pop") os << "back()" << endl;
-            //    else os << value2TransactionMap[value] -> toString() << endl;
-            //}
+            std::ifstream f("nuxmv_result");
+            if (f) system("rm nuxmv_result");
+            verify_invar_nuxmv(foa, ap, "nuxmv_source");
+            std::ifstream fin("nuxmv_result");
+            if (!fin) return false;
+            unordered_map<string, vector<string> > trace_table;
+            parse_trace_nuxmv(foa, "nuxmv_result", trace_table);
+            os << "-Fragment Trace Found: " << endl;
+            for (auto& value : trace_table.at("t")) {
+                if (value == "pop") os << "back()" << endl;
+                else os << value2TransactionMap[value] -> toString() << endl;
+            }
         } 
-        cout << 333 << endl;
         return true;
     }
 

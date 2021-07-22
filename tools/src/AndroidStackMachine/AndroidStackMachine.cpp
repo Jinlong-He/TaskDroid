@@ -144,10 +144,16 @@ namespace TaskDroid {
 
     void AndroidStackMachine::print(std::ostream& os) const {
         os << "-Package: " << packageName << endl;
-        os << "-Main Activity: " << mainActivity -> getName() << endl;
+        if (mainActivity)
+            os << "-Main Activity: " << mainActivity -> getName() << endl;
+        else {
+            os << "-Main Activity: " << endl;
+            return;
+        }
         os << "-Activities: " << endl;
         for (auto& [name, activity] : activityMap) {
-            os << name << endl;
+            os << name << "[" + std::to_string(activity -> getLaunchMode()) + "]" +
+                          "(" + activity -> getAffinity() + ")" << endl;
         }
         os << "-Activity Transition: " << endl;
         for (auto& [activity, actions] : actionMap) {
@@ -227,6 +233,7 @@ namespace TaskDroid {
             delete mainActivity;
             mainActivity = nullptr;
             setMainActivity(nullptr);
+            actionMap.clear();
             return false;
         }
         activityMap.clear();
@@ -408,12 +415,14 @@ namespace TaskDroid {
             for (auto transaction : transactions) {
                 auto& initMap = initFragmentActionMap[transaction];
                 for (auto action : transaction -> getHighLevelFragmentActions()) {
-                    auto viewID = getViewID(action -> getViewID());
-                    initMap[viewID] = action;
+                    auto& view = action -> getViewID();
+                    if (viewMap.count(view) == 0) {
+                        viewMap[view] = viewMap.size();
+                    }
+                    initMap[viewMap.at(view)] = action;
                 }
                 for (auto action : transaction -> getFragmentActions()) {
                     auto fragment = action -> getFragment();
-                    auto viewID = getViewID(action -> getViewID());
                     formActivity(fragment, fragmentTransactionMap, fragmentMap);
                 }
             }
