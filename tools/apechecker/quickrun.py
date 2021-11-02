@@ -209,13 +209,15 @@ if __name__ == '__main__':
             continue
         if flag :
             new_line = ''
-            if '(' in line :
-                new_line = line.split('(')[0]
+            if ' [' in line :
+                new_line = line.split(' [')[0]
+            elif ' (' in line :
+                new_line = line.split(' (')[0]
             else :
                 new_line = line.strip()
             if new_line not in call_set :
                 call_set.add(line)
-                call = line.strip().split(' -> ')
+                call = new_line.strip().split(' -> ')
                 calls.append((call[0], call[1]))
     ps = []
     for call in calls :

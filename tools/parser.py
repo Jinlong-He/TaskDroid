@@ -29,6 +29,9 @@ class static_parser :
                 if len(exec_paths) > 0 :
                     self.path_dict[(source, target)] = exec_paths
                     transitions += source + " -> " + target + '\n'
+                    for path in exec_paths :
+                        transitions += str(path) + '\n'
+                    transitions += '==END==\n'
         out.write(transitions)
         out.close()
 
@@ -57,3 +60,5 @@ class static_parser :
                     path.append(self.path_dict[(source, target)])
         f.close()
 
+parser = static_parser()
+parser.parse_gator(sys.argv[1])

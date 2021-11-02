@@ -133,9 +133,11 @@ namespace TaskDroid {
             std::ifstream fin(gator);
             string line;
             while (getline(fin, line)) {
-                string source = util::split(line, " -> ")[0];
-                string target = util::split(line, " -> ")[1];
-                transtionSet.insert(pair(source, target));
+                if (line.find(" -> ") != string::npos) {
+                    string source = util::split(line, " -> ")[0];
+                    string target = util::split(line, " -> ")[1];
+                    transtionSet.insert(pair(source, target));
+                }
             }
         }
         XMLDocument doc;
