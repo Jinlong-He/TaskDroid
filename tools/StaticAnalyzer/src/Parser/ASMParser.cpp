@@ -127,7 +127,17 @@ namespace TaskDroid {
         }
     }
 
-    void ASMParser::parseATG(const char* fileName, AndroidStackMachine* a) {
+    void ASMParser::parseATG(const char* fileName, AndroidStackMachine* a, const char* gator) {
+        unordered_set<pair<string, string> > transtionSet;
+        if (gator != nullptr) {
+            std::ifstream fin(gator);
+            string line;
+            while (getline(fin, line)) {
+                string source = util::split(line, " -> ")[0];
+                string target = util::split(line, " -> ")[1];
+                transtionSet.insert(pair(source, target));
+            }
+        }
         XMLDocument doc;
         doc.LoadFile(fileName);
         XMLElement* root = doc.RootElement();
@@ -159,12 +169,15 @@ namespace TaskDroid {
                         if (des -> FindAttribute("finish")) {
                             string finish = des -> Attribute("finish");
                             if (finish == "true") {
-                                a -> addAction(sourceActivity, intent, true);
+                                if (gator == nullptr || transtionSet.count(pair(sourceName, targetName)) > 0)
+                                    a -> addAction(sourceActivity, intent, true);
                             } else {
-                                a -> addAction(sourceActivity, intent, false);
+                                if (gator == nullptr || transtionSet.count(pair(sourceName, targetName)) > 0)
+                                    a -> addAction(sourceActivity, intent, false);
                             }
                         } else {
-                            a -> addAction(sourceActivity, intent, false);
+                            if (gator == nullptr || transtionSet.count(pair(sourceName, targetName)) > 0)
+                                a -> addAction(sourceActivity, intent, false);
                         }
                         des = des -> NextSiblingElement();
                     }

@@ -22,6 +22,7 @@ namespace TaskDroid {
             : k(0),
               isMkVarsValues(false),
               isTranslate2Foa(false),
+              isRealAct(false),
               a(nullptr),
               nullValue("null"),
               popValue("pop"),
@@ -33,6 +34,7 @@ namespace TaskDroid {
             : k(k_),
               isMkVarsValues(false),
               isTranslate2Foa(false),
+              isRealAct(false),
               a(a_),
               nullValue("null"),
               popValue("pop"),
@@ -53,6 +55,7 @@ namespace TaskDroid {
         void analyze(AndroidStackMachine* a);
         bool analyzeBoundedness(std::ostream& os = std::cout);
         bool analyzeBackHijacking(std::ostream& os = std::cout);
+        bool analyzeRealActivity(std::ostream& os = std::cout);
         bool analyzeReachability(AndroidStackMachine* a, int k, 
                                  const Configuration<Activity>& configuration,
                                  std::ostream& os = std::cout);
@@ -94,6 +97,7 @@ namespace TaskDroid {
         void mkActivityValues();
         void mkActionValues();
         void mkActivityVars();
+        void mkRealActivityVars();
         void getTransitionNum(Activity* activity, Activities& visited,
                               vector<pair<Activity*, Intent*>>& path);
         void devideActions(Activity* activity, ID sum, double p,
@@ -104,12 +108,12 @@ namespace TaskDroid {
         void mkTraceActionVars(const unordered_set<pair<Activity*, Intent*>>& actions);
         void mkTraceActionVars(double p);
         void mkTraceActivityVars(const Activities& acts);
-        void getTopOrderAP(ID taskID, atomic_proposition& ap);
-        void getTopOrderAP(ID task0ID, ID task1ID, atomic_proposition& ap);
         void getNewOrder(const vector<ID>& order, ID newTaskID,
                          vector<ID>& newOrder);
         void getPopOrder(const vector<ID>& order, vector<ID>& newOrder);
         enum_value* getMainOrderValue();
+        atomic_proposition getTopOrderAP(ID taskID);
+        atomic_proposition getTopOrderAP(ID task0ID, ID task1ID);
         void getPattenTaskAP(const string& affinity, 
                              const vector<Activity*>& task,
                              atomic_proposition& ap);
@@ -117,6 +121,8 @@ namespace TaskDroid {
                                 atomic_proposition& ap);
         void getTaskAP(const string& affinity, const vector<Activity*>& task,
                        atomic_proposition& ap);
+        void getRealActAP(Activity* source, Activity* target,
+                          atomic_proposition& ap);
         void setActivity(ID taskID, ID actID, Activity* activity,
                          const atomic_proposition& ap);
         void switchTask(Intent* intent, ID taskID, const atomic_proposition& ap);
@@ -129,6 +135,7 @@ namespace TaskDroid {
         ID k;
         bool isMkVarsValues;
         bool isTranslate2Foa;
+        bool isRealAct;
         AndroidStackMachine* a;
         fomula_automaton<> foa;
 
@@ -148,11 +155,12 @@ namespace TaskDroid {
         unordered_map<vector<ID>, enum_value*> orderValueMap;
         unordered_map<Activity*, enum_value*> activityValueMap;
         unordered_map<Activity*, bool_variable*> activityBVarMap;
+        unordered_map<ID, enum_variable*> realActivityVarMap;
         unordered_map<pair<Activity*, Intent*>, bool_variable*> actionBVarMap;
         unordered_map<pair<ID, ID>, enum_variable*> activityVarMap;
         unordered_map<pair<Activity*, Intent*>, enum_value*> actionValueMap;
         unordered_map<string, pair<Activity*, Intent*>> value2ActionMap;
-        unordered_map<Activity*, unordered_set<pair<ID, ID> > > availablePos;
+        unordered_map<Activity*, unordered_map<ID, unordered_set<ID> > > availablePos;
         unordered_map<ID, Activities> outActivities;
     };
 }

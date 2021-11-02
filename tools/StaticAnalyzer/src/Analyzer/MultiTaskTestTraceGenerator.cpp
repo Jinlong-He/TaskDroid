@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <fstream>
 #include <time.h> 
@@ -45,18 +44,13 @@ namespace TaskDroid {
             for (auto& [intent, finish] : map) {
                 auto newActivity = intent -> getActivity();
                 if (a -> getActionMap().count(newActivity) == 0)
-                    intents.emplace_back(pair(intent, 0));
+                    intents.emplace_back(pair(intent, 1));
                 else 
-                    intents.emplace_back(pair(intent, a -> getActionMap().at(newActivity).size()));
-                //Activities newVisited = visited;
-                //newVisited.insert(newActivity);
-                //vector<pair<Activity*, Intent*>> newPath;
-                //getTransitionNum(newActivity, newVisited, newPath);
-                //pathMap[intent] = newPath;
-                //intents.emplace_back(pair(intent, newPath.size()));
+                    intents.emplace_back(pair(intent, a -> getActionMap().at(newActivity).size() + 1));
             }
             sort(intents.begin(), intents.end(), less);
             double pp = p*(sum - path.size());
+            cout << pp << endl;
             ID num = 0, id = 0;
             for (ID i = 0; i < intents.size(); i++) {
                 num += intents[i].second;
@@ -65,9 +59,13 @@ namespace TaskDroid {
                     break;
                 }
             }
+            cout << id << endl;
             for (ID i = 0; i <= id; i++) {
                 auto newActivity = intents[i].first -> getActivity();
-                if (a -> getActionMap().count(newActivity) == 0) continue;
+                if (a -> getActionMap().count(newActivity) == 0) {
+                    actions1.insert(pair(activity, intents[i].first));
+                    continue;
+                }
                 for (auto& t : a -> getActionMap().at(newActivity)) {
                     actions1.insert(pair(newActivity, t.first));
                 }
@@ -75,31 +73,6 @@ namespace TaskDroid {
             for (auto& t : actions)
                 if (actions1.count(t) == 0) actions2.insert(t);
             for (auto& t : path) actions2.erase(t);
-            //ID maxNum = 0;
-            //for (auto& [intent, len] : intents)
-            //    if (len == intents.back().second) maxNum++;
-            //if (maxNum > 1) {
-            //    for (ID i = 0; i < maxNum; i++) {
-            //        vector<pair<Intent*, ID>> newIntents = intents;
-            //        auto first = newIntents[newIntents.size() - maxNum];
-            //        newIntents[newIntents.size() - maxNum] = newIntents[newIntents.size() - maxNum + i];
-            //        newIntents[newIntents.size() - maxNum + i] = first;
-            //        auto newVisited = visited;
-            //        for (auto& [intent, len] : newIntents) {
-            //            auto newActivity = intent -> getActivity();
-            //            if (!newVisited.insert(newActivity).second) continue;
-            //            vector<pair<Activity*, Intent*>> newPath;
-            //            getTransitionNum(newActivity, newVisited, newPath);
-            //        }
-            //    }
-            //} else {
-            //    for (auto& [intent, len] : intents) {
-            //        auto newActivity = intent -> getActivity();
-            //        visited.insert(newActivity);
-            //        vector<pair<Activity*, Intent*>> newPath;
-            //        getTransitionNum(newActivity, visited, newPath);
-            //    }
-            //}
         }
     }
 
@@ -174,7 +147,6 @@ namespace TaskDroid {
         if (p == 0) return;
         clear();
         mkVarsValues();
-        getAvailablePos();
         mkTraceActionVars(unordered_set<pair<Activity*, Intent*>>());
         auto ap = atomic_proposition("TRUE");
         for (auto&[pair, var] : actionBVarMap) ap = ap & (*var == bool_value(1));
@@ -186,6 +158,16 @@ namespace TaskDroid {
             getTransitionNum(mainActivity, visited, actions);
             ID sum = actions.size();
             devideActions(mainActivity, sum, p, path, actions, actions1, actions2);
+            cout << "-----------" << endl;
+            cout << "-----------" << endl;
+            cout << "-----------" << endl;
+            cout << "-----------" << endl;
+            cout << actions1.size() << endl;
+            cout << actions2.size() << endl;
+            cout << "-----------" << endl;
+            cout << "-----------" << endl;
+            cout << "-----------" << endl;
+            cout << "-----------" << endl;
             clear();
             mkVarsValues();
             getAvailablePos();

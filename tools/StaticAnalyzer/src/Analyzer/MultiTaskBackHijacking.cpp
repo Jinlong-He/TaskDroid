@@ -20,8 +20,7 @@ namespace TaskDroid {
         auto sourceAP = atomic_proposition("FALSE");
         for (ID taskID = 0; taskID < taskNum; taskID++) {
             if (taskID == targetTaskID) continue;
-            atomic_proposition orderAP("FALSE");
-            getTopOrderAP(targetTaskID, taskID, orderAP);
+            atomic_proposition orderAP = getTopOrderAP(targetTaskID, taskID);
             auto taskAP = atomic_proposition("FALSE");
             for (ID j = 0; j < k; j++) {
                 auto& var = *activityVarMap.at(pair(taskID, j));
@@ -34,6 +33,7 @@ namespace TaskDroid {
             }
             sourceAP = sourceAP | (orderAP & taskAP);
         }
+        if (sourceAP.to_string() == "FALSE") sourceAP = atomic_proposition("TRUE");
         ap = ap & sourceAP;
     }
 

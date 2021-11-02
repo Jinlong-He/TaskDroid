@@ -15,9 +15,10 @@ int main (int argc, char* argv[]) {
     opts.add_options()
     ("help,h", "produce help message")
     ("verify,v", po::value<string>(), "")
-    ("gen,g", po::value<double>(&p)->default_value(1), "")
+    ("gen,g", po::value<double>(&p), "")
     ("act", po::value<string>(), "")
     ("engine,e", po::value<string>()->default_value("nuxmv"), "")
+    ("gator,t", po::value<string>(), "")
     ("k", po::value<int>(&k)->default_value(6), "k")
     ("h", po::value<int>(&h)->default_value(3), "h")
     ("output-file,o", po::value<string>(), "")
@@ -26,7 +27,7 @@ int main (int argc, char* argv[]) {
     ("fragment-input-file,f", po::value<string>(), "fragment file")
     ("aftm-input-file,a", po::value<string>(), "activity fragment transition model file")
     ("main-activity", po::value<string>(), "activity fragment transition model file");
-    string manifestFileName = "", aftmFileName = "", fragmentFileName = "",
+    string manifestFileName = "", aftmFileName = "", fragmentFileName = "", gator = "",
            outputFileName = "out.txt";
     try {
         po::store(po::parse_command_line(argc, argv, opts), vm);
@@ -56,9 +57,15 @@ int main (int argc, char* argv[]) {
                 return 0;
             }
         }
+        if (vm.count("gator")) {
+            gator = vm["gator"].as<std::string>();
+        }
         AndroidStackMachine a;
         ASMParser::parseManifest(manifestFileName.c_str(), &a);
-        ASMParser::parseATG(aftmFileName.c_str(), &a);
+        if (gator == "")
+            ASMParser::parseATG(aftmFileName.c_str(), &a);
+        else 
+            ASMParser::parseATG(aftmFileName.c_str(), &a, gator.c_str());
         ASMParser::parseFragment(fragmentFileName.c_str(), &a);
         if (vm.count("main-activity")) {
             string mainActivityName = vm["main-activity"].as<std::string>();
@@ -69,12 +76,12 @@ int main (int argc, char* argv[]) {
             outputFileName = vm["output-file"].as<std::string>();
         }
         std::ofstream out(outputFileName);
-        a.print(out);
         if (a.getAffinityMap().size() == 0 || !a.getMainActivity()) {
             out << "no graph" << endl;
             //cout << manifestFileName << endl;
             return 0;
         }
+        a.print(out);
         if (a.getAffinityMap().size() > 1) cout << manifestFileName << endl;
         if (vm.count("verify")) {
             string verify = vm["verify"].as<string>();
@@ -109,9 +116,18 @@ int main (int argc, char* argv[]) {
                         analyzer.analyzeBoundedness(out);
                     }
                 }
+            } else if (verify == "realActivity") {
+                if (vm.count("engine")) {
+                    string engine = vm["engine"].as<std::string>();
+                    if (engine == "nuxmv") {
+                        MultiTaskAnalyzer analyzer(k, &a);
+                        analyzer.analyzeRealActivity(out);
+                    }
+                }
             }
         }
         if (vm.count("gen")) {
+            p = vm["gen"].as<double>();
             Activities acts;
             //for (auto&[name, act] : a.getActivityMap()) acts.insert(act);
             MultiTaskAnalyzer analyzer(k, &a);

@@ -31,59 +31,60 @@ namespace TaskDroid {
 
     void MultiTaskAnalyzer::getAvailablePos() {
         auto activity = a -> getMainActivity();
-        auto affinity = a -> getAffinityMap().at(activity -> getAffinity());
+        auto taskID = a -> getTaskID((activity -> getAffinity()));
         getOutActivities();
-        availablePos[activity].insert(pair(affinity, 0));
-        getAvailablePos(activity, affinity, 0);
+        availablePos[activity][taskID].insert(0);
+        getAvailablePos(activity, taskID, 0);
     }
 
     void MultiTaskAnalyzer::getAvailablePos(Activity* activity, ID taskID, ID actID) {
         if (a -> getActionMap().count(activity) == 0) return;
         for (auto& [intent, finish] : a -> getActionMap().at(activity)) {
             auto newActivity = intent -> getActivity();
-            auto newAffinity = a -> getAffinityMap().at(newActivity -> getAffinity());
+            auto newTaskID = a -> getTaskID(newActivity -> getAffinity());
             auto mode = AndroidStackMachine::getMode(intent);
             if (mode == PUSH ||
                 mode == STOP && activity != newActivity ||
                 mode == CTOP && activity != newActivity ||
-                mode == PUSH_N && taskID == newAffinity ||
-                mode == STOP_N && activity != newActivity && taskID == newAffinity ||
-                mode == CTOP_N && activity != newActivity && taskID == newAffinity) {
+                mode == PUSH_N && taskID == newTaskID ||
+                mode == STOP_N && activity != newActivity && taskID == newTaskID ||
+                mode == CTOP_N && activity != newActivity && taskID == newTaskID) {
                 if (finish) {
-                    if (availablePos[newActivity].insert(pair(taskID, actID)).second)
+                    if (availablePos[newActivity][taskID].insert(actID).second)
                         getAvailablePos(newActivity, taskID, actID);
                 } else {
                     if (actID < k - 1) {
-                        if( availablePos[newActivity].insert(pair(taskID, actID + 1)).second)
+                        if (availablePos[newActivity][taskID].insert(actID + 1).second)
                             getAvailablePos(newActivity, taskID, actID + 1);
                     }
                 }
             } else if (mode == CTSK) {
                 if (availablePos[newActivity].insert(pair(taskID, 0)).second)
                     getAvailablePos(newActivity, taskID, 0);
-            } else if (mode == PUSH_N && taskID != newAffinity ||
-                       mode == STOP_N && taskID != newAffinity ||
-                       mode == CTOP_N && taskID != newAffinity) {
-                if (outActivities.count(newAffinity) == 0) {
-                    if (availablePos[newActivity].insert(pair(newAffinity, 0)).second)
-                        getAvailablePos(newActivity, newAffinity, 0);
+            } else if (mode == PUSH_N && taskID != newTaskID ||
+                       mode == STOP_N && taskID != newTaskID ||
+                       mode == CTOP_N && taskID != newTaskID) {
+                if (outActivities.count(newTaskID) == 0) {
+                    if (availablePos[newActivity][newTaskID].insert(0).second)
+                        getAvailablePos(newActivity, newTaskID, 0);
                 } else {
                     unordered_set<ID> poses;
-                    for (auto out : outActivities.at(newAffinity)) {
+                    for (auto out : outActivities.at(newTaskID)) {
                         if (availablePos.count(out) == 0) continue;
-                        for (auto& [tid, aid] : availablePos.at(out)) {
-                            if (tid == newAffinity) poses.insert(aid);
+                        for (auto& [tid, aids] : availablePos.at(out)) {
+                            for (auto aid : aids)
+                                if (tid == newTaskID) poses.insert(aid);
                         }
                     }
                     for (auto pos : poses) {
                         if (pos == k - 1) continue;
-                        if (availablePos[newActivity].insert(pair(newAffinity, pos + 1)).second)
-                            getAvailablePos(newActivity, newAffinity, pos + 1);
+                        if (availablePos[newActivity][newTaskID].insert(pos + 1).second)
+                            getAvailablePos(newActivity, newTaskID, pos + 1);
                     }
                 }
-            } else if (mode == CTSK_N && taskID != newAffinity) {
-                if (availablePos[newActivity].insert(pair(newAffinity, 0)).second)
-                    getAvailablePos(newActivity, newAffinity, 0);
+            } else if (mode == CTSK_N && taskID != newTaskID) {
+                if (availablePos[newActivity][newTaskID].insert(0).second)
+                    getAvailablePos(newActivity, newTaskID, 0);
             }
         }
     }
@@ -115,19 +116,23 @@ namespace TaskDroid {
         orders.emplace_back(vector<T>(num, null));
     }
 
-    void MultiTaskAnalyzer::getTopOrderAP(ID taskID, 
-                                          atomic_proposition& ap) {
+    atomic_proposition MultiTaskAnalyzer::getTopOrderAP(ID taskID) {
+        atomic_proposition ap("FALSE");
         for (auto& [order, v] : orderValueMap) {
             if (order[taskID] == 0) ap = ap | orderVar == *v;
         }
+        if (ap.to_string() == "FALSE") return atomic_proposition("TRUE");
+        return ap;
     }
 
-    void MultiTaskAnalyzer::getTopOrderAP(ID task0ID, ID task1ID,
-                                          atomic_proposition& ap) {
+    atomic_proposition MultiTaskAnalyzer::getTopOrderAP(ID task0ID, ID task1ID) {
+        atomic_proposition ap("FALSE");
         for (auto& [order, v] : orderValueMap) {
             if (order[task0ID] == 0 && order[task1ID] == 1) 
                 ap = ap | orderVar == *v;
         }
+        if (ap.to_string() == "FALSE") return atomic_proposition("TRUE");
+        return ap;
     }
 
     void MultiTaskAnalyzer::getNewOrder(const vector<ID>& order, ID newTaskID,
@@ -268,6 +273,11 @@ namespace TaskDroid {
                 auto& newOrderValue = *orderValueMap.at(newOrder);
                 auto p = orderVar == orderValue & ap;
                 add_transition(foa, orderVar, newOrderValue, p);
+                if (isRealAct && order[newTaskID] == -1 && realActivityVarMap.count(newTaskID) > 0) {
+                    auto& var = *realActivityVarMap.at(newTaskID);
+                    auto& value = *activityValueMap.at(newActivity);
+                    add_transition(foa, var, value, p);
+                }
             }
         }
     }
@@ -278,8 +288,16 @@ namespace TaskDroid {
         auto newActivity = intent -> getActivity();
         auto newTaskID = a -> getTaskID(newActivity -> getAffinity());
         auto& newValue = *activityValueMap.at(newActivity);
+        auto realAP = atomic_proposition("TRUE");
+        if (realActivityVarMap.count(newTaskID) > 0) {
+            auto& realVar = *realActivityVarMap.at(newTaskID);
+            realAP = (realVar != newValue);
+        }
         if (newTaskID == taskID) {
-            mkPUSH(activity, intent, finish, taskID, actID, ap);
+            if (isRealAct)
+                mkPUSH(activity, intent, finish, taskID, actID, realAP & ap);
+            else 
+                mkPUSH(activity, intent, finish, taskID, actID, ap);
         } else {
             for (ID j = 0; j < k; j++) {
                 auto& newVar = *activityVarMap.at(pair(newTaskID, j));
@@ -288,7 +306,7 @@ namespace TaskDroid {
                     auto& var = *activityVarMap.at(pair(newTaskID, j - 1));
                     p = p & (var != nullValue);
                 }
-                add_transition(foa, newVar, newValue, p & ap);
+                add_transition(foa, newVar, newValue, realAP & p & ap);
             }
             if (finish) setActivity(taskID, actID, nullptr, ap);
         }
@@ -300,8 +318,16 @@ namespace TaskDroid {
         auto newActivity = intent -> getActivity();
         auto newTaskID = a -> getTaskID(newActivity -> getAffinity());
         auto& newValue = *activityValueMap.at(newActivity);
+        auto realAP = atomic_proposition("TRUE");
+        if (realActivityVarMap.count(newTaskID) > 0) {
+            auto& realVar = *realActivityVarMap.at(newTaskID);
+            realAP = (realVar != newValue);
+        }
         if (newTaskID == taskID) {
-            mkSTOP(activity, intent, finish, taskID, actID, ap);
+            if (isRealAct)
+                mkSTOP(activity, intent, finish, taskID, actID, realAP & ap);
+            else 
+                mkSTOP(activity, intent, finish, taskID, actID, ap);
         } else {
             for (ID j = 0; j < k; j++) {
                 auto& newVar = *activityVarMap.at(pair(newTaskID, j));
@@ -310,7 +336,7 @@ namespace TaskDroid {
                     auto& var = *activityVarMap.at(pair(newTaskID, j - 1));
                     p = p & (var != newValue) & (var != nullValue);
                 }
-                add_transition(foa, newVar, newValue, p & ap);
+                add_transition(foa, newVar, newValue, realAP & p & ap);
             }
             if (finish) setActivity(taskID, actID, nullptr, ap);
         }
@@ -372,6 +398,14 @@ namespace TaskDroid {
         this -> a = a;
         this -> a -> fomalize();
         taskNum = this -> a -> getAffinityMap().size();
+        bool realActFlag = false;
+        for (auto& [activity, actions] : a -> getActionMap())
+            for (auto& [intent, finish]  : actions)
+                if (AndroidStackMachine::getMode(intent) == PUSH_N ||
+                    AndroidStackMachine::getMode(intent) == STOP_N)
+                    realActFlag = true;
+        if (taskNum > 1 || realActFlag)
+            isRealAct = true;
         mkVarsValues();
     }
 
@@ -476,6 +510,34 @@ namespace TaskDroid {
         }
     }
 
+    void MultiTaskAnalyzer::mkRealActivityVars() {
+        unordered_map<string, Activities> realActivities;
+        for (auto& [activity, actions] : a -> getActionMap()) {
+            for (auto& [intent, finish]  : actions) {
+                if (AndroidStackMachine::isNewMode(intent)) {
+                    auto target = intent -> getActivity();
+                    realActivities[target -> getAffinity()].insert(target);
+                }
+            }
+        }
+        for (auto& [affinity, acts] : realActivities) {
+            ID id = a -> getTaskID(affinity);
+            string name = "ra_" + to_string(id);
+            vector<enum_value> realActivityValues({nullValue});
+            for (auto act : acts)
+                realActivityValues.emplace_back(*activityValueMap.at(act));
+            enum_variable* v = new enum_variable(name, 
+                                                 realActivityValues.begin(),
+                                                 realActivityValues.end());
+            realActivityVarMap[id] = v;
+            items.emplace_back(v);
+            if (id == mainTaskID)
+                add_control_state(foa, *v, *v == mainActivityValue);
+            else 
+                add_control_state(foa, *v, *v == nullValue);
+        }
+    }
+
     void MultiTaskAnalyzer::mkVarsValues() {
         if (isMkVarsValues) return;
         isMkVarsValues = true;
@@ -483,6 +545,8 @@ namespace TaskDroid {
         mkActivityValues();
         mkActionValues();
         mkActivityVars();
+        getAvailablePos();
+        if (isRealAct) mkRealActivityVars();
     }
 
     void MultiTaskAnalyzer::translate2FOA() {
@@ -490,8 +554,7 @@ namespace TaskDroid {
         isTranslate2Foa = true;
         mkVarsValues();
         for (ID i = 0; i < taskNum; i++) {
-            auto orderAP = atomic_proposition("FALSE");
-            getTopOrderAP(i, orderAP);
+            auto orderAP = getTopOrderAP(i);
             if (taskNum == 1) orderAP = atomic_proposition("TRUE");
             for (ID j = 0; j < k; j++) {
                 mkPOP(i, j, orderAP & actionVar == popValue);
@@ -504,114 +567,60 @@ namespace TaskDroid {
                 auto actionAP = (actionVar == actionValue);
                 auto newTaskID = a -> getTaskID(intent -> getActivity() -> getAffinity());
                 if (availablePos.count(activity) == 0) continue;
-                for (auto& [i, j] : availablePos.at(activity)) {
-                    auto orderAP = atomic_proposition("FALSE");
-                    getTopOrderAP(i, orderAP);
+                for (auto& [i, js] : availablePos.at(activity)) {
+                    auto orderAP = getTopOrderAP(i);
                     if (taskNum == 1) orderAP = atomic_proposition("TRUE");
-                    auto& var = *activityVarMap.at(pair(i, j));
-                    auto ap = (var == value) & orderAP & actionAP;
-                    auto ap_N = (var == value) & actionAP;
-                    if (j + 1 < k) {
-                        auto& var = *activityVarMap.at(pair(i, j + 1));
-                        ap = (var == nullValue) & ap;
-                        ap_N = (var == nullValue) & ap_N;
-                    }
-                    if (actionBVarMap.count(pair(activity, intent)) > 0) {
-                        auto& var = *actionBVarMap.at(pair(activity, intent));
-                        add_transition(foa, var, bool_value(1), ap);
-                    }
-                    switch (AndroidStackMachine::getMode(intent)) {
-                        case PUSH :
-                            mkPUSH(activity, intent, finish, i, j, ap);
-                            break;
-                        case STOP :
-                            mkSTOP(activity, intent, finish, i, j, ap);
-                            break;
-                        case CTOP :
-                            mkCTOP(activity, intent, finish, i, j, ap);
-                            break;
-                        case CTSK :
-                            mkCTSK(activity, intent, finish, i, j, ap);
-                            break;
-                        case RTOF :
-                            mkPUSH(activity, intent, finish, i, j, ap);
-                            break;
-                        case PUSH_N :
-                            switchTask(intent, i, ap_N);
-                            mkPUSH_N(activity, intent, finish, i, j, ap);
-                            break;
-                        case STOP_N :
-                            break;
-                        case CTOP_N :
-                            switchTask(intent, i, ap_N);
-                            mkCTOP_N(activity, intent, finish, i, j, ap);
-                            break;
-                        case CTSK_N :
-                            switchTask(intent, i, ap_N);
-                            mkCTSK_N(activity, intent, finish, i, j, ap);
-                            break;
-                        case RTOF_N :
-                            mkPUSH_N(activity, intent, finish, i, j, ap);
-                            break;
-                        default :
-                            break;
+                    for (auto j : js) {
+                        auto& var = *activityVarMap.at(pair(i, j));
+                        auto ap = (var == value) & orderAP & actionAP;
+                        auto ap_N = (var == value) & actionAP;
+                        if (j + 1 < k) {
+                            auto& var = *activityVarMap.at(pair(i, j + 1));
+                            ap = (var == nullValue) & ap;
+                            ap_N = (var == nullValue) & ap_N;
+                        }
+                        if (actionBVarMap.count(pair(activity, intent)) > 0) {
+                            auto& var = *actionBVarMap.at(pair(activity, intent));
+                            add_transition(foa, var, bool_value(1), ap);
+                        }
+                        switch (AndroidStackMachine::getMode(intent)) {
+                            case PUSH :
+                                mkPUSH(activity, intent, finish, i, j, ap);
+                                break;
+                            case STOP :
+                                mkSTOP(activity, intent, finish, i, j, ap);
+                                break;
+                            case CTOP :
+                                mkCTOP(activity, intent, finish, i, j, ap);
+                                break;
+                            case CTSK :
+                                mkCTSK(activity, intent, finish, i, j, ap);
+                                break;
+                            case RTOF :
+                                mkPUSH(activity, intent, finish, i, j, ap);
+                                break;
+                            case PUSH_N :
+                                switchTask(intent, i, ap_N);
+                                mkPUSH_N(activity, intent, finish, i, j, ap);
+                                break;
+                            case STOP_N :
+                                break;
+                            case CTOP_N :
+                                switchTask(intent, i, ap_N);
+                                mkCTOP_N(activity, intent, finish, i, j, ap);
+                                break;
+                            case CTSK_N :
+                                switchTask(intent, i, ap_N);
+                                mkCTSK_N(activity, intent, finish, i, j, ap);
+                                break;
+                            case RTOF_N :
+                                mkPUSH_N(activity, intent, finish, i, j, ap);
+                                break;
+                            default :
+                                break;
+                        }
                     }
                 }
-                //for (ID i = 0; i < taskNum; i++) {
-                //    auto orderAP = atomic_proposition("FALSE");
-                //    getTopOrderAP(i, orderAP);
-                //    if (taskNum == 1) orderAP = atomic_proposition("TRUE");
-                //    for (ID j = 0; j < k; j++) {
-                //        auto& var = *activityVarMap.at(pair(i, j));
-                //        auto ap = (var == value) & orderAP & actionAP;
-                //        auto ap_N = (var == value) & actionAP;
-                //        if (j + 1 < k) {
-                //            auto& var = *activityVarMap.at(pair(i, j + 1));
-                //            ap = (var == nullValue) & ap;
-                //            ap_N = (var == nullValue) & ap_N;
-                //        }
-                //        if (actionBVarMap.size() > 0) {
-                //            auto& var = *actionBVarMap.at(pair(activity, intent));
-                //            add_transition(foa, var, bool_value(1), ap);
-                //        }
-                //        switch (AndroidStackMachine::getMode(intent)) {
-                //            case PUSH :
-                //                mkPUSH(activity, intent, finish, i, j, ap);
-                //                break;
-                //            case STOP :
-                //                mkSTOP(activity, intent, finish, i, j, ap);
-                //                break;
-                //            case CTOP :
-                //                mkCTOP(activity, intent, finish, i, j, ap);
-                //                break;
-                //            case CTSK :
-                //                mkCTSK(activity, intent, finish, i, j, ap);
-                //                break;
-                //            case RTOF :
-                //                mkPUSH(activity, intent, finish, i, j, ap);
-                //                break;
-                //            case PUSH_N :
-                //                switchTask(intent, i, ap_N);
-                //                mkPUSH_N(activity, intent, finish, i, j, ap);
-                //                break;
-                //            case STOP_N :
-                //                break;
-                //            case CTOP_N :
-                //                switchTask(intent, i, ap_N);
-                //                mkCTOP_N(activity, intent, finish, i, j, ap);
-                //                break;
-                //            case CTSK_N :
-                //                switchTask(intent, i, ap_N);
-                //                mkCTSK_N(activity, intent, finish, i, j, ap);
-                //                break;
-                //            case RTOF_N :
-                //                mkPUSH_N(activity, intent, finish, i, j, ap);
-                //                break;
-                //            default :
-                //                break;
-                //        }
-                //    }
-                //}
             }
         }
         for (auto& [p, var] : activityVarMap) {
@@ -621,6 +630,11 @@ namespace TaskDroid {
             add_transition(foa, orderVar, orderVar, atomic_proposition("TRUE"));
         if (actionBVarMap.size() > 0) {
             for (auto& [pair, var] : actionBVarMap) {
+                add_transition(foa, *var, *var, atomic_proposition("TRUE"));
+            }
+        }
+        if (isRealAct) {
+            for (auto& [p, var] : realActivityVarMap) {
                 add_transition(foa, *var, *var, atomic_proposition("TRUE"));
             }
         }
@@ -679,7 +693,7 @@ namespace TaskDroid {
         translate2FOA();
         std::ifstream f("nuxmv_result");
         if (f) system("rm nuxmv_result");
-        verify_invar_nuxmv(foa, ap, "nuxmv_source", 30);
+        verify_invar_nuxmv(foa, ap, "nuxmv_source", 50);
         std::ifstream fin("nuxmv_result");
         if (!fin) return false;
         unordered_map<string, vector<string> > trace_table;
