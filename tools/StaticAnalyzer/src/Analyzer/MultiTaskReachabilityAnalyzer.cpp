@@ -125,10 +125,12 @@ namespace TaskDroid {
         return ap;
     }
 
-    atomic_proposition MultiTaskAnalyzer::getTopOrderAP(ID task0ID, ID task1ID) {
+    atomic_proposition MultiTaskAnalyzer::getTopOrderAP(ID task0ID, ID task1ID, bool eq) {
         atomic_proposition ap("FALSE");
         for (auto& [order, v] : orderValueMap) {
-            if (order[task0ID] == 0 && order[task1ID] == 1) 
+            if (eq && order[task0ID] == 0 && order[task1ID] == 1) 
+                ap = ap | orderVar == *v;
+            if (!eq && order[task0ID] == 0 && order[task1ID] >= 1) 
                 ap = ap | orderVar == *v;
         }
         if (ap.to_string() == "FALSE") return atomic_proposition("TRUE");
@@ -520,6 +522,7 @@ namespace TaskDroid {
                 }
             }
         }
+        realActivities[a -> getMainActivity() -> getAffinity()].insert(a -> getMainActivity());
         for (auto& [affinity, acts] : realActivities) {
             ID id = a -> getTaskID(affinity);
             string name = "ra_" + to_string(id);
@@ -583,6 +586,10 @@ namespace TaskDroid {
                             auto& var = *actionBVarMap.at(pair(activity, intent));
                             add_transition(foa, var, bool_value(1), ap);
                         }
+                        if (activityBVarMap.count(intent -> getActivity()) > 0) {
+                            auto& var = *activityBVarMap.at(intent -> getActivity());
+                            add_transition(foa, var, bool_value(1), ap);
+                        }
                         switch (AndroidStackMachine::getMode(intent)) {
                             case PUSH :
                                 mkPUSH(activity, intent, finish, i, j, ap);
@@ -630,6 +637,11 @@ namespace TaskDroid {
             add_transition(foa, orderVar, orderVar, atomic_proposition("TRUE"));
         if (actionBVarMap.size() > 0) {
             for (auto& [pair, var] : actionBVarMap) {
+                add_transition(foa, *var, *var, atomic_proposition("TRUE"));
+            }
+        }
+        if (activityBVarMap.size() > 0) {
+            for (auto& [act, var] : activityBVarMap) {
                 add_transition(foa, *var, *var, atomic_proposition("TRUE"));
             }
         }

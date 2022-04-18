@@ -12,7 +12,7 @@ namespace TaskDroid {
         cout << root -> FirstChildElement() -> Value();
     }
 
-    void ASMParser::parseManifestTxt(const char* fileName, AndroidStackMachine* a) {
+    void ASMParser::parseManifestTxt(const char* fileName, AndroidStackMachine* a, bool amm) {
         std::ifstream fin(fileName);
         string line, name, launchModeStr, affinity = "__";
         LaunchMode launchMode = STD;
@@ -38,11 +38,11 @@ namespace TaskDroid {
                 nameFlag = false;
                 auto pos = line.find(": ") + 2;
                 name = line.substr(pos, line.length() - pos);
+                if (name.find(".") == 0) {
+                    name = a -> getPackageName() + name;
+                }
                 if (name.find(".") == string::npos) {
                     name = a -> getPackageName() + "." + name;
-                }
-                else if (name.find(".") == 0) {
-                    name = a -> getPackageName() + name;
                 }
             }
             if (line.find("- name: android.intent.category.LAUNCHER") != string::npos)
@@ -57,6 +57,10 @@ namespace TaskDroid {
                 if (launchModeStr == "3") launchMode = SIT;
             }
             if (affinityFlag && line.find("- taskAffinity") != string::npos) {
+                if (!amm) {
+                    affinity = "__";
+                    continue;
+                }
                 affinityFlag = false;
                 auto pos = line.find(": ") + 2;
                 affinity = line.substr(pos);
@@ -67,10 +71,10 @@ namespace TaskDroid {
         a -> setMainActivity(a -> getActivity(mainActivityName));
     }
 
-    void ASMParser::parseManifest(const char* fileName, AndroidStackMachine* a) {
+    void ASMParser::parseManifest(const char* fileName, AndroidStackMachine* a, bool amm) {
         string name = fileName;
         if (name.find(".xml", name.length() - 5) == string::npos) {
-            parseManifestTxt(fileName, a);
+            parseManifestTxt(fileName, a, amm);
             return;
         }
         XMLDocument doc;
@@ -189,7 +193,8 @@ namespace TaskDroid {
         }
     }
 
-    void ASMParser::parseFragment(const char* fileName, AndroidStackMachine* a) {
+    void ASMParser::parseFragment(const char* fileName, AndroidStackMachine* a, bool amm) {
+        if (!amm) return;
         XMLDocument doc;
         doc.LoadFile(fileName);
         XMLElement* root = doc.RootElement();

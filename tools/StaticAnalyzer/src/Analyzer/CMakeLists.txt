@@ -6,5 +6,7 @@ ADD_LIBRARY(Analyzer MultiTaskReachabilityAnalyzer.cpp
                      MultiTaskBoundednessAnalyzer.cpp
                      MultiTaskBackHijacking.cpp
                      MultiTaskTestTraceGenerator.cpp
-                     FragmentAnalyzer.cpp)
+                     MultiTaskUBBP.cpp
+                     FragmentAnalyzer.cpp
+                     FragmentUBBP.cpp)
 

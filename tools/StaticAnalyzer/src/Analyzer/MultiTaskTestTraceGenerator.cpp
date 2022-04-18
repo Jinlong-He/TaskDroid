@@ -118,7 +118,7 @@ namespace TaskDroid {
     void MultiTaskAnalyzer::mkTraceActivityVars(const Activities& acts) {
         ID id = 0;
         for (auto activity : acts) {
-            string name = "a_" + to_string(id++);
+            string name = "ab_" + to_string(id++);
             bool_variable* v = new bool_variable(name);
             activityBVarMap[activity] = v;
             items.emplace_back(v);
@@ -128,19 +128,15 @@ namespace TaskDroid {
                 add_control_state(foa, *v, *v == false);
             }
         }
-        for (auto& [activity, actions] : a -> getActionMap()) {
-            for (auto& [intent, finish] : actions) {
-                auto& actionValue = *actionValueMap.at(pair(activity, intent));
-                auto target = intent -> getActivity();
-                if (acts.count(target) > 0) {
-                    add_transition(foa, *activityBVarMap[target], bool_value(1), actionVar == actionValue);
-                }
-            }
-        }
-        for (auto activity : acts) {
-            auto& var = *activityBVarMap[activity];
-            add_transition(foa, var, var, atomic_proposition("TRUE"));
-        }
+    }
+
+    void MultiTaskAnalyzer::genTestTrace(const Activities& acts, double p, std::ostream& os) {
+        clear();
+        mkVarsValues();
+        mkTraceActivityVars(acts);
+        auto ap = atomic_proposition("TRUE");
+        for (auto& [act, var] : activityBVarMap) ap = ap & (*var == bool_value(1));
+        analyzeReachability(ap, os);
     }
 
     void MultiTaskAnalyzer::genTestTrace(double p, std::ostream& os) {
@@ -158,16 +154,6 @@ namespace TaskDroid {
             getTransitionNum(mainActivity, visited, actions);
             ID sum = actions.size();
             devideActions(mainActivity, sum, p, path, actions, actions1, actions2);
-            cout << "-----------" << endl;
-            cout << "-----------" << endl;
-            cout << "-----------" << endl;
-            cout << "-----------" << endl;
-            cout << actions1.size() << endl;
-            cout << actions2.size() << endl;
-            cout << "-----------" << endl;
-            cout << "-----------" << endl;
-            cout << "-----------" << endl;
-            cout << "-----------" << endl;
             clear();
             mkVarsValues();
             getAvailablePos();

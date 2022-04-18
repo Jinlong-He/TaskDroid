@@ -56,6 +56,7 @@ namespace TaskDroid {
         bool analyzeBoundedness(std::ostream& os = std::cout);
         bool analyzeBackHijacking(std::ostream& os = std::cout);
         bool analyzeRealActivity(std::ostream& os = std::cout);
+        bool analyzeUBBP(std::ostream& os = std::cout);
         bool analyzeReachability(AndroidStackMachine* a, int k, 
                                  const Configuration<Activity>& configuration,
                                  std::ostream& os = std::cout);
@@ -67,8 +68,8 @@ namespace TaskDroid {
         bool analyzePattenReachability(const string& affinity, 
                                        const vector<Activity*>& task,
                                        std::ostream& os = std::cout);
-        //void genTestTrace(const Activities& acts = Activities(), double p = 1,
-        //                  std::ostream& os = std::cout);
+        void genTestTrace(const Activities& acts = Activities(), double p = 1,
+                          std::ostream& os = std::cout);
         void genTestTrace(double p = 1, std::ostream& os = std::cout);
         void translate2FOA();
     private:
@@ -113,7 +114,7 @@ namespace TaskDroid {
         void getPopOrder(const vector<ID>& order, vector<ID>& newOrder);
         enum_value* getMainOrderValue();
         atomic_proposition getTopOrderAP(ID taskID);
-        atomic_proposition getTopOrderAP(ID task0ID, ID task1ID);
+        atomic_proposition getTopOrderAP(ID task0ID, ID task1ID, bool eq = true);
         void getPattenTaskAP(const string& affinity, 
                              const vector<Activity*>& task,
                              atomic_proposition& ap);
@@ -123,6 +124,10 @@ namespace TaskDroid {
                        atomic_proposition& ap);
         void getRealActAP(Activity* source, Activity* target,
                           atomic_proposition& ap);
+        void getUBBPnewAP(Activity* source, Activity* target,
+                          atomic_proposition& ap);
+        void getUBBPctpAP(Activity* source, Activity* target,
+                          atomic_proposition& ap, bool n = false);
         void setActivity(ID taskID, ID actID, Activity* activity,
                          const atomic_proposition& ap);
         void switchTask(Intent* intent, ID taskID, const atomic_proposition& ap);

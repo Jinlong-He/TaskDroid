@@ -14,6 +14,7 @@ int main (int argc, char* argv[]) {
     double p;
     opts.add_options()
     ("help,h", "produce help message")
+    ("amm", po::value<string>(), "true")
     ("verify,v", po::value<string>(), "")
     ("gen,g", po::value<double>(&p), "")
     ("act", po::value<string>(), "")
@@ -27,15 +28,21 @@ int main (int argc, char* argv[]) {
     ("fragment-input-file,f", po::value<string>(), "fragment file")
     ("aftm-input-file,a", po::value<string>(), "activity fragment transition model file")
     ("main-activity", po::value<string>(), "activity fragment transition model file");
-    string manifestFileName = "", aftmFileName = "", fragmentFileName = "", gator = "",
+    string manifestFileName = "", aftmFileName = "", fragmentFileName = "", gator = "", amm = "true",
            outputFileName = "out.txt";
     try {
         po::store(po::parse_command_line(argc, argv, opts), vm);
         po::notify(vm);
+        if (vm.count("amm")) {
+            amm = vm["amm"].as<std::string>();
+        }
         if (vm.count("input-files")) {
             string dir = vm["input-files"].as<std::string>();
             manifestFileName = dir + "/AndroidManifest.txt";
-            aftmFileName = dir + "/ictgMerge.xml";
+            if (amm == "false")
+                aftmFileName = dir + "/ictgMerge.xml";
+            if (amm == "true")
+                aftmFileName = dir + "/ictgOpt.xml";
             fragmentFileName = dir + "/SingleObject_entry.xml";
         } else {
             if (vm.count("manifest-input-file")) {
@@ -61,12 +68,18 @@ int main (int argc, char* argv[]) {
             gator = vm["gator"].as<std::string>();
         }
         AndroidStackMachine a;
-        ASMParser::parseManifest(manifestFileName.c_str(), &a);
+        if (amm == "false")
+            ASMParser::parseManifest(manifestFileName.c_str(), &a, 0);
+        if (amm == "true")
+            ASMParser::parseManifest(manifestFileName.c_str(), &a);
         if (gator == "")
             ASMParser::parseATG(aftmFileName.c_str(), &a);
         else 
             ASMParser::parseATG(aftmFileName.c_str(), &a, gator.c_str());
-        ASMParser::parseFragment(fragmentFileName.c_str(), &a);
+        if (amm == "false")
+            ASMParser::parseFragment(fragmentFileName.c_str(), &a, 0);
+        if (amm == "true")
+            ASMParser::parseFragment(fragmentFileName.c_str(), &a);
         if (vm.count("main-activity")) {
             string mainActivityName = vm["main-activity"].as<std::string>();
             a.setMainActivity(a.getActivity(mainActivityName));
@@ -124,14 +137,38 @@ int main (int argc, char* argv[]) {
                         analyzer.analyzeRealActivity(out);
                     }
                 }
+            } else if (verify == "ubbp") {
+                if (vm.count("engine")) {
+                    string engine = vm["engine"].as<std::string>();
+                    if (engine == "nuxmv") {
+                        MultiTaskAnalyzer analyzer(k, &a);
+                        analyzer.analyzeUBBP(out);
+                    }
+                }
+            } else if (verify == "frag-ubbp") {
+                string act = vm["act"].as<string>();
+                cout << act << endl;
+                if (act == "all") {
+                    for (auto& [activity, transactions] : a.getActivityTransactionMap()) {
+                        FragmentAnalyzer analyzer(k, h, &a, activity);
+                        analyzer.analyzeUBBP(out);
+                    }
+                } else {
+                    auto activity = a.getActivity(act);
+                    if (a.getActivityTransactionMap().count(activity)) {
+                        FragmentAnalyzer analyzer(k, h, &a, activity);
+                        analyzer.analyzeUBBP(out);
+                    }
+                }
             }
         }
         if (vm.count("gen")) {
             p = vm["gen"].as<double>();
             Activities acts;
-            //for (auto&[name, act] : a.getActivityMap()) acts.insert(act);
+            for (auto&[name, act] : a.getActivityMap()) acts.insert(act);
             MultiTaskAnalyzer analyzer(k, &a);
-            analyzer.genTestTrace(p, out);
+            //analyzer.genTestTrace(p, out);
+            analyzer.genTestTrace(acts, p, out);
         }
         out.close();
     } catch(string str) {

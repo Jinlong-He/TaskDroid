@@ -682,17 +682,9 @@ namespace TaskDroid {
         }
     }
 
-    bool FragmentAnalyzer::analyzeReachability(const string& viewID,
-                                               const vector<FragmentAction*>& stack,
+    bool FragmentAnalyzer::analyzeReachability(const atomic_proposition& ap,
                                                std::ostream& os) {
-        return analyzeReachability(viewMap.at(viewID), stack, 0, os);
-    }
-
-    bool FragmentAnalyzer::analyzeReachability(ID viewID,
-                                               const vector<FragmentAction*>& stack, 
-                                               bool star, std::ostream& os) {
-        auto ap = atomic_proposition("FALSE");
-        getStackAP(viewID, stack, ap, star);
+        bool flag = false;
         for (auto& [transaction, map] : initFragmentActionMap) {
             clear_init_list(foa);
             for (auto& [viewID, action] : map) {
@@ -724,9 +716,12 @@ namespace TaskDroid {
             }
             std::ifstream f("nuxmv_result");
             if (f) system("rm nuxmv_result");
-            verify_invar_nuxmv(foa, ap, "nuxmv_source");
+            verify_invar_nuxmv(foa, ap, "nuxmv_source", 30);
             std::ifstream fin("nuxmv_result");
-            if (!fin) return false;
+            if (!fin) {
+                flag = flag | false;
+                continue;
+            }
             unordered_map<string, vector<string> > trace_table;
             parse_trace_nuxmv(foa, "nuxmv_result", trace_table);
             os << "-Fragment Trace Found: " << endl;
@@ -734,73 +729,24 @@ namespace TaskDroid {
                 if (value == "pop") os << "back()" << endl;
                 else os << value2TransactionMap[value] -> toString() << endl;
             }
+            flag = flag | true;
         } 
-        return true;
+        return flag;
     }
 
-    //void FragmentAnalyzer::getGraph(ID viewID, Fragment* fragment,
-    //                                typename LoopAnalyzer<Fragment>::PathGraph& graph) {
-    //    if (fragmentTransactionMap.count(fragment) > 0) {
-    //        auto& map = graph[fragment];
-    //        for (auto& transaction : fragmentTransactionMap.at(fragment)) {
-    //            for (auto& action : transaction -> getFragmentActions()) {
-    //                if (action.getFragmentMode() == ADD &&
-    //                    viewMap.at(action.getViewID()) == viewID) {
-    //                    auto newFragment = action.getFragment();
-    //                    map[newFragment] = 1;
-    //                    if (graph.count(newFragment) == 0) 
-    //                        getGraph(viewID, newFragment, graph);
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
+    bool FragmentAnalyzer::analyzeReachability(const string& viewID,
+                                               const vector<FragmentAction*>& stack,
+                                               std::ostream& os) {
+        return analyzeReachability(viewMap.at(viewID), stack, 0, os);
+    }
 
-    //void FragmentAnalyzer::checkREP(std::ostream& os) {
-    //    unordered_map<ID, unordered_set<vector<Fragment*> > > loopsMap;
-    //    for (auto& [source, transactions] : fragmentTransactionMap) {
-    //        for (auto& transaction : transactions) {
-    //            if (transaction -> isAddTobackStack()) {
-    //                unordered_map<ID, Fragment*> topFragments;
-    //                unordered_map<ID, Fragment*> repFragments;
-    //                for (auto& action : transaction -> getHighLevelFragmentActions()) {
-    //                    auto& viewID = viewMap.at(action.getViewID());
-    //                    auto fragment = action.getFragment();
-    //                    topFragments[viewID] = fragment;
-    //                    if (action.getFragmentMode() == REP)
-    //                        repFragments[viewID] = fragment;
-    //                }
-    //                for (auto& [viewID, fragment] : topFragments) {
-    //                    if (fragmentTransactionMap.count(fragment) == 0) continue;
-    //                    for (auto& transaction : fragmentTransactionMap.at(fragment)) {
-    //                        for (auto& action : transaction -> getHighLevelFragmentActions()) {
-    //                            if (action.getFragmentMode() == REP) continue;
-    //                            auto& viewID = viewMap.at(action.getViewID());
-    //                            if (repFragments.count(viewID) > 0) {
-    //                                loopsMap[viewID].insert(action.getFragments());
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //    for (auto& [viewID, loops] : loopsMap) {
-    //        for (auto& loop : loops) {
-    //            vector<Fragment*> path = loop;
-    //            path.insert(path.end(), loop.begin(), loop.end());
-    //            if (path.size() > k * h) continue;
-    //            atomic_proposition ap("TRUE");
-    //            os << "REP Loop on " + activity -> getName() + " found: ";
-    //            for (auto f : path) {
-    //                os << f -> getName() << " ";
-    //            }
-    //            os << endl;
-    //            if (!analyzeReachability(viewID, path, 1, os)) 
-    //                os << "nuXmv trace not found!" << endl;
-    //        }
-    //    }
-    //}
+    bool FragmentAnalyzer::analyzeReachability(ID viewID,
+                                               const vector<FragmentAction*>& stack, 
+                                               bool star, std::ostream& os) {
+        auto ap = atomic_proposition("FALSE");
+        getStackAP(viewID, stack, ap, star);
+        return analyzeReachability(ap, os);
+    }
 
     bool FragmentAnalyzer::analyzeBoundedness(std::ostream& os) {
         bool flag = false;

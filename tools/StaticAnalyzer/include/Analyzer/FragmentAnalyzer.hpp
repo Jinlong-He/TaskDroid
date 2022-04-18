@@ -55,9 +55,12 @@ namespace TaskDroid {
         }
 
         bool analyzeBoundedness(std::ostream& os = std::cout);
+        bool analyzeUBBP(std::ostream& os = std::cout);
         //void checkADD(std::ostream& os = std::cout);
         //void checkREP(std::ostream& os = std::cout);
         void analyzeReachability(std::ostream& os = std::cout);
+        bool analyzeReachability(const atomic_proposition& ap,
+                                 std::ostream& os = std::cout);
         bool analyzeReachability(const string& viewID,
                                  const vector<FragmentAction*>& task,
                                  std::ostream& os = std::cout);
@@ -121,6 +124,8 @@ namespace TaskDroid {
         void getGraph(ID viewID, Fragment* fragment,
                       unordered_map<Fragment*, 
                                      unordered_map<Fragment*, int> >& graph);
+        void getUBBPAP(FragmentTransaction* transaction, 
+                       atomic_proposition& ap);
 
         ID k;
         ID h;
