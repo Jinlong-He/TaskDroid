@@ -768,7 +768,7 @@ namespace TaskDroid {
     }
 
     void FragmentAnalyzer::loadASM(AndroidStackMachine* a) {
-        this -> a -> fomalize();
+        this -> a -> formalize();
     }
 
     void FragmentAnalyzer::loadActivity(Activity* activity) {

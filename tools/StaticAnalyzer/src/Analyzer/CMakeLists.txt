@@ -1,12 +1,12 @@
 
 MESSAGE(STATUS "Model This is SOURCE dir " ${PROJECT_SOURCE_DIR})
 
-ADD_LIBRARY(Analyzer MultiTaskReachabilityAnalyzer.cpp
-                     MultiTaskRealActivityAnalyzer.cpp
+ADD_LIBRARY(Analyzer MultiTaskAnalyzer.cpp
+                     LegalPosMaker.cpp
+                     OrderMaker.cpp
+                     ValuesMaker.cpp
+                     NuXmvTranslator.cpp
                      MultiTaskBoundednessAnalyzer.cpp
-                     MultiTaskBackHijacking.cpp
-                     MultiTaskTestTraceGenerator.cpp
-                     MultiTaskUBBP.cpp
-                     FragmentAnalyzer.cpp
-                     FragmentUBBP.cpp)
+                     MultiTaskUnexpectednessAnalyzer.cpp)
+
 

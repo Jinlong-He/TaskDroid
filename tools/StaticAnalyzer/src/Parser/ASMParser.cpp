@@ -55,6 +55,7 @@ namespace TaskDroid {
                 if (launchModeStr == "1") launchMode = STP;
                 if (launchModeStr == "2") launchMode = STK;
                 if (launchModeStr == "3") launchMode = SIT;
+                if (launchMode == SIT) affinity = name;
             }
             if (affinityFlag && line.find("- taskAffinity") != string::npos) {
                 if (!amm) {
@@ -64,6 +65,8 @@ namespace TaskDroid {
                 affinityFlag = false;
                 auto pos = line.find(": ") + 2;
                 affinity = line.substr(pos);
+                if (affinity.length() == 0) affinity = name;
+                if (launchMode == SIT) affinity = name;
             }
         }
         if (count > a -> getActivityMap().size())
@@ -106,6 +109,7 @@ namespace TaskDroid {
                 }
                 if (actElement -> FindAttribute("android:taskAffinity")) {
                     affinity = actElement -> Attribute("android:taskAffinity");
+                    if (launchMode == SIT) affinity = name;
                 }
                 auto activity = a -> mkActivity(name, affinity, launchMode);
                 if (main) continue;

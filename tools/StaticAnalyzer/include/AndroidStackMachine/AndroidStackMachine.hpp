@@ -34,7 +34,7 @@ namespace TaskDroid {
     typedef unordered_map<string, ID> ViewMap;
     typedef unordered_map<FragmentTransaction*,
                 unordered_map<ID, FragmentAction*> > InitFragmentActionMap;
-    enum ActionMode {PUSH, STOP, CTOP, CTSK, RTOF, SIST,
+    enum ActionMode {PUSH, STOP, CTOP, CTSK, RTOF, SIST, MKTK,
                      PUSH_N, STOP_N, CTOP_N, CTSK_N, RTOF_N};
     class AndroidStackMachine {
     public:
@@ -43,7 +43,7 @@ namespace TaskDroid {
               activityMap(),
               actionMap(),
               intents(),
-              isFomalize(false) {}
+              isFormalize(false) {}
         AndroidStackMachine(Activity* mainActivity_, 
                             const ActivityMap& activityMap_,
                             const ActionMap& actionMap_,
@@ -53,7 +53,7 @@ namespace TaskDroid {
               activityMap(activityMap_),
               actionMap(actionMap_),
               intents(),
-              isFomalize(false) {}
+              isFormalize(false) {}
 
         ~AndroidStackMachine() {
             for (auto& pair : activityMap) {
@@ -90,10 +90,10 @@ namespace TaskDroid {
         ID getViewID(const string& view) const;
         void addAction(Activity* activity, Intent* intent, bool finish = false);
         bool minimize();
-        void fomalize();
+        void formalize();
         void print(std::ostream& os = std::cout) const;
-        static ActionMode getMode(Intent* intent);
-        static bool isNewMode(Intent* intent);
+        static ActionMode getMode(Activity* activity, Intent* intent);
+        static bool isNewMode(Activity* activity, Intent* intent);
 
         const FragmentMap& getFragmentMap() const;
         const FragmentMap& getFragmentMap(Activity* activity) const;
@@ -129,7 +129,8 @@ namespace TaskDroid {
             activity2FragmentTransactionMap;
         unordered_map<Activity*, ViewMap> 
             activity2ViewMap;
-        bool isFomalize;
+        bool isFormalize;
     };
 }
 #endif /* AndroidStackMachine_hpp */
+

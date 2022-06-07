@@ -7,24 +7,23 @@ namespace TaskDroid {
     void MultiTaskAnalyzer::getOutActivities() {
         auto activity = a -> getMainActivity();
         auto affinity = a -> getAffinityMap().at(activity -> getAffinity());
-        unordered_map<ID, Activities> visited;
-        visited[affinity].insert(activity);
-        getOutActivities(affinity, activity, visited);
+        //unordered_map<ID, Activities> visited;
+        outActivities[affinity].insert(activity);
+        getOutActivities(affinity, activity);
     }
 
-    void MultiTaskAnalyzer::getOutActivities(ID taskID, Activity* activity,
-                                             unordered_map<ID, Activities>& visited) {
+    void MultiTaskAnalyzer::getOutActivities(ID taskID, Activity* activity) {
         if (a -> getActionMap().count(activity) == 0) return;
         for (auto& [intent, finish] : a -> getActionMap().at(activity)) {
             auto newActivity = intent -> getActivity();
             auto newAffinity = a -> getAffinityMap().at(newActivity -> getAffinity());
-            if (AndroidStackMachine::isNewMode(intent) && 
+            if (AndroidStackMachine::isNewMode(activity, intent) && 
                 taskID != newAffinity) {
-                if (visited[newAffinity].insert(newActivity).second)
-                    getOutActivities(newAffinity, newActivity, visited);
+                if (outActivities[newAffinity].insert(newActivity).second)
+                    getOutActivities(newAffinity, newActivity);
             } else {
-                if (visited[taskID].insert(newActivity).second)
-                    getOutActivities(taskID, newActivity, visited);
+                if (outActivities[taskID].insert(newActivity).second)
+                    getOutActivities(taskID, newActivity);
             }
         }
     }
@@ -42,7 +41,7 @@ namespace TaskDroid {
         for (auto& [intent, finish] : a -> getActionMap().at(activity)) {
             auto newActivity = intent -> getActivity();
             auto newTaskID = a -> getTaskID(newActivity -> getAffinity());
-            auto mode = AndroidStackMachine::getMode(intent);
+            auto mode = AndroidStackMachine::getMode(activity, intent);
             if (mode == PUSH ||
                 mode == STOP && activity != newActivity ||
                 mode == CTOP && activity != newActivity ||
@@ -82,7 +81,7 @@ namespace TaskDroid {
                             getAvailablePos(newActivity, newTaskID, pos + 1);
                     }
                 }
-            } else if (mode == CTSK_N && taskID != newTaskID) {
+            } else if (mode == CTSK_N && taskID != newTaskID || mode == SIST) {
                 if (availablePos[newActivity][newTaskID].insert(0).second)
                     getAvailablePos(newActivity, newTaskID, 0);
             }
@@ -284,6 +283,22 @@ namespace TaskDroid {
         }
     }
 
+    void MultiTaskAnalyzer::mkSIST(Activity* activity, Intent* intent, 
+                                     bool finish, ID taskID, ID actID,
+                                     const atomic_proposition& ap) {
+        auto newActivity = intent -> getActivity();
+        auto newTaskID = a -> getTaskID(newActivity -> getAffinity());
+        auto& newValue = *activityValueMap.at(newActivity);
+        auto realAP = atomic_proposition("TRUE");
+        if (realActivityVarMap.count(newTaskID) > 0) {
+            auto& realVar = *realActivityVarMap.at(newTaskID);
+            realAP = (realVar != newValue);
+        }
+        auto& newVar = *activityVarMap.at(pair(newTaskID, 0));
+        add_transition(foa, newVar, newValue, realAP & ap);
+        if (finish) setActivity(taskID, actID, nullptr, ap);
+    }
+
     void MultiTaskAnalyzer::mkPUSH_N(Activity* activity, Intent* intent, 
                                      bool finish, ID taskID, ID actID,
                                      const atomic_proposition& ap) {
@@ -398,13 +413,13 @@ namespace TaskDroid {
 
     void MultiTaskAnalyzer::loadASM(AndroidStackMachine* a) {
         this -> a = a;
-        this -> a -> fomalize();
+        this -> a -> formalize();
         taskNum = this -> a -> getAffinityMap().size();
         bool realActFlag = false;
         for (auto& [activity, actions] : a -> getActionMap())
             for (auto& [intent, finish]  : actions)
-                if (AndroidStackMachine::getMode(intent) == PUSH_N ||
-                    AndroidStackMachine::getMode(intent) == STOP_N)
+                if (AndroidStackMachine::getMode(activity, intent) == PUSH_N ||
+                    AndroidStackMachine::getMode(activity, intent) == STOP_N)
                     realActFlag = true;
         if (taskNum > 1 || realActFlag)
             isRealAct = true;
@@ -516,7 +531,7 @@ namespace TaskDroid {
         unordered_map<string, Activities> realActivities;
         for (auto& [activity, actions] : a -> getActionMap()) {
             for (auto& [intent, finish]  : actions) {
-                if (AndroidStackMachine::isNewMode(intent)) {
+                if (AndroidStackMachine::isNewMode(activity, intent)) {
                     auto target = intent -> getActivity();
                     realActivities[target -> getAffinity()].insert(target);
                 }
@@ -590,7 +605,10 @@ namespace TaskDroid {
                             auto& var = *activityBVarMap.at(intent -> getActivity());
                             add_transition(foa, var, bool_value(1), ap);
                         }
-                        switch (AndroidStackMachine::getMode(intent)) {
+                        switch (AndroidStackMachine::getMode(activity, intent)) {
+                            case SIST :
+                                switchTask(intent, i, ap_N);
+                                mkSIST(activity, intent, finish, i, j, ap);
                             case PUSH :
                                 mkPUSH(activity, intent, finish, i, j, ap);
                                 break;
@@ -722,8 +740,8 @@ namespace TaskDroid {
             }
         }
         os << "---Trace END---" << endl;
-        os << "-Acitivity Transition Coverage: " << 1.0 * values.size()/value2ActionMap.size() << endl;;
-        os << "-Acitivity Transition Coverage: " << values.size() << "/" << value2ActionMap.size() << endl;;
+        //os << "-Acitivity Transition Coverage: " << 1.0 * values.size()/value2ActionMap.size() << endl;;
+        //os << "-Acitivity Transition Coverage: " << values.size() << "/" << value2ActionMap.size() << endl;;
         return true;
     }
 }

@@ -296,16 +296,16 @@ namespace TaskDroid {
         return true;
     }
 
-    void AndroidStackMachine::fomalize() {
-        if (isFomalize) return;
+    void AndroidStackMachine::formalize() {
+        if (isFormalize) return;
         if (minimize()) formActivity();
-        isFomalize = true;
+        isFormalize = true;
     }
 
-    ActionMode AndroidStackMachine::getMode(Intent* intent) {
+    ActionMode AndroidStackMachine::getMode(Activity* source, Intent* intent) {
         const auto& flags = intent -> getFlags();
         auto activity = intent -> getActivity();
-        if (flags.count(F_NTK) > 0) {
+        if (flags.count(F_NTK) > 0 || source -> getLaunchMode() == SIT) {
             switch (activity -> getLaunchMode()) {
                 case STK :
                     if (flags.count(F_CTK) > 0) return CTSK_N;
@@ -355,8 +355,8 @@ namespace TaskDroid {
         return PUSH;
     }
 
-    bool AndroidStackMachine::isNewMode(Intent* intent) {
-        return (getMode(intent) > 4);
+    bool AndroidStackMachine::isNewMode(Activity* source, Intent* intent) {
+        return (getMode(source, intent) > 4);
     }
 
     void AndroidStackMachine::formFragmentTransaction(FragmentTransaction* transaction) {

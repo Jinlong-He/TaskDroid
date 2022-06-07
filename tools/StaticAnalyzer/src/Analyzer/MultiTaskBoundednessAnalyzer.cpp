@@ -1,6 +1,7 @@
 #include <iostream>
 #include <queue>
 #include "Analyzer/MultiTaskAnalyzer.hpp"
+#include "Analyzer/LoopAnalyzer.hpp"
 #include "atl/fomula_automaton/fomula_automaton.hpp"
 using std::cout, std::endl, std::to_string, std::queue;
 using namespace atl;
@@ -15,8 +16,9 @@ namespace TaskDroid {
         for (auto& [intent, finish] : a -> getActionMap().at(activity)) {
             auto newActivity = intent -> getActivity();
             string newAffinity = newActivity -> getAffinity();
-            if (AndroidStackMachine::isNewMode(intent) && 
-                newAffinity != affinity) {
+            if (AndroidStackMachine::isNewMode(activity, intent) && 
+                newAffinity != affinity ||
+                AndroidStackMachine::getMode(activity, intent) == MKTK) {
                 if (realActivities[newAffinity].insert(newActivity).second) {
                     visited[newAffinity].insert(newActivity);
                     getRealActivities(a, newAffinity, newActivity, 
@@ -27,8 +29,8 @@ namespace TaskDroid {
                     getRealActivities(a, affinity, newActivity, 
                                       realActivities, visited);
                 }
-                if (AndroidStackMachine::getMode(intent) == CTSK ||
-                    AndroidStackMachine::getMode(intent) == CTSK_N &&
+                if (AndroidStackMachine::getMode(activity, intent) == CTSK ||
+                    AndroidStackMachine::getMode(activity, intent) == CTSK_N &&
                     newAffinity == affinity) {
                     realActivities[affinity].insert(newActivity);
                 }
@@ -57,7 +59,8 @@ namespace TaskDroid {
                 if (actionMap.count(activity) == 0) continue;
                 for (auto& [intent, finish] : actionMap.at(activity)) {
                     auto action = pair(intent, finish);
-                    if (AndroidStackMachine::isNewMode(intent)) {
+                    if (AndroidStackMachine::isNewMode(activity, intent) ||
+                        AndroidStackMachine::getMode(activity, intent) == MKTK) {
                         auto& affinity = intent -> getActivity() -> getAffinity();
                         if (affinity == slaveActivity -> getAffinity()) {
                             masterOutPort[activity].emplace_back(action);
@@ -143,7 +146,7 @@ namespace TaskDroid {
                                 unordered_map<Activity*, int> >& graph) {
         for (auto& [activity, actions] : completeGraph) {
             for (auto& [intent, finish] : actions) {
-                auto mode = AndroidStackMachine::getMode(intent);
+                auto mode = AndroidStackMachine::getMode(activity, intent);
                 auto newActivity = intent -> getActivity();
                 auto& map = graph[activity];
                 if (mode == PUSH || mode == PUSH_N ||
@@ -194,7 +197,7 @@ namespace TaskDroid {
             LoopAnalyzer<Activity>::getPositiveLoop(graph, loops);
             if (loops.size()) flag = true;
             for (auto& loop : loops) {
-                os << "-Boundedness Patten Found:" << endl;
+                os << "[Unboundedness] Patten Found:" << endl;
                 for (auto act : loop) {
                     os << act -> getName() << endl;
                 }
@@ -206,3 +209,4 @@ namespace TaskDroid {
         return flag;
     }
 }
+

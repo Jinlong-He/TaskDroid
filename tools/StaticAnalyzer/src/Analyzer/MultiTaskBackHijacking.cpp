@@ -42,9 +42,9 @@ namespace TaskDroid {
         unordered_map<Activity*, Activities> pattens;
         for (auto& [source, actionMap] : a -> getActionMap()) {
             for (auto& [intent, finish] : actionMap) {
-                if (AndroidStackMachine::getMode(intent) == PUSH_N ||
-                    AndroidStackMachine::getMode(intent) == STOP_N ||
-                    AndroidStackMachine::getMode(intent) == CTOP_N) 
+                if (AndroidStackMachine::getMode(source, intent) == PUSH_N ||
+                    AndroidStackMachine::getMode(source, intent) == STOP_N ||
+                    AndroidStackMachine::getMode(source, intent) == CTOP_N) 
                     pattens[source].insert(intent -> getActivity());
             }
         }
