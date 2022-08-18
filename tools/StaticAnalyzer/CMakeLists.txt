@@ -9,10 +9,12 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/include/fml/include
   ${PROJECT_SOURCE_DIR}/include/Parser
   /usr/local/include
+  /opt/homebrew/include
   /usr/include
 )
 LINK_DIRECTORIES(
   /usr/local/lib
+  /opt/homebrew/lib
   /usr/lib
 )
 MESSAGE ("CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")

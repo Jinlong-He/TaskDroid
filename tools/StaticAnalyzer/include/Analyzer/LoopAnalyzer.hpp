@@ -18,10 +18,10 @@ namespace TaskDroid {
     template <class Symbol>
     class LoopAnalyzer {
     public:
-        typedef vector<Symbol*> Path;
+        typedef vector<Symbol> Path;
         typedef vector<Path> Paths;
-        typedef unordered_map<Symbol*, Paths> PathsMap;
-        typedef unordered_map<Symbol*, unordered_map<Symbol*, int> > Graph;
+        typedef unordered_map<Symbol, Paths> PathsMap;
+        typedef unordered_map<Symbol, unordered_map<Symbol, int> > Graph;
 
         static void getPositiveLoop(const Graph& graph, Paths& loops) {
             Paths newLoops;
@@ -73,9 +73,9 @@ namespace TaskDroid {
             return false;
         }
 
-        static void getLoop(const Graph& graph, Symbol* init, Paths& loops) {
-            queue<Symbol*> q({init});
-            unordered_set<Symbol*> visited({init}), sources;
+        static void getLoop(const Graph& graph, Symbol init, Paths& loops) {
+            queue<Symbol> q({init});
+            unordered_set<Symbol> visited({init}), sources;
             PathsMap pathsMap({{init, Paths({Path({init})})}});
             while (!q.empty()) {
                 auto source = q.front();
@@ -103,9 +103,9 @@ namespace TaskDroid {
 
         static void getLoopWeight(const Graph& graph, Symbol* init, Paths& loops) {
             PathsMap paths({{init, Paths({Path({init})})}});
-            unordered_map<Symbol*, int> dis({{init, 0}});
-            queue<Symbol*> q({init});
-            unordered_set<Symbol*> visited;
+            unordered_map<Symbol, int> dis({{init, 0}});
+            queue<Symbol> q({init});
+            unordered_set<Symbol> visited;
             while (!q.empty()) {
                 auto source = q.front();
                 q.pop();

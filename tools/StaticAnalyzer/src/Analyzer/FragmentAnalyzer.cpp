@@ -748,19 +748,87 @@ namespace TaskDroid {
         return analyzeReachability(ap, os);
     }
 
+    void FragmentAnalyzer::formalizeGraph(const LGraph& lgraph, 
+                                          vector<Graph>& graphs) {
+        for (ID i = 0; i < viewMap.size(); i++) {
+            Graph graph;
+            for (auto& [ver, map] : lgraph) {
+                for (auto& [newVer, labels] : map) {
+                    int max = -100000;
+                    for (auto& label : labels) {
+                        if (label.at(i) > max) max = label.at(i);
+                    }
+                    graph[ver][newVer] = max;
+                }
+            }
+            graphs.emplace_back(graph);
+        }
+    }
+
+    void FragmentAnalyzer::getGraph(const Vertex& init, LGraph& graph) {
+        vector<Vertex> work, newWork;
+        work.emplace_back(init);
+        while (work.size()) {
+            for (auto& ver : work) {
+                for (auto& vec : ver) {
+                    for (auto top : vec) {
+                        if (fragmentTransactionMap.count(top) == 0)  continue;
+                        for (auto transaction : fragmentTransactionMap.at(top)) {
+                            Vertex newVer = ver;
+                            vector<int> label(viewMap.size(), 0);
+                            for (auto action : transaction -> getHighLevelFragmentActions()) {
+                                auto viewID = viewMap.at(action -> getViewID());
+                                auto mode = action -> getFragmentMode();
+                                auto& frgs = action -> getFragments();
+                                newVer.at(viewID) = frgs;
+                                if (mode == ADD) label.at(viewID) = 1;
+                                else label.at(viewID) = -100000;
+                            }
+                            graph[ver][newVer].insert(label);
+                            if (graph.count(newVer) == 0) 
+                                newWork.emplace_back(newVer);
+                        }
+                    }
+                }
+            }
+            work.clear();
+            if (newWork.size() > 0) work = newWork;
+            newWork.clear();
+        }
+    }
+
     bool FragmentAnalyzer::analyzeBoundedness(std::ostream& os) {
         bool flag = false;
-        for (auto& [f, transactions] : fragmentTransactionMap) {
-            for (auto transaction : transactions) {
-                for (auto action : transaction -> getHighLevelFragmentActions()) {
-                    auto viewID = viewMap.at(action -> getViewID());
-                    vector<FragmentAction*> stack({action, action});
-                    os << "- Fragment Boundedness Patten Found:" << endl;
-                    for (auto fragment : action -> getFragments()) {
-                        os << fragment -> getName() << endl;
-                    }
+        for (auto& [transaction, map] : initFragmentActionMap) {
+            //auto& actions = transaction -> getFragmentActions();
+            flag = false;
+            Vertex ver(viewMap.size());
+            for (auto [viewID, action] : map) {
+                auto mode = action -> getFragmentMode();
+                auto& frgs = action -> getFragments();
+                ver.at(viewID) = frgs;
+                if (mode == ADD) {
+                    os << "[Frag-Unboundedness :ADD] Patten Found:" << endl;
+                    os << activity -> getName() << " ADD" << endl;
                     os << "---Patten END---" << endl;
-                    flag = flag | analyzeReachability(viewID, stack, 1, os);
+                    flag = true;
+                }
+            }
+            if (!flag) {
+                LGraph graph;
+                vector<Graph> graphs;
+                getGraph(ver, graph);
+                formalizeGraph(graph, graphs);
+                vector<vector<Vertex> > loops;
+                for (auto& graph : graphs) {
+                    LoopAnalyzer<Vertex>::getPositiveLoop(graph, loops);
+                    if (loops.size()) flag = true;
+                    for (auto& loop : loops) {
+                        os << "[Frag-Unboundedness :REP] Patten Found:" << endl;
+                        os << activity -> getName() << " REP" << endl;
+                        os << "---Patten END---" << endl;
+                        flag = true;
+                    }
                 }
             }
         }

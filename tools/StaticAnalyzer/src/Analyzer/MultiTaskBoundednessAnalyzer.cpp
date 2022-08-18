@@ -7,8 +7,36 @@ using std::cout, std::endl, std::to_string, std::queue;
 using namespace atl;
 using namespace ll;
 namespace TaskDroid {
+    void getLocalActions(AndroidStackMachine* a,
+                         const string& affinity,
+                         Activity* realActivity,
+                         ActionMap& localActions) {
+        Activities work({realActivity}), newWork;
+        while (work.size()) {
+            for (auto activity : work) {
+                if (a -> getActionMap().count(activity) == 0) return;
+                for (auto& [intent, finish] : a -> getActionMap().at(activity)) {
+                    auto newActivity = intent -> getActivity();
+                    string newAffinity = newActivity -> getAffinity();
+                    if (!(AndroidStackMachine::isNewMode(activity, intent) && 
+                        newAffinity != affinity ||
+                        AndroidStackMachine::getMode(activity, intent) == MKTK)) {
+                        localActions[activity].emplace_back(pair(intent, finish));
+                        if (localActions.count(newActivity) == 0)
+                            newWork.insert(newActivity);
+                    }
+                }
+            }
+            work.clear();
+            if (newWork.size()) {
+                work = newWork;
+                newWork.clear();
+            }
+        }
+    }
+
     void getRealActivities(AndroidStackMachine* a,
-                           string& affinity,
+                           const string& affinity,
                            Activity* activity,
                            unordered_map<string, Activities>& realActivities,
                            unordered_map<string, Activities>& visited) {
@@ -111,20 +139,24 @@ namespace TaskDroid {
                 slaveCompleteActionMap);
         getVirtualActions(masterVirtualActionMap, masterOutPort, masterInPort);
         getVirtualActions(slaveVirtualActionMap, slaveOutPort, slaveInPort);
-        masterCompleteActionMap.insert(masterVirtualActionMap.begin(),
-                                       masterVirtualActionMap.end());
-        slaveCompleteActionMap.insert(slaveVirtualActionMap.begin(),
-                                      slaveVirtualActionMap.end());
+        for (auto& [activity, actions] : masterVirtualActionMap) 
+            for (auto& action : actions) 
+                masterCompleteActionMap[activity].emplace_back(action);
+        for (auto& [activity, actions] : slaveVirtualActionMap) 
+            for (auto& action : actions) 
+                slaveCompleteActionMap[activity].emplace_back(action);
     }
 
-    void getCompleteActions(AndroidStackMachine* a, 
+    void getCompleteActions(int k, AndroidStackMachine* a, 
                             unordered_map<Activity*, ActionMap>& completeActions) {
         unordered_map<string, Activities> realActivities;
         getRealActivities(a, realActivities);
-        if (realActivities.size() == 1) {
+        if (realActivities.size() == 1 || k == 0) {
             for (auto& [affinity, realActivities] :realActivities) 
                 for (auto realActivity : realActivities)
-                    completeActions[realActivity] = a -> getActionMap();
+                    //completeActions[realActivity] = a -> getActionMap();
+                    getLocalActions(a, affinity, realActivity,
+                                    completeActions[realActivity]);
             return;
         }
         for (auto& [masterAffinity, masterActivities] : realActivities) {
@@ -184,9 +216,9 @@ namespace TaskDroid {
         }
     }
 
-    bool MultiTaskAnalyzer::analyzeBoundedness(std::ostream& os) {
+    bool MultiTaskAnalyzer::analyzeBoundedness(int k, std::ostream& os) {
         unordered_map<Activity*, ActionMap> completeActions;
-        getCompleteActions(a, completeActions);
+        getCompleteActions(k, a, completeActions);
         unordered_map<Activity*, unordered_map<Activity*, int> > graph;
         vector<vector<Activity*> > loops;
         bool flag = false;
@@ -194,10 +226,10 @@ namespace TaskDroid {
             graph.clear();
             loops.clear();
             getGraph(completeGraph, graph);
-            LoopAnalyzer<Activity>::getPositiveLoop(graph, loops);
+            LoopAnalyzer<Activity*>::getPositiveLoop(graph, loops);
             if (loops.size()) flag = true;
             for (auto& loop : loops) {
-                os << "[Unboundedness] Patten Found:" << endl;
+                os << "[Task-Unboundedness] Patten Found:" << endl;
                 for (auto act : loop) {
                     os << act -> getName() << endl;
                 }

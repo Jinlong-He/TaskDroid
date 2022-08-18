@@ -6,7 +6,9 @@ ADD_LIBRARY(Analyzer MultiTaskAnalyzer.cpp
                      OrderMaker.cpp
                      ValuesMaker.cpp
                      NuXmvTranslator.cpp
+                     MultiTaskSemanticsAnalyzer.cpp
                      MultiTaskBoundednessAnalyzer.cpp
-                     MultiTaskUnexpectednessAnalyzer.cpp)
+                     MultiTaskUnexpectednessAnalyzer.cpp
+                     FragmentAnalyzer.cpp)
 
 

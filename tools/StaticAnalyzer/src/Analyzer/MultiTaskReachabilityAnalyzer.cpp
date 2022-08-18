@@ -735,7 +735,8 @@ namespace TaskDroid {
                 os << "back" << endl;
             } else {
                 os << value2ActionMap[value].first -> getName() << " -> " <<
-                      value2ActionMap[value].second -> getActivity() -> getName() << endl;
+                      value2ActionMap[value].second -> toString();
+                if (finish) os << " [finish]";
                 values.insert(value);
             }
         }

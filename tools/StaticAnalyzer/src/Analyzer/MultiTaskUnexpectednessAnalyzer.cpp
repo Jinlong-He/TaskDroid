@@ -149,6 +149,5 @@ namespace TaskDroid {
         }
         return flag;
     }
-
 }
 

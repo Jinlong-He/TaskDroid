@@ -79,7 +79,7 @@ namespace TaskDroid {
                 actionValues.emplace_back(*v);
                 actionValueMap[pair(activity, intent)] = v;
                 items.emplace_back(v);
-                value2ActionMap[name] = pair(activity, intent);
+                value2ActionMap[name] = pair(activity, pair(intent, finish));
             }
         }
     }

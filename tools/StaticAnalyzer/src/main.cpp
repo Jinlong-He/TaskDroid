@@ -3,6 +3,7 @@
 #include "AndroidStackMachine/AndroidStackMachine.hpp"
 #include "Parser/ASMParser.hpp"
 #include "Analyzer/MultiTaskAnalyzer.hpp"
+#include "Analyzer/FragmentAnalyzer.hpp"
 //#include "Analyzer/FragmentAnalyzer.hpp"
 using namespace TaskDroid;
 using std::cout, std::endl;
@@ -10,7 +11,7 @@ namespace po = boost::program_options;
 int main (int argc, char* argv[]) {
     po::options_description opts("Allowed options");
     po::variables_map vm;
-    int k = 0, h = 0, m = 0;
+    int k = 0, h = 0, m = 0, n = 0;
     double p;
     opts.add_options()
     ("help,h", "produce help message")
@@ -18,6 +19,7 @@ int main (int argc, char* argv[]) {
     ("verify,v", po::value<string>(), "")
     ("act", po::value<string>(), "")
     ("engine,e", po::value<string>()->default_value("nuxmv"), "")
+    ("bound-num,n", po::value<int>(&n)->default_value(1), "n")
     ("stack-height,k", po::value<int>(&k)->default_value(5), "k")
     ("stack-num,m", po::value<int>(&m)->default_value(1), "m")
     ("frag-num,h", po::value<int>(&h)->default_value(3), "h")
@@ -92,11 +94,29 @@ int main (int argc, char* argv[]) {
             string verify = vm["verify"].as<string>();
             if (verify == "boundedness") {
                 if (engine == "nuxmv") {
-                    analyzer.analyzeBoundedness(out);
+                    analyzer.analyzeBoundedness(n, out);
                 }
             } else if (verify == "unexpectedness") {
                 if (engine == "nuxmv") {
                     analyzer.analyzeUnexpectedness(out);
+                }
+            } else if (verify == "semantics") {
+                if (engine == "nuxmv") {
+                    analyzer.analyzeSemantics(out);
+                }
+            } else if (verify == "frag-boundedness") {
+                string act = vm["act"].as<string>();
+                if (act == "all") {
+                    for (auto& [activity, transactions] : a.getActivityTransactionMap()) {
+                        FragmentAnalyzer analyzer(k, h, &a, activity);
+                        analyzer.analyzeBoundedness(out);
+                    }
+                } else {
+                    auto activity = a.getActivity(act);
+                    if (a.getActivityTransactionMap().count(activity)) {
+                        FragmentAnalyzer analyzer(k, h, &a, activity);
+                        analyzer.analyzeBoundedness(out);
+                    }
                 }
             }
         }

@@ -61,8 +61,9 @@ namespace TaskDroid {
 
         void loadASM(AndroidStackMachine* a);
         void analyze(AndroidStackMachine* a);
+        bool analyzeSemantics(std::ostream& os = std::cout);
         bool analyzeUnexpectedness(std::ostream& os = std::cout);
-        bool analyzeBoundedness(std::ostream& os = std::cout);
+        bool analyzeBoundedness(int k, std::ostream& os = std::cout);
         bool analyzeBackHijacking(std::ostream& os = std::cout);
         bool analyzeRealActivity(std::ostream& os = std::cout);
         bool analyzeUBBP(std::ostream& os = std::cout);
@@ -212,7 +213,7 @@ namespace TaskDroid {
         unordered_map<vector<ID>, enum_value*> orderValueMap;
         unordered_map<Activity*, enum_value*> activityValueMap;
         unordered_map<pair<Activity*, Intent*>, enum_value*> actionValueMap;
-        unordered_map<string, pair<Activity*, Intent*>> value2ActionMap;
+        unordered_map<string, pair<Activity*, pair<Intent*, bool>>> value2ActionMap;
         LegalPosMap legalPos;
         PosRecordMap records;
         unordered_map<ID, Activities> visited;

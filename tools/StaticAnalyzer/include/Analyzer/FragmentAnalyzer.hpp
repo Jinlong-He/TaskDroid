@@ -70,6 +70,11 @@ namespace TaskDroid {
                                  std::ostream& os = std::cout);
         void loadASM(AndroidStackMachine* a);
         void setInitFragments(const unordered_map<string, Fragment*>& initFragments);
+        typedef vector<vector<Fragment*> > Vertex;
+        typedef vector<int> Label;
+        typedef unordered_set<Label> Labels;
+        typedef unordered_map<Vertex, unordered_map<Vertex, Labels>> LGraph;
+        typedef unordered_map<Vertex, unordered_map<Vertex, int>> Graph;
     private:
         void loadActivity(Activity* activity);
         void mkFragmentValues();
@@ -121,9 +126,8 @@ namespace TaskDroid {
                         atomic_proposition& ap, int type = -1);
         void getStackAP(ID viewID, const vector<FragmentAction*>& task,
                         atomic_proposition& ap, bool star = false);
-        void getGraph(ID viewID, Fragment* fragment,
-                      unordered_map<Fragment*, 
-                                     unordered_map<Fragment*, int> >& graph);
+        void getGraph(const Vertex& init, LGraph& graph);
+        void formalizeGraph(const LGraph& lgraph, vector<Graph>& graphs);
         void getUBBPAP(FragmentTransaction* transaction, 
                        atomic_proposition& ap);
 
