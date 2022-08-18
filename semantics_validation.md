@@ -1,3 +1,7 @@
 # Semantics Validation
 We design a diagnosis app ValApp and conduct experiments to validate the formal semantics of AMASS against the actual behavior of the app under different multitasking mechanisms in Android 6.0, 7.0, 8.0, 9.0, 10.0, 11.0 and 12.0.
-## 1 Case $\tau = A\rightarrow B$
+## 1 Case [$\tau = A \xrightarrow{\mathsf{start}(\phi)} B$]([https://www.runoob.com](http://htmlpreview.github.io/?https://github.com/Jinlong-He/TaskDroid/blob/master/semantics_validation/semantics_validation_start.htm))
+## 2 Case [$\tau = A \xrightarrow{\mathsf{finishStart}(\phi)} B$]([https://www.runoob.com](http://htmlpreview.github.io/?https://github.com/Jinlong-He/TaskDroid/blob/master/semantics_validation/semantics_validation_finish.htm))
+## 3 Case [$\tau = A \xrightarrow{\mathsf{TS}} (\beta_1(F_1, i_1), \cdots, \beta_k(F_k, i_k))$]([https://www.runoob.com](http://htmlpreview.github.io/?https://github.com/Jinlong-He/TaskDroid/blob/master/semantics_validation/semantics_validation_TS.htm))
+## 4 Case [$\tau = A \xrightarrow{\mathsf{NTS}} (\beta_1(F_1, i_1), \cdots, \beta_k(F_k, i_k))$]([https://www.runoob.com](http://htmlpreview.github.io/?https://github.com/Jinlong-He/TaskDroid/blob/master/semantics_validation/semantics_validation_NTS.htm))
+## 5 Case [$\tau = \mathsf{back}$]([https://www.runoob.com](http://htmlpreview.github.io/?https://github.com/Jinlong-He/TaskDroid/blob/master/semantics_validation/semantics_validation_back.htm))
