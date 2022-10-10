@@ -17,6 +17,8 @@ def search_install_cmd() :
         return 'brew'
     if check_cmd('apt-get') :
         return 'apt-get'
+    if check_cmd('yum') :
+        return 'yum'
     return ''
 
 install_cmd = search_install_cmd()
