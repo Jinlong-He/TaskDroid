@@ -85,7 +85,7 @@ namespace TaskDroid {
         translate2FOA();
         std::ifstream f("nuxmv_result");
         if (f) system("rm nuxmv_result");
-        verify_invar_nuxmv(foa, ap, "nuxmv_source", 50);
+        verify_invar_nuxmv(foa, ap, "nuxmv/source", 50);
         std::ifstream fin("nuxmv_result");
         if (!fin) return false;
         unordered_map<string, vector<string> > trace_table;
@@ -104,8 +104,8 @@ namespace TaskDroid {
             }
         }
         os << "---Trace END---" << endl;
-        //os << "-Acitivity Transition Coverage: " << 1.0 * values.size()/value2ActionMap.size() << endl;;
-        //os << "-Acitivity Transition Coverage: " << values.size() << "/" << value2ActionMap.size() << endl;;
+        fin.close();
+        system("rm nuxmv_result && rm out.smv");
         return true;
     }
     

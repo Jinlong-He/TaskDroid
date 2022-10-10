@@ -75,18 +75,17 @@ def check_nuxmv() :
 
 def install_nuxmv() :
     print('-- Installing for nuXmv......')
-    os.system('%s 30 git clone https://github.com/Jinlong-He/nuXmv.git'%(timeout_cmd))
+    os.system('%s 30 git clone https://github.com/Jinlong-He/nuXmv.git nuxmv_tmp'%(timeout_cmd))
     print('-- Install for nuXmv......', end = '')
-    if os.path.exists('./nuXmv') :
+    if os.path.exists('./nuxmv_tmp') :
         print('\033[0;32;40mOK!\033[0m')
-        return 1
     else :
         print('\033[0;31;40mError!\033[0m')
         return 0 
     if platform == 'darwin' :
-        os.system('mv nuXmv/bin/nuXmv-Darwin ./ && rm -rf nuXmv && mv nuXmv-Darwin nuXmv')
+        os.system('mv nuxmv_tmp/bin/nuXmv-Darwin nuxmv/nuxmv && rm -rf nuxmv_tmp')
     else :
-        os.system('mv nuXmv/bin/nuXmv-Linux64 nuxmv && rm -rf nuXmv')
+        os.system('mv nuxmv_tmp/bin/nuXmv-Linux64 nuxmv/nuxmv && rm -rf nuxmv_tmp')
     return 1
 
 def check_cmake() :

@@ -17,10 +17,10 @@ namespace TaskDroid {
     class ASMParser {
     public:
         static void parse(const char* fileName, AndroidStackMachine* a);
-        static void parseManifest(const char* fileName, AndroidStackMachine* a, bool amm = true);
-        static void parseManifestTxt(const char* fileName, AndroidStackMachine* a, bool amm = true);
-        static void parseATG(const char* fileName, AndroidStackMachine* a, const char* gator = nullptr);
-        static void parseFragment(const char* fileName, AndroidStackMachine* a, bool amm = true);
+        static void parseManifest(const char* fileName, AndroidStackMachine* a);
+        static void parseManifestTxt(const char* fileName, AndroidStackMachine* a);
+        static void parseATG(const char* fileName, AndroidStackMachine* a);
+        static void parseFragment(const char* fileName, AndroidStackMachine* a);
         static void parseFragmentConfig(const char* fileName, 
                                         AndroidStackMachine* a,
                                         Configuration<Fragment>* config);

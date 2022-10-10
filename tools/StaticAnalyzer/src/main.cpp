@@ -15,7 +15,6 @@ int main (int argc, char* argv[]) {
     double p;
     opts.add_options()
     ("help,h", "produce help message")
-    ("old", "old version")
     ("verify,v", po::value<string>(), "")
     ("act", po::value<string>(), "")
     ("engine,e", po::value<string>()->default_value("nuxmv"), "")
@@ -33,17 +32,10 @@ int main (int argc, char* argv[]) {
     try {
         po::store(po::parse_command_line(argc, argv, opts), vm);
         po::notify(vm);
-        bool old = false;
-        if (vm.count("old")) {
-            old = true;
-        }
         if (vm.count("input-files")) {
             string dir = vm["input-files"].as<std::string>();
             manifestFileName = dir + "/AndroidManifest.txt";
-            if (old == true)
-                aftmFileName = dir + "/ictgMerge.xml";
-            if (old == false)
-                aftmFileName = dir + "/ictgOpt.xml";
+            aftmFileName = dir + "/ictgOpt.xml";
             fragmentFileName = dir + "/SingleObject_entry.xml";
         } else {
             if (vm.count("manifest-input-file")) {
@@ -71,8 +63,7 @@ int main (int argc, char* argv[]) {
         AndroidStackMachine a;
         ASMParser::parseManifest(manifestFileName.c_str(), &a);
         ASMParser::parseATG(aftmFileName.c_str(), &a);
-        if (old == false)
-            ASMParser::parseFragment(fragmentFileName.c_str(), &a);
+        ASMParser::parseFragment(fragmentFileName.c_str(), &a);
         if (vm.count("main-activity")) {
             string mainActivityName = vm["main-activity"].as<std::string>();
             a.setMainActivity(a.getActivity(mainActivityName));
@@ -84,11 +75,9 @@ int main (int argc, char* argv[]) {
         std::ofstream out(outputFileName);
         if (a.getAffinityMap().size() == 0 || !a.getMainActivity()) {
             out << "no graph" << endl;
-            //cout << manifestFileName << endl;
             return 0;
         }
         a.print(out);
-        //if (a.getAffinityMap().size() > 1) cout << manifestFileName << endl;
         if (vm.count("verify")) {
             MultiTaskAnalyzer analyzer(&a, k, m);
             string verify = vm["verify"].as<string>();
@@ -120,44 +109,6 @@ int main (int argc, char* argv[]) {
                 }
             }
         }
-        //    } else if (verify == "backHijacking") {
-        //        if (vm.count("engine")) {
-        //            string engine = vm["engine"].as<std::string>();
-        //            if (engine == "nuxmv") {
-        //                MultiTaskAnalyzer analyzer(k, &a);
-        //                analyzer.analyzeBackHijacking(out);
-        //            }
-        //        }
-        //    } else if (verify == "frag-boundedness") {
-        //        string act = vm["act"].as<string>();
-        //        cout << act << endl;
-        //        if (act == "all") {
-        //            for (auto& [activity, transactions] : a.getActivityTransactionMap()) {
-        //                FragmentAnalyzer analyzer(k, h, &a, activity);
-        //                analyzer.analyzeBoundedness(out);
-        //            }
-        //        } else {
-        //            auto activity = a.getActivity(act);
-        //            if (a.getActivityTransactionMap().count(activity)) {
-        //                FragmentAnalyzer analyzer(k, h, &a, activity);
-        //                analyzer.analyzeBoundedness(out);
-        //            }
-        //        }
-        //    } else if (verify == "realActivity") {
-        //        if (vm.count("engine")) {
-        //            string engine = vm["engine"].as<std::string>();
-        //            if (engine == "nuxmv") {
-        //                MultiTaskAnalyzer analyzer(k, &a);
-        //                analyzer.analyzeRealActivity(out);
-        //            }
-        //        }
-        //    } else if (verify == "unexpectedness") {
-        //        if (engine == "nuxmv") {
-        //            MultiTaskAnalyzer analyzer(k, &a);
-        //            analyzer.analyzeUnexpectedness(out);
-        //        }
-        //    }
-        //}
         out.close();
     } catch(string str) {
     }

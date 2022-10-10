@@ -12,7 +12,7 @@ namespace TaskDroid {
         cout << root -> FirstChildElement() -> Value();
     }
 
-    void ASMParser::parseManifestTxt(const char* fileName, AndroidStackMachine* a, bool amm) {
+    void ASMParser::parseManifestTxt(const char* fileName, AndroidStackMachine* a) {
         std::ifstream fin(fileName);
         string line, name, launchModeStr, affinity = "__";
         LaunchMode launchMode = STD;
@@ -58,10 +58,6 @@ namespace TaskDroid {
                 if (launchMode == SIT) affinity = name;
             }
             if (affinityFlag && line.find("- taskAffinity") != string::npos) {
-                if (!amm) {
-                    affinity = "__";
-                    continue;
-                }
                 affinityFlag = false;
                 auto pos = line.find(": ") + 2;
                 affinity = line.substr(pos);
@@ -74,10 +70,10 @@ namespace TaskDroid {
         a -> setMainActivity(a -> getActivity(mainActivityName));
     }
 
-    void ASMParser::parseManifest(const char* fileName, AndroidStackMachine* a, bool amm) {
+    void ASMParser::parseManifest(const char* fileName, AndroidStackMachine* a) {
         string name = fileName;
         if (name.find(".xml", name.length() - 5) == string::npos) {
-            parseManifestTxt(fileName, a, amm);
+            parseManifestTxt(fileName, a);
             return;
         }
         XMLDocument doc;
@@ -135,19 +131,7 @@ namespace TaskDroid {
         }
     }
 
-    void ASMParser::parseATG(const char* fileName, AndroidStackMachine* a, const char* gator) {
-        unordered_set<pair<string, string> > transtionSet;
-        if (gator != nullptr) {
-            std::ifstream fin(gator);
-            string line;
-            while (getline(fin, line)) {
-                if (line.find(" -> ") != string::npos) {
-                    string source = util::split(line, " -> ")[0];
-                    string target = util::split(line, " -> ")[1];
-                    transtionSet.insert(pair(source, target));
-                }
-            }
-        }
+    void ASMParser::parseATG(const char* fileName, AndroidStackMachine* a) {
         XMLDocument doc;
         doc.LoadFile(fileName);
         XMLElement* root = doc.RootElement();
@@ -179,15 +163,12 @@ namespace TaskDroid {
                         if (des -> FindAttribute("finish")) {
                             string finish = des -> Attribute("finish");
                             if (finish == "true") {
-                                if (gator == nullptr || transtionSet.count(pair(sourceName, targetName)) > 0)
-                                    a -> addAction(sourceActivity, intent, true);
+                                a -> addAction(sourceActivity, intent, true);
                             } else {
-                                if (gator == nullptr || transtionSet.count(pair(sourceName, targetName)) > 0)
-                                    a -> addAction(sourceActivity, intent, false);
+                                a -> addAction(sourceActivity, intent, false);
                             }
                         } else {
-                            if (gator == nullptr || transtionSet.count(pair(sourceName, targetName)) > 0)
-                                a -> addAction(sourceActivity, intent, false);
+                            a -> addAction(sourceActivity, intent, false);
                         }
                         des = des -> NextSiblingElement();
                     }
@@ -197,8 +178,7 @@ namespace TaskDroid {
         }
     }
 
-    void ASMParser::parseFragment(const char* fileName, AndroidStackMachine* a, bool amm) {
-        if (!amm) return;
+    void ASMParser::parseFragment(const char* fileName, AndroidStackMachine* a) {
         XMLDocument doc;
         doc.LoadFile(fileName);
         XMLElement* root = doc.RootElement();

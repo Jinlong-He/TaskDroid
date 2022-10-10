@@ -228,7 +228,7 @@ namespace TaskDroid {
             del = nullptr;
         }
         affinityMap.clear();
-        if (acts.size() == 1 && frags.size() == 0) {
+        if (acts.size() == 1 && actionMap.count(mainActivity) == 0 && frags.size() == 0) {
             activityMap.erase(mainActivity -> getName());
             delete mainActivity;
             mainActivity = nullptr;
