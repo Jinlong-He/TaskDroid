@@ -23,6 +23,26 @@ def search_install_cmd() :
 
 install_cmd = search_install_cmd()
 
+def check_fml() :
+    print('-- Check for fml..........', end='')
+    if os.path.exists('./StaticAnalyzer/include/fml/include') :
+        print('\033[0;32;40mOK!\033[0m')
+        return 1
+    else :
+        print('\033[0;31;40mError!\033[0m')
+        return 0 
+
+def install_fml() :
+    print('-- Installing for fml......')
+    os.system('%s 30 git submodule update --init --recursive'%(timeout_cmd))
+    print('-- Install for fml........', end = '')
+    if os.path.exists('./StaticAnalyzer/include/fml/include') :
+        print('\033[0;32;40mOK!\033[0m')
+        return 1
+    else :
+        print('\033[0;31;40mError!\033[0m')
+        return 0 
+
 def check_boost() :
     print('-- Check for boost........', end='')
     boost_dir = ''
@@ -46,7 +66,7 @@ def install_boost() :
 
 def check_nuxmv() :
     print('-- Check for nuXmv........', end='')
-    if check_cmd('nuXmv1') :
+    if check_cmd('nuXmv') :
         print('\033[0;32;40mOK!\033[0m')
         return 1
     else :
@@ -59,6 +79,7 @@ def install_nuxmv() :
     print('-- Install for nuXmv......', end = '')
     if os.path.exists('./nuXmv') :
         print('\033[0;32;40mOK!\033[0m')
+        return 1
     else :
         print('\033[0;31;40mError!\033[0m')
         return 0 
@@ -124,6 +145,9 @@ def check() :
             return 0
     if not check_nuxmv() :
         if not install_nuxmv() :
+            return 0
+    if not check_fml() :
+        if not install_fml() :
             return 0
     return 1
 
