@@ -27,7 +27,7 @@ namespace TaskDroid {
               m(0),
               isMkVarsValues(false),
               isTranslate2Foa(false),
-              isRealAct(false),
+              isSingleTask(false),
               hasRTOF(false),
               a(nullptr),
               nullValue("null"),
@@ -36,14 +36,14 @@ namespace TaskDroid {
               actionValues({nullValue, popValue}),
               activityValues({nullValue}) {}
 
-        MultiTaskAnalyzer(AndroidStackMachine* a_, ID k_ = 5, ID m_ = 2)
-            : a(a_),
+        MultiTaskAnalyzer(AndroidStackMachine* a_, ID k_ = 5, ID m_ = 2) : 
               k(k_),
               m(m_),
               isMkVarsValues(false),
               isTranslate2Foa(false),
-              isRealAct(false),
+              isSingleTask(false),
               hasRTOF(false),
+              a(a_),
               nullValue("null"),
               popValue("pop"),
               orderValues({nullValue}),
@@ -220,7 +220,7 @@ namespace TaskDroid {
 
         bool isMkVarsValues;
         bool isTranslate2Foa;
-        bool isRealAct;
+        bool isSingleTask;
         bool hasRTOF;
         AndroidStackMachine* a;
         fomula_automaton<> foa;

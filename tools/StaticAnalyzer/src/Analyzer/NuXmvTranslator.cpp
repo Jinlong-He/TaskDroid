@@ -243,6 +243,10 @@ namespace TaskDroid {
         auto newActivity = intent -> getActivity();
         auto newTaskID = getTaskID(newActivity);
         auto& newValue = *activityValueMap.at(newActivity);
+        if (isSingleTask) {
+            taskPropMap[Order()][taskID].emplace_back(pair(0, ap));
+            return;
+        }
         vector<Order> topOrders;
         getTopOrders(taskID, topOrders);
         bool f = actID == 0 && finish;
@@ -283,8 +287,6 @@ namespace TaskDroid {
                                      bool finish, ID taskID, ID actID,
                                      const TaskPropMap& taskPropMap) {
         auto newActivity = intent -> getActivity();
-        auto newTaskID = getTaskID(newActivity);
-        auto& newValue = *activityValueMap.at(newActivity);
         for (auto& [order, map] : taskPropMap) {
             for (auto& [newTaskID, vec] : map) {
                 for (auto& [real, prop] : vec) {
@@ -320,7 +322,6 @@ namespace TaskDroid {
                                      bool finish, ID taskID, ID actID,
                                      const TaskPropMap& taskPropMap) {
         auto newActivity = intent -> getActivity();
-        auto newTaskID = getTaskID(newActivity);
         auto& newValue = *activityValueMap.at(newActivity);
         for (auto& [order, map] : taskPropMap) {
             for (auto& [newTaskID, vec] : map) {
@@ -360,7 +361,6 @@ namespace TaskDroid {
                                      bool finish, ID taskID, ID actID,
                                      const TaskPropMap& taskPropMap) {
         auto newActivity = intent -> getActivity();
-        auto newTaskID = getTaskID(newActivity);
         auto& newValue = *activityValueMap.at(newActivity);
         for (auto& [order, map] : taskPropMap) {
             for (auto& [newTaskID, vec] : map) {
@@ -416,7 +416,6 @@ namespace TaskDroid {
                                      bool finish, ID taskID, ID actID,
                                      const TaskPropMap& taskPropMap) {
         auto newActivity = intent -> getActivity();
-        auto newTaskID = getTaskID(newActivity);
         auto& newValue = *activityValueMap.at(newActivity);
         for (auto& [order, map] : taskPropMap) {
             for (auto& [newTaskID, vec] : map) {
@@ -446,7 +445,6 @@ namespace TaskDroid {
         getTopOrders(taskID, topOrders);
         auto newActivity = intent -> getActivity();
         auto& newValue = *activityValueMap.at(newActivity);
-        auto newTaskID = getTaskID(newActivity);
         bool f = finish && actID == 0;
         for (auto& order : topOrders) {
             auto& value = *orderValueMap.at(order);
@@ -491,14 +489,12 @@ namespace TaskDroid {
         mkVarsValues();
         mkPOP();
         for (auto& [activity, actions] : a -> getActionMap()) {
-            auto& value = *activityValueMap.at(activity);
             for (auto& [intent, finish] : actions) {
                 auto& actionValue = *actionValueMap.at(pair(activity, intent));
                 auto actionAP = (actionVar == actionValue);
                 if (legalPos.count(activity) == 0) continue;
                 for (auto& [i, js] : legalPos.at(activity)) {
                     for (auto j : js) {
-                        auto& var = *activityVarMap.at(pair(i, j));
                         auto ap = mkIsTopActAP(i, j, activity) & actionAP;
                         TaskPropMap taskPropMap;
                         switch (AndroidStackMachine::getMode(activity, intent)) {

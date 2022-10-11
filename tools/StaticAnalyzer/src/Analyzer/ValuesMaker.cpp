@@ -121,6 +121,10 @@ namespace TaskDroid {
                 }
             }
         }
+        if (multiTaskIDMap.size() == 0 && a -> getAffinityMap().size() == 1) {
+            isSingleTask = true;
+            return;
+        }
         for (auto& [taskID, mTaskID] : multiTaskIDMap)
             for (ID i = 0; i < m; i++)
                 realActivities[mTaskID + i] = realActivities.at(taskID);

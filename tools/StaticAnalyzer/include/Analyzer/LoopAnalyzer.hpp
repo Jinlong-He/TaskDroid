@@ -39,10 +39,11 @@ namespace TaskDroid {
                 Paths newLoops, newerLoops;
                 getLoop(graph, symbol, newLoops);
                 if (loops.size() == 0) loops = newLoops;
-                bool flag = true;
                 for (auto& newLoop : newLoops) {
+                    bool flag = true;
                     for (auto& loop : loops) 
-                        if (isSame(loop, newLoop)) flag = false;
+                        if (isSame(loop, newLoop))
+                            flag = false;
                     if (flag) newerLoops.push_back(newLoop);
                 }
                 loops.insert(loops.end(), newerLoops.begin(), newerLoops.end());

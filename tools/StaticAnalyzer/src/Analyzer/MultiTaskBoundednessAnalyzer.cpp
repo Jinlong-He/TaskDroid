@@ -14,12 +14,12 @@ namespace TaskDroid {
         Activities work({realActivity}), newWork;
         while (work.size()) {
             for (auto activity : work) {
-                if (a -> getActionMap().count(activity) == 0) return;
+                if (a -> getActionMap().count(activity) == 0) continue;
                 for (auto& [intent, finish] : a -> getActionMap().at(activity)) {
                     auto newActivity = intent -> getActivity();
                     string newAffinity = newActivity -> getAffinity();
-                    if (!(AndroidStackMachine::isNewMode(activity, intent) && 
-                        newAffinity != affinity ||
+                    if (!((AndroidStackMachine::isNewMode(activity, intent) && 
+                        newAffinity != affinity) ||
                         AndroidStackMachine::getMode(activity, intent) == MKTK)) {
                         localActions[activity].emplace_back(pair(intent, finish));
                         if (localActions.count(newActivity) == 0)
@@ -154,7 +154,6 @@ namespace TaskDroid {
         if (realActivities.size() == 1 || k == 0) {
             for (auto& [affinity, realActivities] :realActivities) 
                 for (auto realActivity : realActivities)
-                    //completeActions[realActivity] = a -> getActionMap();
                     getLocalActions(a, affinity, realActivity,
                                     completeActions[realActivity]);
             return;
@@ -175,7 +174,7 @@ namespace TaskDroid {
 
     void getGraph(const ActionMap& completeGraph,
                   unordered_map<Activity*, 
-                                unordered_map<Activity*, int> >& graph) {
+                  unordered_map<Activity*, int> >& graph) {
         for (auto& [activity, actions] : completeGraph) {
             for (auto& [intent, finish] : actions) {
                 auto mode = AndroidStackMachine::getMode(activity, intent);
