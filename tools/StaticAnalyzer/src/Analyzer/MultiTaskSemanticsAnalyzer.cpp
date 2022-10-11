@@ -26,20 +26,20 @@ namespace TaskDroid {
                         auto tasks = getTasks(order, targetID);
                         if (tasks.size() > 0 && !sit1) {
                             sit1 = true;
-                            os << "[Semantics: SIT(1)] Patten Found:" << endl;
+                            os << "[Semantics: SIT(1)] Pattern Found:" << endl;
                             os << activity -> getName() << " -> "
                                << target -> getName() << endl;
-                            os << "---Patten END---" << endl;
+                            os << "---Pattern END---" << endl;
                             auto orderAP = (orderVar == *orderValueMap.at(order));
                             auto topAP = mkIsTopActAP(mainTaskID, 0, mainActivity);
                             if (analyzeReachability(topAP & orderAP, os)) flag = true;
                         } 
                         if (tasks.size() == 0 && !sit2) {
                             sit2 = true;
-                            os << "[Semantics: SIT(2)] Patten Found:" << endl;
+                            os << "[Semantics: SIT(2)] Pattern Found:" << endl;
                             os << activity -> getName() << " -> "
                                << target -> getName() << endl;
-                            os << "---Patten END---" << endl;
+                            os << "---Pattern END---" << endl;
                             auto orderAP = (orderVar == *orderValueMap.at(order));
                             auto topAP = mkIsTopActAP(mainTaskID, 0, mainActivity);
                             if (analyzeReachability(topAP & orderAP, os)) flag = true;

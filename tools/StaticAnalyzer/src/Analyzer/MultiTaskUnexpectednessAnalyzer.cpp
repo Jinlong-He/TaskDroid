@@ -102,26 +102,26 @@ namespace TaskDroid {
                 auto lmd = target -> getLaunchMode();
                 auto mode = AndroidStackMachine::getMode(activity, intent);
                 if (mode == PUSH_N || mode == STOP_N) {
-                    os << "[Unexpectedness: REAL(all)] Patten Found:" << endl;
+                    os << "[Unexpectedness: REAL(all)] Pattern Found:" << endl;
                     os << activity -> getName() << " -> "
                        << target -> getName() << endl;
-                    os << "---Patten END---" << endl;
+                    os << "---Pattern END---" << endl;
                     atomic_proposition ap = getRealActAP(activity, target);
                     if (analyzeReachability(ap, os)) flag = true;
                 } 
                 if ((mode == RTOF || mode == RTOF_N) && activity != target) {
-                    os << "[Unexpectedness: RTF(7.0)] Patten Found:" << endl;
+                    os << "[Unexpectedness: RTF(7.0)] Pattern Found:" << endl;
                     os << activity -> getName() << " -> "
                        << target -> getName() << endl;
-                    os << "---Patten END---" << endl;
+                    os << "---Pattern END---" << endl;
                     atomic_proposition ap = getRTF7AP(activity, target);
                     if (analyzeReachability(ap, os)) flag = true;
                 }
                 if (mode == RTOF_N) {
-                    os << "[Unexpectedness: RTF(11.0*)] Patten Found:" << endl;
+                    os << "[Unexpectedness: RTF(11.0*)] Pattern Found:" << endl;
                     os << activity -> getName() << " -> "
                        << target -> getName() << endl;
-                    os << "---Patten END---" << endl;
+                    os << "---Pattern END---" << endl;
                     atomic_proposition ap = getRTF11AP(activity, target) |
                                             getRealActAP(activity, target);
                     if (analyzeReachability(ap, os)) flag = true;
@@ -129,19 +129,19 @@ namespace TaskDroid {
                 if (mode == CTOP &&
                     (target -> getLaunchMode() == STP || 
                      intent -> getFlags().count(F_STP))) {
-                    os << "[Unexpectedness: STP(all)] Patten Found:" << endl;
+                    os << "[Unexpectedness: STP(all)] Pattern Found:" << endl;
                     os << activity -> getName() << " -> "
                        << target -> getName() << endl;
-                    os << "---Patten END---" << endl;
+                    os << "---Pattern END---" << endl;
                     atomic_proposition ap = getSTPAP(activity, target);
                     if (analyzeReachability(ap, os)) flag = true;
                 }
                 if (mode == CTOP_N && lmd != STK && 
                     (lmd == STP || intent -> getFlags().count(F_STP))) {
-                    os << "[Unexpectedness: STPN(all)] Patten Found:" << endl;
+                    os << "[Unexpectedness: STPN(all)] Pattern Found:" << endl;
                     os << activity -> getName() << " -> "
                        << target -> getName() << endl;
-                    os << "---Patten END---" << endl;
+                    os << "---Pattern END---" << endl;
                     atomic_proposition ap = getRTF11AP(activity, target);
                     if (analyzeReachability(ap, os)) flag = true;
                 }

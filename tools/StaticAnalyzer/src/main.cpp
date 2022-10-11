@@ -27,8 +27,9 @@ int main (int argc, char* argv[]) {
     ("manifest-input-file,m", po::value<string>(), "manifest file")
     ("fragment-input-file,f", po::value<string>(), "fragment file")
     ("aftm-input-file,a", po::value<string>(), "activity fragment transition model file")
-    ("main-activity", po::value<string>(), "activity fragment transition model file");
-    string manifestFileName = "", aftmFileName = "", fragmentFileName = "", gator = "", engine = "nuxmv", outputFileName = "out.txt";
+    ("main-activity", po::value<string>(), "activity fragment transition model file")
+    ("nuxmv", po::value<string>(), "nuxmv command");
+    string manifestFileName = "", aftmFileName = "", fragmentFileName = "", gator = "", engine = "nuxmv", outputFileName = "out.txt", nuxmvCmd = "nuXmv";
     try {
         po::store(po::parse_command_line(argc, argv, opts), vm);
         po::notify(vm);

@@ -63,24 +63,23 @@ namespace TaskDroid {
         void analyze(AndroidStackMachine* a);
         bool analyzeSemantics(std::ostream& os = std::cout);
         bool analyzeUnexpectedness(std::ostream& os = std::cout);
-        bool analyzeBoundedness(int k, std::ostream& os = std::cout);
-        bool analyzeBackHijacking(std::ostream& os = std::cout);
-        bool analyzeRealActivity(std::ostream& os = std::cout);
-        bool analyzeUBBP(std::ostream& os = std::cout);
+        bool analyzeBoundedness(int k, std::ostream& os = std::cout,
+                                const string& nuxmvCmd = "nuXmv");
         bool analyzeReachability(AndroidStackMachine* a, int k, 
                                  const Configuration<Activity>& configuration,
-                                 std::ostream& os = std::cout);
+                                 std::ostream& os = std::cout,
+                                 const string& nuxmvCmd = "nuXmv");
         bool analyzeReachability(const string& affinity, 
                                  const vector<Activity*>& task,
-                                 std::ostream& os = std::cout);
+                                 std::ostream& os = std::cout,
+                                 const string& nuxmvCmd = "nuXmv");
         bool analyzeReachability(const atomic_proposition& ap,
-                                 std::ostream& os = std::cout);
-        bool analyzePattenReachability(const string& affinity, 
+                                 std::ostream& os = std::cout,
+                                 const string& nuxmvCmd = "nuXmv");
+        bool analyzePatternReachability(const string& affinity, 
                                        const vector<Activity*>& task,
-                                       std::ostream& os = std::cout);
-        void genTestTrace(const Activities& acts = Activities(), double p = 1,
-                          std::ostream& os = std::cout);
-        void genTestTrace(double p = 1, std::ostream& os = std::cout);
+                                       std::ostream& os = std::cout,
+                                       const string& nuxmvCmd = "nuXmv");
         void translate2FOA();
     private:
         void setFrontActivity(Activity* activity, const atomic_proposition& ap);
@@ -103,7 +102,7 @@ namespace TaskDroid {
         void mkTraceActivityVars(const Activities& acts);
         atomic_proposition getTopOrderAP(ID taskID);
         atomic_proposition getTopOrderAP(ID task0ID, ID task1ID, bool eq = true);
-        void getPattenTaskAP(const string& affinity, 
+        void getPatternTaskAP(const string& affinity, 
                              const vector<Activity*>& task,
                              atomic_proposition& ap);
         void getBackHijackingAP(Activity* source, Activity* target,

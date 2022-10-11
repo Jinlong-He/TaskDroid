@@ -808,9 +808,9 @@ namespace TaskDroid {
                 auto& frgs = action -> getFragments();
                 ver.at(viewID) = frgs;
                 if (mode == ADD) {
-                    os << "[Frag-Unboundedness :ADD] Patten Found:" << endl;
+                    os << "[Frag-Unboundedness :ADD] Pattern Found:" << endl;
                     os << activity -> getName() << " ADD" << endl;
-                    os << "---Patten END---" << endl;
+                    os << "---Pattern END---" << endl;
                     flag = true;
                 }
             }
@@ -824,9 +824,9 @@ namespace TaskDroid {
                     LoopAnalyzer<Vertex>::getPositiveLoop(graph, loops);
                     if (loops.size()) flag = true;
                     for (auto& loop : loops) {
-                        os << "[Frag-Unboundedness :REP] Patten Found:" << endl;
+                        os << "[Frag-Unboundedness :REP] Pattern Found:" << endl;
                         os << activity -> getName() << " REP" << endl;
-                        os << "---Patten END---" << endl;
+                        os << "---Pattern END---" << endl;
                         flag = true;
                     }
                 }

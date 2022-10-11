@@ -32,7 +32,7 @@ namespace TaskDroid {
         translate2FOA();
     }
 
-    void MultiTaskAnalyzer::getPattenTaskAP(const string& affinity,
+    void MultiTaskAnalyzer::getPatternTaskAP(const string& affinity,
                                             const vector<Activity*>& task,
                                             atomic_proposition& ap) {
         if (task.size() > k || task.size() == 0) return;
@@ -64,28 +64,31 @@ namespace TaskDroid {
         }
     }
 
-    bool MultiTaskAnalyzer::analyzePattenReachability(const string& affinity,
+    bool MultiTaskAnalyzer::analyzePatternReachability(const string& affinity,
                                                       const vector<Activity*>& task,
-                                                      std::ostream& os) {
+                                                      std::ostream& os,
+                                                      const string& nuxmvCmd) {
         atomic_proposition ap("FALSE");
-        getPattenTaskAP(affinity, task, ap);
-        return analyzeReachability(ap, os);
+        getPatternTaskAP(affinity, task, ap);
+        return analyzeReachability(ap, os, nuxmvCmd);
     }
 
     bool MultiTaskAnalyzer::analyzeReachability(const string& affinity,
                                                 const vector<Activity*>& task,
-                                                std::ostream& os) {
+                                                std::ostream& os,
+                                                const string& nuxmvCmd) {
         atomic_proposition ap("TRUE");
         getTaskAP(affinity, task, ap);
-        return analyzeReachability(ap, os);
+        return analyzeReachability(ap, os, nuxmvCmd);
     }
 
     bool MultiTaskAnalyzer::analyzeReachability(const atomic_proposition& ap,
-                                                std::ostream& os) {
+                                                std::ostream& os,
+                                                const string& nuxmvCmd) {
         translate2FOA();
         std::ifstream f("nuxmv_result");
         if (f) system("rm nuxmv_result");
-        verify_invar_nuxmv(foa, ap, "nuxmv/source", 50);
+        verify_invar_nuxmv(foa, ap, "nuxmv/source", 50, nuxmvCmd);
         std::ifstream fin("nuxmv_result");
         if (!fin) return false;
         unordered_map<string, vector<string> > trace_table;

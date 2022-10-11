@@ -216,7 +216,8 @@ namespace TaskDroid {
         }
     }
 
-    bool MultiTaskAnalyzer::analyzeBoundedness(int k, std::ostream& os) {
+    bool MultiTaskAnalyzer::analyzeBoundedness(int k, std::ostream& os,
+                                               const string& nuxmvCmd) {
         unordered_map<Activity*, ActionMap> completeActions;
         getCompleteActions(k, a, completeActions);
         unordered_map<Activity*, unordered_map<Activity*, int> > graph;
@@ -229,13 +230,13 @@ namespace TaskDroid {
             LoopAnalyzer<Activity*>::getPositiveLoop(graph, loops);
             if (loops.size()) flag = true;
             for (auto& loop : loops) {
-                os << "[Task-Unboundedness] Patten Found:" << endl;
+                os << "[Task-Unboundedness] Pattern Found:" << endl;
                 for (auto act : loop) {
                     os << act -> getName() << endl;
                 }
-                os << "---Patten END---" << endl;
+                os << "---Pattern END---" << endl;
                 loop.push_back(loop[0]);
-                analyzePattenReachability(realActivity -> getAffinity(), loop, os);
+                analyzePatternReachability(realActivity -> getAffinity(), loop, os, nuxmvCmd);
             }
         }
         return flag;
