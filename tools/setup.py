@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, subprocess
 platform = sys.platform
 timeout_cmd = ''
 if platform == 'darwin' :
@@ -117,19 +117,27 @@ def install_make() :
     return check_make()
 
 def config_nuxmv(f) :
-    if not check_cmd('nuXmv1') :
-        f.write('./nuXmv')
+    if platform == 'darwin' :
+        f.write('./nuxmv/nuXmv-Darwin\n')
+    else :
+        f.write('./nuxmv/nuXmv-Linux64\n')
+
+def config_sdk() :
+    subprocess.getstatusoutput('cd ICCExtractor && tar -zxvf sdk.tar.gz')
 
 def configure() :
+    print('-- Configuring...')
     if check() :
         f = open('.conf','w')
-        print('-- Configuring............', end='')
+        print('-- Configure..............', end='')
         config_nuxmv(f)
-        print('\033[0;32;40mOK!\033[0m')
+        config_sdk()
+        f.write(timeout_cmd + '\n')
+        print('\033[0;32;40mDone!\033[0m')
         f.close()
     else :
         print('-- Configure..............', end='')
-        print('\033[0;31;40mError!\033[0m')
+        print('\033[0;31;40mFailed!\033[0m')
 
 
 def check() :
@@ -142,9 +150,9 @@ def check() :
     if not check_boost() :
         if not install_boost() :
             return 0
-    if not check_nuxmv() :
-        if not install_nuxmv() :
-            return 0
+    #if not check_nuxmv() :
+    #    if not install_nuxmv() :
+    #        return 0
     if not check_fml() :
         if not install_fml() :
             return 0
